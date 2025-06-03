@@ -1,1 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
 @import "tailwindcss";
+
+@theme {
+  --font-primary: "Plus Jakarta Sans", sans-serif;
+  --font-second: "Caveat", cursive;
+  --color-soft-orange: #EB5A3C; 
+  --color-soft-orange-400: rgb(235, 90, 60, 0.9);
+  --color-soft-chocolate: #DF9755; 
+  --color-soft-chocolate-400: rgb(223, 151, 85, 0.9);
+  --color-pale-yellow: #E7D283; 
+  --color-pale-yellow-400: rgb(231, 210, 131, 0.9); 
+  --color-pale-white: #EDF4C2; 
+  --color-pale-white-400: rgb(237, 244, 194, 0.9);
+}
+
+body {
+  @apply font-primary;
+}

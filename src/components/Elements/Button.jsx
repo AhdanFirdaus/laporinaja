@@ -1,11 +1,12 @@
 const colorMap = {
-  green: 'bg-green-500 hover:bg-green-600',
-  goldenbrown: 'bg-[#9F691E] hover:bg-rose-600',
-  blue: 'bg-blue-500 hover:bg-blue-600',
+  softorange: 'bg-soft-orange hover:bg-soft-orange-400',
+  softchocolate: 'bg-soft-chocolate hover:bg-soft-chocolate',
+  paleyellow: 'bg-pale-yellow hover:bg-pale-yellow-400', 
+  palewhite: 'bg-pale-white hover:bg-pale-white-400'
 };
 
 const Button = ({ children, onClick, color = '', type = 'button', className = '', rounded = 'rounded-md', txtcolor = "text-white" }) => {
-  const colorClasses = colorMap[color] || colorMap['green']; // default ke hijau
+  const colorClasses = colorMap[color] || colorMap['softorange'];
   return (
     <button
       type={type}
