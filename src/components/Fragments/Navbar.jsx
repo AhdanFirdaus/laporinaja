@@ -31,7 +31,7 @@ const Navbar = () => {
             <Link to="/#tanyajawab" className="text-gray-700 hover:text-soft-orange">
               Tanya Jawab
             </Link>
-            <Button color="softorange" className="font-bold">
+            <Button className="font-bold">
               Masuk
             </Button>
           </div>
