@@ -9,7 +9,7 @@ const router = createBrowserRouter([
     path: "/",
     element: <div>main page</div>,
     errorElement: <ErrorPage />,
-  }
+  },
 ])
 
 createRoot(document.getElementById('root')).render(
