@@ -3,8 +3,8 @@ import ProfileCard from "../components/Fragments/ProfileCard";
 import PrivacyPolicy from "../components/Fragments/PrivacyPolicy";
 import Sidebar from "../components/Layouts/Sidebar";
 import Terms from "../components/Fragments/Terms";
-import ComplainForm from "../components/Fragments/ComplainForm";
 import ComplaintsList from "../components/Fragments/ComplaintsList";
+import ReportForm from "../components/Fragments/ReportForm";
 
 const mockUser = {
   avatar: "https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg",
@@ -27,7 +27,7 @@ const ProfilePage = () => {
     profile: "Profil Anda",
     privacy: "Kebijakan Privasi",
     terms: "Ketentuan Pengguna",
-    complain: "Ajukan Keluhan",
+    report: "Ajukan Keluhan",
     complaints: "Daftar Keluhan",
   };
 
@@ -38,11 +38,11 @@ const ProfilePage = () => {
         <h2 className="text-2xl font-bold text-[var(--color-soft-chocolate)] mb-4">
           {titleMap[view]}
         </h2>
-
+        
         {view === "profile" && <ProfileCard user={mockUser} />}
         {view === "privacy" && <PrivacyPolicy />}
         {view === "terms" && <Terms />}
-        {view === "complain" && <ComplainForm />}
+        {view === "report" && <ReportForm />}
         {view === "complaints" && <ComplaintsList />}
       </main>
     </div>

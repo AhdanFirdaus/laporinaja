@@ -12,7 +12,7 @@ const Sidebar = ({ onSelect, currentView }) => {
     { key: "profile", icon: <FaCircleUser />, label: "Profil" },
     { key: "privacy", icon: <FaShieldAlt />, label: "Kebijakan Privasi" },
     { key: "terms", icon: <FaFileContract />, label: "Ketentuan Pengguna" },
-    { key: "complain", icon: <FaBullhorn />, label: "Ajukan Keluhan" },
+    { key: "report", icon: <FaBullhorn />, label: "Ajukan Keluhan" },
     { key: "complaints", icon: <FaExclamationCircle />, label: "Keluhan" },
   ];
 
