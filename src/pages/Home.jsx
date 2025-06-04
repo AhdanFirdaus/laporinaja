@@ -121,7 +121,7 @@ export default function Home() {
             </div>
           </div>
           <div className="lg:w-1/2 p-4 sm:p-6 bg-peach-100 rounded-lg">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 sm:mb-4 font-second text-soft-orange">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-4 font-second text-soft-orange">
               Tentang LaporinAja
             </h2>
             <p className="text-gray-600 mb-2 sm:mb-4">
