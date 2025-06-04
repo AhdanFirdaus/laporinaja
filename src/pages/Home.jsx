@@ -162,7 +162,7 @@ export default function Home() {
       </section>
 
       {/* tentang section */}
-      <section id="tentang" className="py-12 sm:py-16 bg-pale-white-400/30">
+      <section id="tentang" className="py-12 sm:py-16 bg-soft-orange/10">
         <div className="container mx-auto flex flex-col lg:flex-row items-center justify-between max-w-[90%]">
           <div className="lg:w-1/2 mb-10 lg:mb-0">
             <div className="relative w-full">
@@ -277,7 +277,7 @@ export default function Home() {
               transition={{ duration: 0.6 }}
               className="order-2 lg:order-1"
             >
-              <h3 className="text-2xl font-semibold font-second text-soft-orange mb-3">
+              <h3 className="text-3xl font-semibold font-second text-soft-orange mb-3">
                 Lebih dari 1.200 kerusakan diperbaiki
               </h3>
               <p className="text-gray-600 leading-relaxed">
@@ -322,7 +322,7 @@ export default function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <h3 className="text-2xl font-semibold font-second text-soft-orange mb-3">
+              <h3 className="text-3xl font-semibold font-second text-soft-orange mb-3">
                 Lingkungan yang Lebih Bersih dan Aman
               </h3>
               <p className="text-gray-600 leading-relaxed">
@@ -341,7 +341,7 @@ export default function Home() {
               transition={{ duration: 0.6 }}
               className="text-center mb-8"
             >
-              <h3 className="text-2xl font-semibold font-second text-soft-orange mb-3">
+              <h3 className="text-3xl font-semibold font-second text-soft-orange mb-3">
                 Sebelum dan Sesudah
               </h3>
               <p className="text-gray-600 max-w-xl mx-auto">
@@ -483,12 +483,11 @@ export default function Home() {
       </section>
 
       {/* tanya jawab section */}
-      <section
-        id="tanyajawab"
-        className="py-12 sm:py-16"
-      >
+      <section id="tanyajawab" className="py-12 sm:py-16">
         <div className="text-center mb-10">
-          <h2 className="text-3xl sm:text-4xl font-bold font-second text-soft-orange mb-2">Tanya Jawab</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold font-second text-soft-orange mb-2">
+            Tanya Jawab
+          </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur
             blandit tempus porttitor.
