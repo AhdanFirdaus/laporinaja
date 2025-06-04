@@ -1,10 +1,10 @@
+import { useState, useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import { FiPlay, FiPause, FiPlus, FiMinus } from "react-icons/fi";
 import Navbar from "../components/Fragments/Navbar";
 import Button from "../components/Elements/Button";
-import { motion } from "framer-motion";
-import { FaPlay, FaPause } from "react-icons/fa";
 import ReactCompareImage from "react-compare-image";
 import AcceptTask from "../assets/accepttask.svg";
-import { useState, useEffect, useRef } from "react";
 import Img1 from "../assets/img1.jpg";
 import Img2 from "../assets/img2.jpg";
 import Img3 from "../assets/img3.jpg";
@@ -22,6 +22,11 @@ export default function Home() {
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showIcon, setShowIcon] = useState(true);
+  const [activeIndex, setActiveIndex] = useState(null);
+
+  const toggleFAQ = (index) => {
+    setActiveIndex(index === activeIndex ? null : index);
+  };
 
   const togglePlay = () => {
     const video = videoRef.current;
@@ -77,6 +82,34 @@ export default function Home() {
       number: 4,
       title: "Get Support",
       details: [],
+    },
+  ];
+
+  const faqs = [
+    {
+      question: "Apa itu CodeLab?",
+      answer:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    },
+    {
+      question: "Apakah CodeLab mudah dikustomisasi?",
+      answer:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque habitant morbi tristique senectus et netus.",
+    },
+    {
+      question: "Teknologi apa yang digunakan oleh CodeLab?",
+      answer:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam.",
+    },
+    {
+      question: "Apakah saya butuh skill coding tingkat lanjut?",
+      answer:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam nec dui quis sapien sodales fringilla.",
+    },
+    {
+      question: "Bagaimana cara mendapatkan support?",
+      answer:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam tincidunt, nisl eget vestibulum posuere.",
     },
   ];
 
@@ -178,7 +211,7 @@ export default function Home() {
             </div>
           </div>
           <div className="lg:w-1/2 p-4 sm:p-6 bg-peach-100 rounded-lg">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-4 font-second text-soft-orange">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-2 sm:mb-4 font-second text-soft-orange">
               Tentang LaporinAja
             </h2>
             <p className="text-gray-600 mb-2 sm:mb-4">
@@ -227,7 +260,7 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
-            <h2 className="text-2xl sm:text-3xl font-bold font-second text-soft-orange mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold font-second text-soft-orange mb-4">
               Dampak Aplikasi Kami
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
@@ -362,7 +395,7 @@ export default function Home() {
         <div className="container mx-auto flex flex-col lg:flex-row items-center justify-between max-w-[90%]">
           {/* Text Section */}
           <div className="w-full lg:w-1/2 mb-8 lg:mb-0 lg:pr-8">
-            <h2 className="text-2xl sm:text-3xl font-bold font-second text-soft-orange mb-6">
+            <h2 className="text-3xl sm:text-4xl  font-bold font-second text-soft-orange mb-6">
               Cara Pemakaian
             </h2>
             <div className="space-y-4">
@@ -441,10 +474,64 @@ export default function Home() {
                   className="bg-soft-orange text-white rounded-full w-16 h-16 flex items-center justify-center hover:bg-soft-orange-400 shadow-md shadow-soft-orange-400 transition duration-300 cursor-pointer"
                   onClick={togglePlay}
                 >
-                  {isPlaying ? <FaPause /> : <FaPlay />}
+                  {isPlaying ? <FiPause /> : <FiPlay />}
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      </section>
+
+      {/* tanya jawab section */}
+      <section
+        id="tanyajawab"
+        className="py-12 sm:py-16"
+      >
+        <div className="text-center mb-10">
+          <h2 className="text-3xl sm:text-4xl font-bold font-second text-soft-orange mb-2">Tanya Jawab</h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur
+            blandit tempus porttitor.
+          </p>
+        </div>
+
+        {/* Flex Container */}
+        <div className="container mx-auto max-w-[90%]">
+          <div className="flex flex-col lg:flex-row gap-8 h-full">
+            {/* Left: FAQ List */}
+            <div className="w-full lg:w-2/3 space-y-4">
+              {faqs.map((faq, index) => (
+                <div
+                  key={index}
+                  className="border border-gray-200 rounded-lg overflow-hidden"
+                >
+                  <button
+                    onClick={() => toggleFAQ(index)}
+                    className="w-full flex justify-between items-center px-4 py-3 text-left text-lg font-medium focus:outline-none"
+                  >
+                    <span>{faq.question}</span>
+                    {activeIndex === index ? <FiMinus /> : <FiPlus />}
+                  </button>
+                  {activeIndex === index && (
+                    <div className="px-4 pb-4 text-gray-600">{faq.answer}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Right: Contact Card */}
+            <div className="w-full lg:w-1/3 flex items-stretch">
+              <div className="bg-soft-orange/10 p-6 sm:p-8 rounded-2xl text-center flex flex-col justify-center w-full">
+                <h3 className="text-xl font-semibold mb-2 leading-tight">
+                  Punya Pertanyaan Lain?
+                </h3>
+                <p className="mb-4 text-gray-600 leading-relaxed">
+                  Kami siap membantu Anda. Jangan ragu untuk menghubungi tim
+                  kami kapan saja.
+                </p>
+                <Button color="softorange">Hubungi Kami</Button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
