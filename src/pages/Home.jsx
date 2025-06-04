@@ -1,9 +1,10 @@
 import Navbar from "../components/Fragments/Navbar";
 import Button from "../components/Elements/Button";
 import { motion } from "framer-motion";
+import { FaPlay, FaPause } from "react-icons/fa";
 import ReactCompareImage from "react-compare-image";
 import AcceptTask from "../assets/accepttask.svg";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Img1 from "../assets/img1.jpg";
 import Img2 from "../assets/img2.jpg";
 import Img3 from "../assets/img3.jpg";
@@ -12,9 +13,38 @@ import Before1 from "../assets/Before1.png";
 import After1 from "../assets/After1.png";
 import Before2 from "../assets/Before2.png";
 import After2 from "../assets/After2.png";
+import Contoh from "../assets/contoh.mp4";
 
 export default function Home() {
   const [currentImage, setCurrentImage] = useState(0);
+  const [openStep, setOpenStep] = useState(1);
+  const [expandedStep, setExpandedStep] = useState(1);
+  const videoRef = useRef(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [showIcon, setShowIcon] = useState(true);
+
+  const togglePlay = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (video.paused) {
+      video.play();
+      setIsPlaying(true);
+      setShowIcon(false);
+    } else {
+      video.pause();
+      setIsPlaying(false);
+      setShowIcon(true);
+    }
+  };
+
+  const handlePointerEnter = () => {
+    if (isPlaying) setShowIcon(true);
+  };
+
+  const handlePointerLeave = () => {
+    if (isPlaying) setShowIcon(false);
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -22,6 +52,33 @@ export default function Home() {
     }, 3000);
     return () => clearInterval(interval);
   }, []);
+
+  const steps = [
+    {
+      number: 1,
+      title: "Sign Up",
+      details: [
+        "Brief description of how to sign up.",
+        "Image or video of the sign-up page.",
+        "Tooltip explaining each field in the sign-up form.",
+      ],
+    },
+    {
+      number: 2,
+      title: "Customize Your Profile",
+      details: [],
+    },
+    {
+      number: 3,
+      title: "Start Using Our Service",
+      details: [],
+    },
+    {
+      number: 4,
+      title: "Get Support",
+      details: [],
+    },
+  ];
 
   return (
     <>
@@ -36,7 +93,7 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             className="lg:w-1/2 text-center lg:text-left mb-10 lg:mb-0"
           >
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-800 leading-tight mb-4">
+            <h1 className="text-4xl sm:text-5xl font-bold text-gray-700 leading-tight mb-4">
               Lorem, ipsum dolor sit amet consectetur adipisicing.
             </h1>
             <p className="text-lg text-gray-600 mb-6">
@@ -121,7 +178,7 @@ export default function Home() {
             </div>
           </div>
           <div className="lg:w-1/2 p-4 sm:p-6 bg-peach-100 rounded-lg">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 sm:mb-4 font-second text-soft-orange">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-4 font-second text-soft-orange">
               Tentang LaporinAja
             </h2>
             <p className="text-gray-600 mb-2 sm:mb-4">
@@ -296,6 +353,98 @@ export default function Home() {
                 />
               </motion.div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* cara pemakaian section */}
+      <section id="carapemakaian" className="py-12 sm:py-16">
+        <div className="container mx-auto flex flex-col lg:flex-row items-center justify-between max-w-[90%]">
+          {/* Text Section */}
+          <div className="w-full lg:w-1/2 mb-8 lg:mb-0 lg:pr-8">
+            <h2 className="text-2xl sm:text-3xl font-bold font-second text-soft-orange mb-6">
+              Cara Pemakaian
+            </h2>
+            <div className="space-y-4">
+              {steps.map((step) => (
+                <div key={step.number}>
+                  <button
+                    onClick={() => {
+                      setOpenStep(step.number); // Set active step
+                      setExpandedStep(
+                        expandedStep === step.number ? null : step.number
+                      ); // Toggle details
+                    }}
+                    className="flex items-center justify-between w-full text-left focus:outline-none"
+                  >
+                    <span className="flex items-center">
+                      <span
+                        className={`w-8 h-8 flex items-center justify-center rounded-full mr-3 border border-soft-orange ${
+                          openStep === step.number
+                            ? "bg-soft-orange text-white"
+                            : "text-soft-orange"
+                        }`}
+                      >
+                        {step.number}
+                      </span>
+                      <span className="text-lg font-medium text-gray-700">
+                        {step.title}
+                      </span>
+                    </span>
+                    <svg
+                      className={`w-5 h-5 transform transition-transform ${
+                        expandedStep === step.number ? "rotate-180" : ""
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                  {expandedStep === step.number && step.details.length > 0 && (
+                    <ul className="mt-2 ml-11 space-y-1 text-gray-600 list-disc">
+                      {step.details.map((detail, index) => (
+                        <li key={index}>{detail}</li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* video step */}
+          <div
+            className="w-full lg:w-1/2 relative"
+            onMouseEnter={handlePointerEnter}
+            onMouseLeave={handlePointerLeave}
+            onTouchStart={handlePointerEnter}
+          >
+            <video
+              ref={videoRef}
+              src={Contoh}
+              className="rounded-lg shadow-lg w-full h-auto object-cover"
+              onClick={togglePlay}
+            >
+              Your browser does not support the video tag.
+            </video>
+
+            {showIcon && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <button
+                  className="bg-soft-orange text-white rounded-full w-16 h-16 flex items-center justify-center hover:bg-soft-orange-400 shadow-md shadow-soft-orange-400 transition duration-300 cursor-pointer"
+                  onClick={togglePlay}
+                >
+                  {isPlaying ? <FaPause /> : <FaPlay />}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </section>
