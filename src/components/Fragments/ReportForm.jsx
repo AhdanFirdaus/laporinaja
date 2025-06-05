@@ -1,5 +1,9 @@
-import React, { useState } from "react";
-import { MdClose } from "react-icons/md";
+import { useState, useRef } from "react";
+import { FiX } from "react-icons/fi";
+import Button from "../Elements/Button";
+import Input from "../Elements/Input";
+import Textarea from "../Elements/Textarea";
+import Select from "../Elements/Select";
 import Swal from "sweetalert2";
 
 const ReportForm = () => {
@@ -46,7 +50,7 @@ const ReportForm = () => {
       icon: "success",
       title: "Berhasil!",
       text: "Keluhan berhasil diajukan.",
-      confirmButtonColor: "#FF7F50",
+      confirmButtonColor: "#52BA5E",
     });
   };
 
@@ -56,7 +60,7 @@ const ReportForm = () => {
       title: "Konfirmasi",
       text: "Apakah Anda yakin ingin menghapus keluhan ini?",
       showCancelButton: true,
-      confirmButtonColor: "#FF7F50",
+      confirmButtonColor: "#52BA5E",
       cancelButtonColor: "#d33",
       confirmButtonText: "Hapus",
       cancelButtonText: "Batal",
@@ -67,127 +71,108 @@ const ReportForm = () => {
           icon: "success",
           title: "Dihapus!",
           text: "Keluhan telah dihapus.",
-          confirmButtonColor: "#FF7F50",
+          confirmButtonColor: "#52BA5E",
         });
       }
     });
   };
 
+  const fileInputRef = useRef(null);
+
+  const handleButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleClearFile = () => {
+    setFormData({ ...formData, photo: null });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const categoryOptions = [
+    "Jalan dan Trotoar",
+    "Penerangan Jalan Umum",
+    "Saluran Air",
+    "Sampah",
+    "Keamanan dan Ketertiban",
+    "Lainnya",
+  ];
+
   return (
     <>
-      <form onSubmit={handleSubmit} className="w-full font-[var(--font-primary)]">
-        <div className="mb-4">
-          <label className="block font-medium mb-1 text-[var(--color-soft-chocolate)]">
-            Judul
-          </label>
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            className="w-full border border-[var(--color-soft-chocolate)] px-3 py-2 rounded-lg focus:outline-none focus:ring focus:ring-[var(--color-soft-orange)]"
-            required
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="w-full font-primary">
+        <Input
+          label="Judul"
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          required
+        />
 
-        <div className="mb-4">
-          <label className="block font-medium mb-1 text-[var(--color-soft-chocolate)]">
-            Catatan
-          </label>
-          <textarea
-            name="note"
-            value={formData.note}
-            onChange={handleChange}
-            className="w-full border border-[var(--color-soft-chocolate)] px-3 py-2 rounded-lg resize-none h-24 focus:outline-none focus:ring focus:ring-[var(--color-soft-orange)]"
-            required
-          ></textarea>
-        </div>
+        <Textarea
+          label="Catatan"
+          name="note"
+          value={formData.note}
+          onChange={handleChange}
+          required
+        />
 
-        <div className="mb-4">
-          <label className="block font-medium mb-1 text-[var(--color-soft-chocolate)]">
-            Tanggal Kejadian
-          </label>
-          <input
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            className="w-full border border-[var(--color-soft-chocolate)] px-3 py-2 rounded-lg focus:outline-none focus:ring focus:ring-[var(--color-soft-orange)]"
-            required
-          />
-        </div>
+        <Input
+          label="Tanggal Kejadian"
+          type="date"
+          name="date"
+          value={formData.date}
+          onChange={handleChange}
+          required
+        />
 
-        <div className="mb-4">
-          <label className="block font-medium mb-1 text-[var(--color-soft-chocolate)]">
-            Lokasi
-          </label>
-          <input
-            type="text"
-            name="location"
-            value={formData.location}
-            onChange={handleChange}
-            className="w-full border border-[var(--color-soft-chocolate)] px-3 py-2 rounded-lg focus:outline-none focus:ring focus:ring-[var(--color-soft-orange)]"
-            required
-          />
-        </div>
+        <Input
+          label="Lokasi"
+          name="location"
+          value={formData.location}
+          onChange={handleChange}
+          required
+        />
 
-        <div className="mb-4">
-          <label className="block font-medium mb-1 text-[var(--color-soft-chocolate)]">
-            Kategori
-          </label>
-          <select
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            className="w-full border border-[var(--color-soft-chocolate)] px-3 py-2 rounded-lg focus:outline-none focus:ring focus:ring-[var(--color-soft-orange)]"
-            required
-          >
-            <option value="">-- Pilih Kategori --</option>
-            <option value="Jalan dan Trotoar">Jalan dan Trotoar</option>
-            <option value="Penerangan Jalan Umum">Penerangan Jalan Umum</option>
-            <option value="Saluran Air">Saluran Air</option>
-            <option value="Sampah">Sampah</option>
-            <option value="Keamanan dan Ketertiban">Keamanan dan Ketertiban</option>
-            <option value="Lainnya">Lainnya</option>
-          </select>
-        </div>
+        <Select
+          label="Kategori"
+          name="category"
+          value={formData.category}
+          onChange={handleChange}
+          options={categoryOptions}
+          required
+        />
 
         <div className="mb-10">
-          <label className="block font-medium mb-1 text-[var(--color-soft-chocolate)]">
-            Foto
-          </label>
-          <div className="flex items-center border border-[var(--color-soft-chocolate)] px-3 py-2 rounded-lg focus-within:ring focus-within:ring-[var(--color-soft-orange)]">
-            <label
-              htmlFor="photo-upload"
-              className="border border-[var(--color-soft-chocolate)] px-3 py-2 rounded-lg cursor-pointer hover:bg-[var(--color-soft-orange)] hover:text-white transition"
-            >
+          <label className="block font-medium mb-1 text-gray-700">Foto</label>
+          <div className="flex items-center border border-gray-800 px-3 py-2 rounded-lg focus-within:border-soft-orange focus-within:ring-0">
+            <Button type="button" onClick={handleButtonClick}>
               Upload File
-            </label>
+            </Button>
             <span className="text-sm text-gray-600 ml-3 truncate">
               {formData.photo ? formData.photo.name : "No File Chosen"}
             </span>
             {formData.photo && (
               <button
                 type="button"
-                onClick={() => {
-                  setFormData({ ...formData, photo: null });
-                  document.getElementById("photo-upload").value = "";
-                }}
+                onClick={handleClearFile}
                 className="ml-3 text-red-500 hover:text-red-700 text-2xl transition-all duration-200"
                 title="Hapus Foto"
               >
-                <MdClose />
+                <FiX />
               </button>
             )}
           </div>
           <input
             id="photo-upload"
+            ref={fileInputRef}
             type="file"
             name="photo"
             accept="image/*"
             onChange={(e) => {
               handleChange(e);
-              e.target.value = "";
+              // Jangan kosongkan value di sini karena akan bikin file tidak bisa dipilih ulang yang sama
             }}
             className="hidden"
             required={!formData.photo}
@@ -195,61 +180,88 @@ const ReportForm = () => {
         </div>
 
         <div className="flex justify-end">
-          <button
-            type="submit"
-            className="flex items-center justify-center gap-2 text-[var(--color-soft-orange)] border border-[var(--color-soft-orange)] bg-transparent hover:bg-[var(--color-soft-orange)] hover:text-white px-6 py-3 rounded-xl shadow-sm hover:shadow-md transition-all duration-300"
-          >
-            Kirim Keluhan
-          </button>
+          <Button type="submit">Kirim Keluhan</Button>
         </div>
       </form>
 
       {/* Riwayat Keluhan */}
-      <div className="mt-10 border-t pt-6">
-        <h2 className="text-xl font-bold text-[var(--color-soft-chocolate)] mb-4">Riwayat Keluhan</h2>
+      <div className="mt-12 border-t pt-8 bg-gray-50">
+        <h2 className="text-3xl font-bold font-second text-soft-orange mb-6 tracking-tight">
+          Riwayat Keluhan
+        </h2>
         {reportHistory.length === 0 ? (
-          <p className="text-gray-500">Belum ada keluhan yang diajukan.</p>
+          <p className="text-gray-500 text-lg italic text-center py-8">
+            Belum ada keluhan yang diajukan.
+          </p>
         ) : (
-          <ul className="space-y-4">
+          <ul className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
             {reportHistory.map((report) => (
               <li
                 key={report.id}
-                className="border border-[var(--color-soft-chocolate)] p-4 rounded-lg bg-white shadow-sm"
+                className="border border-gray-200 p-6 rounded-xl bg-white shadow-md hover:shadow-lg transition-shadow duration-300"
               >
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-2xl font-semibold">{report.title}</h3>
-                  <span className="text-sm text-gray-500">{report.timestamp}</span>
-                </div>
-                <p className="text-md text-gray-700 mb-1">
-                  <span className="font-semibold">Kategori:</span> {report.category}
-                </p>
-                <p className="text-md text-gray-700 mb-1">
-                  <span className="font-semibold">Lokasi:</span> {report.location}
-                </p>
-                <p className="text-md text-gray-700 mb-1">
-                  <span className="font-semibold">Tanggal:</span> {report.date}
-                </p>
-                <p className="text-md text-gray-700 mb-3">
-                  <span className="font-semibold">Catatan:</span> {report.note}
-                </p>
-                {report.photo && (
-                  <div className="mt-2 mb-3">
-                    <span className="font-semibold text-md">Foto:</span><br />
-                    <img
-                      src={URL.createObjectURL(report.photo)}
-                      alt="Uploaded"
-                      className="mt-1 max-w-xs rounded-lg"
-                    />
+                <div className="space-y-4">
+                  {/* Timestamp at Top-Right */}
+                  <div className="flex justify-end">
+                    <span className="text-sm text-gray-400">
+                      {report.timestamp}
+                    </span>
                   </div>
-                )}
-                <div className="flex justify-end">
-                  <button
-                    onClick={() => handleDelete(report.id)}
-                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all duration-200"
-                    title="Hapus Keluhan"
-                  >
-                    Hapus
-                  </button>
+                  {/* Title with Truncation */}
+                  <h3 className="text-xl font-semibold text-gray-800 line-clamp-2 break-all">
+                    {report.title}
+                  </h3>
+                  {/* Content and Image in Flex Row */}
+                  <div className="flex flex-row gap-6">
+                    <div className="flex-1 space-y-2 text-gray-600">
+                      <p className="text-md">
+                        <span className="font-medium">Kategori:</span>{" "}
+                        <span className="line-clamp-1 break-all">
+                          {report.category}
+                        </span>
+                      </p>
+                      <p className="text-md">
+                        <span className="font-medium">Lokasi:</span>{" "}
+                        <span className="line-clamp-2 break-all">
+                          {report.location}
+                        </span>
+                      </p>
+                      <p className="text-md">
+                        <span className="font-medium">Tanggal:</span>{" "}
+                        <span className="line-clamp-1">{report.date}</span>
+                      </p>
+                      <p className="text-md">
+                        <span className="font-medium">Catatan:</span>{" "}
+                        <span className="line-clamp-3 break-all">
+                          {report.note}
+                        </span>
+                      </p>
+                    </div>
+                    {/* Right Section: Image */}
+                    {report.photo && (
+                      <div className="w-1/3 flex-shrink-0">
+                        <span className="font-medium text-md text-gray-600 block mb-2">
+                          Foto:
+                        </span>
+                        <img
+                          src={URL.createObjectURL(report.photo)}
+                          alt="Uploaded"
+                          className="w-full h-48 rounded-lg object-cover"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  {/* Buttons Section */}
+                  <div className="flex justify-end mt-4 space-x-4">
+                    <Button color="blue">Details</Button>
+                    <Button
+                      color="red"
+                      onClick={() => handleDelete(report.id)}
+                      title="Hapus Keluhan"
+                    >
+                      Hapus
+                    </Button>
+                  </div>
                 </div>
               </li>
             ))}

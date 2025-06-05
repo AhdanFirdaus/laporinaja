@@ -1,5 +1,5 @@
 const PrivacyPolicy = () => (
-  <div className="text-gray-800">
+  <div className="text-gray-700">
     <p className="mb-4">
       Privasi Anda adalah prioritas kami. Aplikasi ini dirancang untuk menjaga kerahasiaan data pribadi setiap warga yang melaporkan kendala fasilitas umum di wilayah Kota Semarang.
     </p>
