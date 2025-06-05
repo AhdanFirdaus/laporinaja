@@ -4,16 +4,9 @@ import { FiPlay, FiPause, FiPlus, FiMinus } from "react-icons/fi";
 import Navbar from "../components/Fragments/Navbar";
 import Button from "../components/Elements/Button";
 import ReactCompareImage from "react-compare-image";
-import AcceptTask from "../assets/accepttask.svg";
-import Img1 from "../assets/img1.jpg";
-import Img2 from "../assets/img2.jpg";
-import Img3 from "../assets/img3.jpg";
-import Img4 from "../assets/img4.jpg";
-import Before1 from "../assets/Before1.png";
-import After1 from "../assets/After1.png";
-import Before2 from "../assets/Before2.png";
-import After2 from "../assets/After2.png";
-import Contoh from "../assets/contoh.mp4";
+import * as Imgs from "../assets/images/Images";
+import Contoh from "../assets/videos/contoh.mp4";
+import Footer from "../components/Fragments/Footer";
 
 export default function Home() {
   const [currentImage, setCurrentImage] = useState(0);
@@ -144,7 +137,7 @@ export default function Home() {
           >
             <div className="relative">
               <div className="w-64 h-54 sm:w-96 sm:h-80 lg:w-[450px] lg:h-[420px] flex items-center justify-center">
-                <img src={AcceptTask} alt="website" className="w-full h-auto" />
+                <img src={Imgs.AcceptTask} alt="website" className="w-full h-auto" />
               </div>
               <motion.div
                 className="absolute -top-5 -left-5 w-10 h-10 bg-soft-orange rounded-full"
@@ -168,7 +161,7 @@ export default function Home() {
             <div className="relative w-full">
               <div className="relative w-full h-64 sm:h-80 md:h-96">
                 {/* Main image (left) */}
-                {[Img4, Img3, Img2, Img1].map((src, index) => (
+                {[Imgs.Img4, Imgs.Img3, Imgs.Img2, Imgs.Img1].map((src, index) => (
                   <motion.img
                     key={index}
                     src={src}
@@ -186,7 +179,7 @@ export default function Home() {
                   />
                 ))}
                 {/* Bottom-right image */}
-                {[Img1, Img2, Img3, Img4].map((src, index) => (
+                {[Imgs.Img1, Imgs.Img2, Imgs.Img3, Imgs.Img4].map((src, index) => (
                   <motion.img
                     key={index + 4}
                     src={src}
@@ -294,7 +287,7 @@ export default function Home() {
             >
               <div className="w-full h-64 bg-gray-200 rounded-lg shadow-lg overflow-hidden">
                 <img
-                  src={After1}
+                  src={Imgs.After1}
                   alt=""
                   className="w-full h-full object-cover"
                 />
@@ -311,7 +304,7 @@ export default function Home() {
             >
               <div className="w-full h-64 bg-gray-200 rounded-lg shadow-lg overflow-hidden">
                 <img
-                  src={After2}
+                  src={Imgs.After2}
                   alt=""
                   className="w-full h-full object-cover"
                 />
@@ -355,8 +348,8 @@ export default function Home() {
                 className="rounded-lg shadow-lg overflow-hidden"
               >
                 <ReactCompareImage
-                  leftImage={Before1}
-                  rightImage={After1}
+                  leftImage={Imgs.Before1}
+                  rightImage={Imgs.After1}
                   leftImageAlt="Sebelum"
                   rightImageAlt="Sesudah"
                   sliderLineColor="#EB5A3C"
@@ -373,8 +366,8 @@ export default function Home() {
                 className="rounded-lg shadow-lg overflow-hidden"
               >
                 <ReactCompareImage
-                  leftImage={Before2}
-                  rightImage={After2}
+                  leftImage={Imgs.Before2}
+                  rightImage={Imgs.After2}
                   leftImageAlt="Sebelum"
                   rightImageAlt="Sesudah"
                   sliderLineColor="#EB5A3C"
@@ -506,13 +499,13 @@ export default function Home() {
                 >
                   <button
                     onClick={() => toggleFAQ(index)}
-                    className="w-full flex justify-between items-center px-4 py-3 text-left text-lg font-medium focus:outline-none"
+                    className="w-full flex justify-between items-center px-4 py-3 text-left font-medium focus:outline-none"
                   >
                     <span>{faq.question}</span>
                     {activeIndex === index ? <FiMinus /> : <FiPlus />}
                   </button>
                   {activeIndex === index && (
-                    <div className="px-4 pb-4 text-gray-600">{faq.answer}</div>
+                    <div className="px-4 pb-4 text-gray-700">{faq.answer}</div>
                   )}
                 </div>
               ))}
@@ -534,6 +527,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* footer */}
+      <Footer/>
     </>
   );
 }
