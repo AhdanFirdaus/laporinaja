@@ -1,8 +1,31 @@
 import Button from "../Elements/Button";
 import { FiArrowRight } from "react-icons/fi";
-import { Link } from "react-router";
+import { scroller } from "react-scroll";
+import { useLocation, useNavigate } from "react-router";
 
 function Footer() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleScroll = (section) => {
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(() => {
+        scroller.scrollTo(section, {
+          smooth: true,
+          duration: 500,
+          offset: -80,
+        });
+      }, 100);
+    } else {
+      scroller.scrollTo(section, {
+        smooth: true,
+        duration: 500,
+        offset: -80,
+      });
+    }
+  };
+
   return (
     <footer className="bg-gray-100 text-gray-700 mt-20">
       {/* Call-to-Action Section */}
@@ -13,13 +36,16 @@ function Footer() {
         <p className="mb-4 text-sm md:text-base">
           Laporkan segala bentuk kerusakan fasilitas umum di Semarang dengan
           mudah melalui{" "}
-          <strong className="font-second text-2xl">laporinaja</strong>.
+          <strong className="font-second text-2xl">LaporinAja</strong>.
         </p>
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           <Button color="white" txtcolor="text-soft-orange">
             Hubungi Kami
           </Button>
-          <Button className="flex items-center gap-2 hover:underline">
+          <Button
+            onClick={() => handleScroll("carapemakaian")}
+            className="flex items-center gap-2 hover:underline"
+          >
             Lihat cara pemakaian <FiArrowRight size={14} />
           </Button>
         </div>
@@ -28,9 +54,10 @@ function Footer() {
       {/* Navigation Footer */}
       <div className="text-center md:text-left px-4 md:px-24 py-10 border-t border-gray-300">
         <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-6">
+          {/* Brand & Info */}
           <div>
             <h1 className="text-3xl font-bold font-second text-soft-orange">
-              laporinaja.
+              LaporinAja
             </h1>
             <p className="text-sm mt-2">
               Untuk Semarang yang lebih baik dan tertib.
@@ -40,19 +67,32 @@ function Footer() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <Link to="#tentang" className="hover:underline">
+          {/* Navigasi */}
+          <div className="grid grid-cols-2 gap-4 text-sm justify-center mx-auto md:mx-0 text-left">
+            <button
+              onClick={() => handleScroll("tentang")}
+              className="hover:underline text-left cursor-pointer"
+            >
               Tentang
-            </Link>
-            <Link to="#dampak" className="hover:underline">
+            </button>
+            <button
+              onClick={() => handleScroll("dampak")}
+              className="hover:underline text-left cursor-pointer"
+            >
               Dampak
-            </Link>
-            <Link to="#carapemakaian" className="hover:underline">
+            </button>
+            <button
+              onClick={() => handleScroll("carapemakaian")}
+              className="hover:underline text-left cursor-pointer"
+            >
               Cara Pemakaian
-            </Link>
-            <Link to="#tanyajawab" className="hover:underline">
+            </button>
+            <button
+              onClick={() => handleScroll("tanyajawab")}
+              className="hover:underline text-left cursor-pointer"
+            >
               Tanya Jawab
-            </Link>
+            </button>
           </div>
         </div>
       </div>
