@@ -7,7 +7,7 @@ const Input = ({ label, name, value, onChange, type = "text", required = false }
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full border focus:border-soft-orange px-3 py-2 rounded-lg focus:outline-none focus:ring focus:ring-[var(--color-soft-orange)]"
+        className="w-full border focus:border-soft-orange px-3 py-2 rounded-lg focus:outline-none focus:ring focus:ring-soft-orange"
         required={required}
       />
     </div>
