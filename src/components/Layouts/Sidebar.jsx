@@ -1,49 +1,107 @@
+import { useState, useEffect } from "react";
 import {
-  FaShieldAlt,
-  FaFileContract,
-  FaBullhorn,
-  FaExclamationCircle,
-  FaSignOutAlt,
-} from "react-icons/fa";
-import { FaCircleUser } from "react-icons/fa6";
+  FiMenu,
+  FiX,
+  FiShield,
+  FiUser,
+  FiBookOpen,
+  FiAlertCircle,
+  FiMessageCircle,
+  FiLogOut,
+} from "react-icons/fi";
+import Button from "../Elements/Button";
 
 const Sidebar = ({ onSelect, currentView }) => {
+  const [isOpen, setIsOpen] = useState(() => window.innerWidth >= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsOpen(window.innerWidth >= 768);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const menuItems = [
-    { key: "profile", icon: <FaCircleUser />, label: "Profil" },
-    { key: "privacy", icon: <FaShieldAlt />, label: "Kebijakan Privasi" },
-    { key: "terms", icon: <FaFileContract />, label: "Ketentuan Pengguna" },
-    { key: "report", icon: <FaBullhorn />, label: "Ajukan Keluhan" },
-    { key: "complaints", icon: <FaExclamationCircle />, label: "Keluhan" },
+    { key: "profile", icon: <FiUser />, label: "Profil" },
+    { key: "privacy", icon: <FiShield />, label: "Kebijakan Privasi" },
+    { key: "terms", icon: <FiBookOpen />, label: "Ketentuan" },
+    { key: "report", icon: <FiMessageCircle />, label: "Ajukan Keluhan" },
+    { key: "complaints", icon: <FiAlertCircle />, label: "Keluhan" },
   ];
 
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
-    <aside className="w-64 bg-white h-screen p-6 shadow-md flex flex-col justify-between">
+    <aside
+      className={`bg-white h-screen shadow-md flex flex-col justify-between transition-all duration-300
+        ${isOpen ? "w-64" : "w-16"} md:w-64 p-4 md:p-6 fixed top-0 left-0 z-50
+        ${!isOpen && "translate-x-0"} md:translate-x-0`}
+    >
       <div>
-        <h1 className="text-4xl font-bold text-soft-orange my-5 mb-20">LaporAja.</h1>
+        <div className="flex items-center justify-center md:justify-between my-5 gap-10">
+          <h1
+            className={`text-4xl font-bold font-second text-center text-soft-orange
+              ${isOpen ? "block" : "hidden"} md:block`}
+          >
+            LaporinAja
+          </h1>
+          <button
+            className="text-gray-700 md:hidden focus:outline-none z-50"
+            onClick={toggleSidebar}
+            aria-label={isOpen ? "Close Sidebar" : "Open Sidebar"}
+          >
+            {isOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+          </button>
+        </div>
         <nav className="space-y-4">
           {menuItems.map((item) => (
             <div
               key={item.key}
-              onClick={() => onSelect(item.key)}
-              className={`flex items-center gap-3 px-3 py-3 rounded-lg cursor-pointer transition-all ${
-                currentView === item.key
-                  ? "bg-soft-chocolate text-white"
-                  : "text-gray-700 hover:bg-soft-chocolate hover:text-white"
-              }`}
+              onClick={() => {
+                onSelect(item.key);
+                if (window.innerWidth < 768) setIsOpen(false);
+              }}
+              className={`flex items-center gap-3 px-3 py-3 rounded-lg cursor-pointer transition-all
+                ${
+                  currentView === item.key
+                    ? "bg-soft-orange text-white"
+                    : "text-gray-700 hover:bg-soft-orange hover:text-white"
+                }
+                ${
+                  isOpen ? "justify-start" : "justify-center"
+                } md:justify-start`}
             >
-              {item.icon}
-              <span>{item.label}</span>
+              <div className="text-xl">{item.icon}</div>
+              <span className={`${isOpen ? "block" : "hidden"} md:block`}>
+                {item.label}
+              </span>
             </div>
           ))}
         </nav>
       </div>
 
       <div className="space-y-6">
-        <div className="flex items-center gap-3 text-red-600 border border-red-500 bg-red-100 hover:bg-red-500 hover:text-white px-3 py-3 rounded-lg cursor-pointer transition-all">
-          <FaSignOutAlt />
-          <span>Sign Out</span>
-        </div>
-        <div className="text-sm text-gray-400 text-center">© 2025 LaporAja.</div>
+        <Button
+          onClick={() => {
+            if (window.innerWidth < 768) setIsOpen(false);
+          }}
+          color="redoutline"
+          className={`flex items-center gap-3 w-full transition-all
+    ${isOpen ? "justify-start" : "justify-center"} md:justify-start`}
+          rounded="rounded-lg"
+          txtcolor="text-red-600"
+          font="font-normal"
+        >
+          <div className="text-xl">
+            <FiLogOut />
+          </div>
+          <span className={`${isOpen ? "block" : "hidden"} md:block`}>
+            Sign Out
+          </span>
+        </Button>
       </div>
     </aside>
   );

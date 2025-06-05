@@ -1,5 +1,5 @@
 const Terms = () => (
-  <div className="text-gray-800">
+  <div className="text-gray-700">
     <p className="mb-4">
       Dengan menggunakan aplikasi ini, Anda menyetujui syarat dan ketentuan berikut sebagai bentuk partisipasi dalam menjaga fasilitas umum di Kota Semarang.
     </p>
