@@ -2,7 +2,8 @@ const colorMap = {
   softorange: 'bg-soft-orange hover:bg-soft-orange-400',
   softchocolate: 'bg-soft-chocolate hover:bg-soft-chocolate',
   paleyellow: 'bg-pale-yellow hover:bg-pale-yellow-400', 
-  palewhite: 'bg-pale-white hover:bg-pale-white-400'
+  palewhite: 'bg-pale-white hover:bg-pale-white-400',
+  white: 'bg-white hover:bg-slate-100'
 };
 
 const Button = ({ children, onClick, color = '', type = 'button', className = '', rounded = 'rounded-md', txtcolor = "text-white" }) => {

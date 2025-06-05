@@ -1,7 +1,8 @@
 import { useState } from "react";
 import Button from "../Elements/Button";
 import { FiMenu, FiX } from "react-icons/fi";
-import { Link } from "react-router";
+import { Link as RouterLink } from "react-router";
+import { Link as ScrollLink } from "react-scroll";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,33 +13,59 @@ const Navbar = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <div className="text-soft-orange font-semibold text-2xl">
-            <Link to="/" className="font-bold font-second">
+            <RouterLink to="/" className="font-bold font-second">
               LaporinAja
-            </Link>
+            </RouterLink>
           </div>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-6">
-            <Link to="/#tentang" className="text-gray-700 hover:text-soft-orange">
+            <ScrollLink
+              to="tentang"
+              smooth={true}
+              duration={500}
+              offset={-80} // Adjust based on navbar height
+              className="text-gray-700 hover:text-soft-orange cursor-pointer"
+            >
               Tentang
-            </Link>
-            <Link to="/#dampak" className="text-gray-700 hover:text-soft-orange">
+            </ScrollLink>
+            <ScrollLink
+              to="dampak"
+              smooth={true}
+              duration={500}
+              offset={-80}
+              className="text-gray-700 hover:text-soft-orange cursor-pointer"
+            >
               Dampak
-            </Link>
-            <Link to="/carapemakaian" className="text-gray-700 hover:text-soft-orange">
+            </ScrollLink>
+            <ScrollLink
+              to="carapemakaian"
+              smooth={true}
+              duration={500}
+              offset={-80}
+              className="text-gray-700 hover:text-soft-orange cursor-pointer"
+            >
               Cara Pemakaian
-            </Link>
-            <Link to="/#tanyajawab" className="text-gray-700 hover:text-soft-orange">
+            </ScrollLink>
+            <ScrollLink
+              to="tanyajawab"
+              smooth={true}
+              duration={500}
+              offset={-80}
+              className="text-gray-700 hover:text-soft-orange cursor-pointer"
+            >
               Tanya Jawab
-            </Link>
-            <Button className="font-bold">
-              Masuk
-            </Button>
+            </ScrollLink>
+            <Button className="font-bold">Masuk</Button>
           </div>
 
           {/* Hamburger for Mobile */}
           <div className="md:hidden">
-            <button onClick={() => setIsOpen(!isOpen)} aria-label="Toggle menu">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label="Toggle menu"
+              className="text-gray-700"
+            >
               {isOpen ? <FiX size={24} /> : <FiMenu size={24} />}
             </button>
           </div>
@@ -48,35 +75,51 @@ const Navbar = () => {
         {isOpen && (
           <div className="md:hidden absolute left-0 right-0 top-full mt-2 mx-7 sm:mx-9 bg-white border rounded-lg shadow-lg z-50">
             <div className="flex flex-col gap-4 p-4">
-              <Link
-                to="/#tentang"
-                className="text-gray-700 hover:text-soft-orange"
+              <ScrollLink
+                to="tentang"
+                smooth={true}
+                duration={500}
+                offset={-80}
+                className="text-gray-700 hover:text-soft-orange cursor-pointer"
                 onClick={() => setIsOpen(false)}
               >
                 Tentang
-              </Link>
-              <Link
-                to="/#dampak"
-                className="text-gray-700 hover:text-soft-orange"
+              </ScrollLink>
+              <ScrollLink
+                to="dampak"
+                smooth={true}
+                duration={500}
+                offset={-80}
+                className="text-gray-700 hover:text-soft-orange cursor-pointer"
                 onClick={() => setIsOpen(false)}
               >
                 Dampak
-              </Link>
-              <Link
-                to="/carapemakaian"
-                className="text-gray-700 hover:text-soft-orange"
+              </ScrollLink>
+              <ScrollLink
+                to="carapemakaian"
+                smooth={true}
+                duration={500}
+                offset={-80}
+                className="text-gray-700 hover:text-soft-orange cursor-pointer"
                 onClick={() => setIsOpen(false)}
               >
                 Cara Pemakaian
-              </Link>
-              <Link
-                to="/#tanyajawab"
-                className="text-gray-700 hover:text-soft-orange"
+              </ScrollLink>
+              <ScrollLink
+                to="tanyajawab"
+                smooth={true}
+                duration={500}
+                offset={-80}
+                className="text-gray-700 hover:text-soft-orange cursor-pointer"
                 onClick={() => setIsOpen(false)}
               >
                 Tanya Jawab
-              </Link>
-              <Button color="rose" className="font-bold w-full text-center">
+              </ScrollLink>
+              <Button
+                color="rose"
+                className="font-bold w-full text-center"
+                onClick={() => setIsOpen(false)}
+              >
                 Masuk
               </Button>
             </div>
