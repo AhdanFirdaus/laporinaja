@@ -25,12 +25,11 @@ const Sidebar = ({ onSelect, currentView }) => {
             <div
               key={item.key}
               onClick={() => onSelect(item.key)}
-              className={`flex items-center gap-3 px-3 py-3 rounded-lg cursor-pointer transition-all
-                ${
-                  currentView === item.key
-                    ? "bg-soft-chocolate text-white"
-                    : "text-gray-700 hover:bg-soft-chocolate hover:text-white"
-                }`}
+              className={`flex items-center gap-3 px-3 py-3 rounded-lg cursor-pointer transition-all ${
+                currentView === item.key
+                  ? "bg-soft-chocolate text-white"
+                  : "text-gray-700 hover:bg-soft-chocolate hover:text-white"
+              }`}
             >
               {item.icon}
               <span>{item.label}</span>

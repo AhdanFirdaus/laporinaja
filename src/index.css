@@ -10,6 +10,7 @@
   --color-pale-white: #EDF4C2; 
 }
 
-body {
+html, body {
   @apply font-primary;
+  overflow: hidden;
 }

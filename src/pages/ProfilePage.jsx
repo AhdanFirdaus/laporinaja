@@ -31,19 +31,38 @@ const ProfilePage = () => {
     complaints: "Daftar Keluhan",
   };
 
+  const renderContent = () => {
+    switch (view) {
+      case "profile":
+        return <ProfileCard user={mockUser} />;
+      case "privacy":
+        return <PrivacyPolicy />;
+      case "terms":
+        return <Terms />;
+      case "report":
+        return <ReportForm />;
+      case "complaints":
+        return <ComplaintsList />;
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="flex">
-      <Sidebar onSelect={setView} currentView={view} />
-      <main className="flex-1 p-6 bg-gray-50 min-h-screen font-primary">
+    <div className="flex min-h-screen">
+      {/* Sidebar tetap di sisi kiri */}
+      <div className="fixed top-0 left-0 w-64 h-screen">
+        <Sidebar onSelect={setView} currentView={view} />
+      </div>
+
+      {/* Konten utama */}
+      <main className="flex-1 ml-64 p-6 bg-gray-50 h-screen overflow-y-auto">
         <h2 className="text-2xl font-bold text-[var(--color-soft-chocolate)] mb-4">
           {titleMap[view]}
         </h2>
-        
-        {view === "profile" && <ProfileCard user={mockUser} />}
-        {view === "privacy" && <PrivacyPolicy />}
-        {view === "terms" && <Terms />}
-        {view === "report" && <ReportForm />}
-        {view === "complaints" && <ComplaintsList />}
+        <div className="pb-10">
+          {renderContent()}
+        </div>
       </main>
     </div>
   );
