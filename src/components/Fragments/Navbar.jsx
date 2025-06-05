@@ -25,7 +25,7 @@ const Navbar = () => {
             <Link to="/#dampak" className="text-gray-700 hover:text-soft-orange">
               Dampak
             </Link>
-            <Link to="/carapemakaian" className="text-gray-700 hover:text-soft-orange">
+            <Link to="/#carapemakaian" className="text-gray-700 hover:text-soft-orange">
               Cara Pemakaian
             </Link>
             <Link to="/#tanyajawab" className="text-gray-700 hover:text-soft-orange">
@@ -63,7 +63,7 @@ const Navbar = () => {
                 Dampak
               </Link>
               <Link
-                to="/carapemakaian"
+                to="/#carapemakaian"
                 className="text-gray-700 hover:text-soft-orange"
                 onClick={() => setIsOpen(false)}
               >
