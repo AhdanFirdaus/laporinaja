@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { FiPlay, FiPause, FiPlus, FiMinus } from "react-icons/fi";
+import { FiPlay, FiPause, FiPlus, FiMinus, FiChevronDown, FiChevronUp } from "react-icons/fi";
 import Navbar from "../components/Fragments/Navbar";
 import Button from "../components/Elements/Button";
 import ReactCompareImage from "react-compare-image";
@@ -137,7 +137,11 @@ export default function Home() {
           >
             <div className="relative">
               <div className="w-64 h-54 sm:w-96 sm:h-80 lg:w-[450px] lg:h-[420px] flex items-center justify-center">
-                <img src={Imgs.AcceptTask} alt="website" className="w-full h-auto" />
+                <img
+                  src={Imgs.AcceptTask}
+                  alt="website"
+                  className="w-full h-auto"
+                />
               </div>
               <motion.div
                 className="absolute -top-5 -left-5 w-10 h-10 bg-soft-orange rounded-full"
@@ -161,41 +165,45 @@ export default function Home() {
             <div className="relative w-full">
               <div className="relative w-full h-64 sm:h-80 md:h-96">
                 {/* Main image (left) */}
-                {[Imgs.Img4, Imgs.Img3, Imgs.Img2, Imgs.Img1].map((src, index) => (
-                  <motion.img
-                    key={index}
-                    src={src}
-                    alt={`Team ${index + 1}`}
-                    className="w-full h-full object-cover rounded-lg z-10 shadow-md"
-                    initial={{ opacity: 0, rotate: 5 }}
-                    animate={{
-                      opacity: index === currentImage ? 1 : 0,
-                      rotate: index === currentImage ? 0 : 5,
-                    }}
-                    transition={{ duration: 0.5 }}
-                    style={{
-                      display: index === currentImage ? "block" : "none",
-                    }}
-                  />
-                ))}
+                {[Imgs.Img4, Imgs.Img3, Imgs.Img2, Imgs.Img1].map(
+                  (src, index) => (
+                    <motion.img
+                      key={index}
+                      src={src}
+                      alt={`Team ${index + 1}`}
+                      className="w-full h-full object-cover rounded-lg z-10 shadow-md"
+                      initial={{ opacity: 0, rotate: 5 }}
+                      animate={{
+                        opacity: index === currentImage ? 1 : 0,
+                        rotate: index === currentImage ? 0 : 5,
+                      }}
+                      transition={{ duration: 0.5 }}
+                      style={{
+                        display: index === currentImage ? "block" : "none",
+                      }}
+                    />
+                  )
+                )}
                 {/* Bottom-right image */}
-                {[Imgs.Img1, Imgs.Img2, Imgs.Img3, Imgs.Img4].map((src, index) => (
-                  <motion.img
-                    key={index + 4}
-                    src={src}
-                    alt={`Team ${index + 5}`}
-                    className="absolute bottom-0 right-0 w-1/2 h-2/3 object-cover rounded-lg z-20 shadow-md hidden lg:block"
-                    initial={{ opacity: 0, rotate: -5 }}
-                    animate={{
-                      opacity: index === currentImage ? 1 : 0,
-                      rotate: index === currentImage ? 0 : -5,
-                    }}
-                    transition={{ duration: 0.5 }}
-                    style={{
-                      display: index === currentImage ? "block" : "none",
-                    }}
-                  />
-                ))}
+                {[Imgs.Img1, Imgs.Img2, Imgs.Img3, Imgs.Img4].map(
+                  (src, index) => (
+                    <motion.img
+                      key={index + 4}
+                      src={src}
+                      alt={`Team ${index + 5}`}
+                      className="absolute bottom-0 right-0 w-1/2 h-2/3 object-cover rounded-lg z-20 shadow-md hidden lg:block"
+                      initial={{ opacity: 0, rotate: -5 }}
+                      animate={{
+                        opacity: index === currentImage ? 1 : 0,
+                        rotate: index === currentImage ? 0 : -5,
+                      }}
+                      transition={{ duration: 0.5 }}
+                      style={{
+                        display: index === currentImage ? "block" : "none",
+                      }}
+                    />
+                  )
+                )}
               </div>
               <div className="absolute bottom-[-5%] left-[5%] sm:bottom-[-10%] sm:left-[10%] w-1/3 sm:w-1/4 md:w-1/3 bg-soft-orange text-white text-center p-2 sm:p-4 rounded-lg z-30 shadow-md">
                 <h2 className="text-xl sm:text-2xl font-bold">123+</h2>
@@ -417,21 +425,11 @@ export default function Home() {
                         {step.title}
                       </span>
                     </span>
-                    <svg
-                      className={`w-5 h-5 transform transition-transform ${
-                        expandedStep === step.number ? "rotate-180" : ""
-                      }`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
+                    {expandedStep === step.number ? (
+                      <FiChevronUp/>
+                    ) : (
+                      <FiChevronDown/>
+                    )}
                   </button>
                   {expandedStep === step.number && step.details.length > 0 && (
                     <ul className="mt-2 ml-11 space-y-1 text-gray-600 list-disc">
@@ -529,7 +527,7 @@ export default function Home() {
       </section>
 
       {/* footer */}
-      <Footer/>
+      <Footer />
     </>
   );
 }
