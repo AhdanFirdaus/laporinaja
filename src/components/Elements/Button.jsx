@@ -1,11 +1,22 @@
-const Button = ({ children, variant = "primary", ...props }) => {
-  const base = "px-4 py-2 rounded font-medium transition";
-  const variants = {
-    primary: `${base} bg-[var(--color-soft-orange)] text-[var(--color-pale-white)] hover:bg-opacity-90`,
-    outline: `${base} border border-[var(--color-soft-orange)] text-[var(--color-soft-orange)] hover:bg-[var(--color-pale-white)] hover:text-[var(--color-soft-orange)]`
-  };
+const colorMap = {
+  softorange: 'bg-soft-orange hover:bg-soft-orange-400',
+  softchocolate: 'bg-soft-chocolate hover:bg-soft-chocolate',
+  paleyellow: 'bg-pale-yellow hover:bg-pale-yellow-400', 
+  palewhite: 'bg-pale-white hover:bg-pale-white-400',
+  white: 'bg-white hover:bg-slate-100'
+};
 
-  return <button className={variants[variant]} {...props}>{children}</button>;
+const Button = ({ children, onClick, color = '', type = 'button', className = '', rounded = 'rounded-md', txtcolor = "text-white" }) => {
+  const colorClasses = colorMap[color] || colorMap['softorange'];
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      className={`px-4 py-2 transition duration-300 font-semibold cursor-pointer ${colorClasses} ${className} ${rounded} ${txtcolor}`}
+    >
+      {children}
+    </button>
+  );
 };
 
 export default Button;
