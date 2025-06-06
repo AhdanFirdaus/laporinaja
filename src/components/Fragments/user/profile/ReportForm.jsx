@@ -16,7 +16,6 @@ const ReportForm = () => {
     location: "",
     category: "",
     customCategory: "", // New field for custom category input
-    photo: null,
   });
 
   const [reportHistory, setReportHistory] = useState([]);
@@ -51,7 +50,6 @@ const ReportForm = () => {
       location: "",
       category: "",
       customCategory: "",
-      photo: null,
     });
 
     Swal.fire({
@@ -93,7 +91,7 @@ const ReportForm = () => {
       fileInputRef.current.value = "";
     }
   };
-
+  
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
