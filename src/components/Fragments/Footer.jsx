@@ -49,9 +49,13 @@ function Footer() {
           </Button>
           <Button
             onClick={() => handleScroll("carapemakaian")}
-            className="flex items-center gap-2 hover:underline"
+            className="group flex items-center gap-2 hover:underline"
           >
-            Lihat cara pemakaian <FiArrowRight size={14} />
+            Lihat cara pemakaian{" "}
+            <FiArrowRight
+              size={14}
+              className="transform transition-transform duration-200 group-hover:-rotate-45"
+            />
           </Button>
         </div>
       </div>
