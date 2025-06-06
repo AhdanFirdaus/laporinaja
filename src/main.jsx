@@ -5,6 +5,7 @@ import "./index.css";
 import ErrorPage from "./pages/404";
 import Home from "./pages/Home"
 import ProfilePage from './pages/ProfilePage';
+import Login from "./pages/Login";
 
 const router = createBrowserRouter([
   {
@@ -14,8 +15,12 @@ const router = createBrowserRouter([
   },
   {
     path: "/profile",
-    element: <div><ProfilePage /></div>
-  }
+    element: <ProfilePage />,
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
 ]);
 
 createRoot(document.getElementById("root")).render(
