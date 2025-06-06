@@ -80,31 +80,32 @@ export default function Home() {
 
   const faqs = [
     {
-      question: "Apa itu CodeLab?",
+      question: "Apa itu LaporinAja?",
       answer:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "LaporinAja adalah layanan digital yang memudahkan warga Semarang untuk melaporkan kerusakan atau kendala di fasilitas umum secara cepat dan aman.",
     },
     {
-      question: "Apakah CodeLab mudah dikustomisasi?",
+      question: "Siapa saja yang bisa menggunakan LaporinAja?",
       answer:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque habitant morbi tristique senectus et netus.",
+        "Warga Semarang yang telah terverifikasi dengan KTP dapat menggunakan aplikasi ini untuk melaporkan masalah di lingkungan sekitar.",
     },
     {
-      question: "Teknologi apa yang digunakan oleh CodeLab?",
+      question: "Apakah data pribadi saya aman?",
       answer:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam.",
+        "Ya, semua data pengguna akan dienkripsi dan hanya digunakan untuk verifikasi. Identitas pelapor tidak akan ditampilkan secara publik.",
     },
     {
-      question: "Apakah saya butuh skill coding tingkat lanjut?",
+      question: "Jenis masalah apa saja yang bisa dilaporkan?",
       answer:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam nec dui quis sapien sodales fringilla.",
+        "Kamu bisa melaporkan berbagai masalah seperti jalan rusak, lampu jalan mati, saluran air tersumbat, sampah menumpuk, hingga isu keamanan.",
     },
     {
-      question: "Bagaimana cara mendapatkan support?",
+      question: "Bagaimana laporan saya diproses?",
       answer:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam tincidunt, nisl eget vestibulum posuere.",
+        "Setelah laporan dikirim, pihak terkait akan meninjau dan memverifikasi laporan tersebut. Petugas juga akan melakukan pengecekan langsung di lapangan.",
     },
   ];
+
 
   return (
     <>
@@ -119,15 +120,17 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             className="lg:w-1/2 text-center lg:text-left mb-10 lg:mb-0"
           >
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-700 leading-tight mb-4">
-              Lorem, ipsum dolor sit amet consectetur adipisicing.
+            <h1 className="text-4xl sm:text-5xl font-bold text-gray-700 leading-tight mb-4"><h1 class="text-4xl md:text-5xl font-bold text-gray-900">📢 LaporinAja</h1>
             </h1>
-            <p className="text-lg text-gray-600 mb-6">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore
-              modi reiciendis dolor repellendus reprehenderit earum voluptatum
-              quibusdam iure tenetur possimus?
+            <h1 className="text-4xl sm:text-5xl font-bold text-gray-700 leading-tight mb-4"><h1 class="text-4xl md:text-5xl font-bold text-gray-900">Suara Warga, Aksi Nyata! 💪</h1>
+            </h1>
+            <p className="text-lg text-gray-600">
+              Bersama kita wujudkan fasilitas umum yang layak, aman, dan nyaman.
             </p>
-            <Button className="text-lg">Mulai</Button>
+            <p className="text-lg text-gray-600 mb-6">
+              Laporkan kendala di sekitarmu dan jadilah bagian dari perubahan nyata. ✨
+            </p>
+            <Button className="text-lg">Lebih Lanjut</Button>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -216,35 +219,28 @@ export default function Home() {
               Tentang LaporinAja
             </h2>
             <p className="text-gray-600 mb-2 sm:mb-4">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat.
+              LaporinAja adalah layanan pengaduan digital yang memudahkan warga Semarang melaporkan kerusakan atau kendala fasilitas umum. Setiap laporan ditindaklanjuti secara aman dan transparan demi lingkungan kota yang lebih tertib dan nyaman.
             </p>
             <ul className="list-none text-gray-600 space-y-1 sm:space-y-2">
               <li className="flex items-center">
-                <span className="w-2 h-2 bg-soft-orange rounded-full mr-2"></span>{" "}
-                Curabitur gravida sem
+                <span className="w-2 h-2 bg-soft-orange rounded-full mr-2"></span>
+                Mudah digunakan oleh semua warga
               </li>
               <li className="flex items-center">
-                <span className="w-2 h-2 bg-soft-orange rounded-full mr-2"></span>{" "}
-                Mauris tempor ac erat
+                <span className="w-2 h-2 bg-soft-orange rounded-full mr-2"></span>
+                Mendorong kepedulian lingkungan sekitar
               </li>
               <li className="flex items-center">
-                <span className="w-2 h-2 bg-soft-orange rounded-full mr-2"></span>{" "}
-                Fuscus eleifend lectus
+                <span className="w-2 h-2 bg-soft-orange rounded-full mr-2"></span>
+                Menjaga privasi pelapor
               </li>
               <li className="flex items-center">
-                <span className="w-2 h-2 bg-soft-orange rounded-full mr-2"></span>{" "}
-                Fuscus non sodales
+                <span className="w-2 h-2 bg-soft-orange rounded-full mr-2"></span>
+                Kolaborasi antara warga dan pemerintah
               </li>
               <li className="flex items-center">
-                <span className="w-2 h-2 bg-soft-orange rounded-full mr-2"></span>{" "}
-                Class aptent taciti
-              </li>
-              <li className="flex items-center">
-                <span className="w-2 h-2 bg-soft-orange rounded-full mr-2"></span>{" "}
-                Nam elementum semper
+                <span className="w-2 h-2 bg-soft-orange rounded-full mr-2"></span>
+                Membangun kota yang lebih baik bersama
               </li>
             </ul>
           </div>
@@ -265,8 +261,7 @@ export default function Home() {
               Dampak Aplikasi Kami
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-              eiusmod tempor incididunt.
+              LaporinAja mendorong partisipasi warga, mempercepat penanganan masalah, dan membangun lingkungan kota yang lebih tertib dan nyaman.
             </p>
           </motion.div>
 
@@ -279,12 +274,10 @@ export default function Home() {
               className="order-2 lg:order-1"
             >
               <h3 className="text-3xl font-semibold font-second text-soft-orange mb-3">
-                Lebih dari 1.200 kerusakan diperbaiki
+                Ribuan Warga Terbantu Lewat Aksi Nyata
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+                Partisipasi aktif warga dalam melaporkan masalah membuat banyak kendala cepat ditangani. Kolaborasi ini terbukti meningkatkan kualitas hidup masyarakat di berbagai kecamatan.
               </p>
             </motion.div>
             <motion.div
@@ -295,7 +288,7 @@ export default function Home() {
             >
               <div className="w-full h-64 bg-gray-200 rounded-lg shadow-lg overflow-hidden">
                 <img
-                  src={Imgs.After1}
+                  src={Imgs.Dampak1}
                   alt=""
                   className="w-full h-full object-cover"
                 />
@@ -312,7 +305,7 @@ export default function Home() {
             >
               <div className="w-full h-64 bg-gray-200 rounded-lg shadow-lg overflow-hidden">
                 <img
-                  src={Imgs.After2}
+                  src={Imgs.Dampak2}
                   alt=""
                   className="w-full h-full object-cover"
                 />
@@ -324,12 +317,10 @@ export default function Home() {
               transition={{ duration: 0.6 }}
             >
               <h3 className="text-3xl font-semibold font-second text-soft-orange mb-3">
-                Lingkungan yang Lebih Bersih dan Aman
+                Kolaborasi Warga dan Pemerintah
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+                Dengan saling mendukung dan bertindak bersama, kolaborasi antara masyarakat dan pemerintah mampu menghadirkan solusi nyata demi kota yang lebih tertib, bersih, dan nyaman.
               </p>
             </motion.div>
           </div>
@@ -346,7 +337,7 @@ export default function Home() {
                 Sebelum dan Sesudah
               </h3>
               <p className="text-gray-600 max-w-xl mx-auto">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Buktikan sendiri perubahan nyata fasilitas umum yang makin baik berkat laporan dan aksi kita bersama!
               </p>
             </motion.div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -413,11 +404,10 @@ export default function Home() {
                   >
                     <span className="flex items-center">
                       <span
-                        className={`w-8 h-8 flex items-center justify-center rounded-full mr-3 border border-soft-orange ${
-                          openStep === step.number
-                            ? "bg-soft-orange text-white"
-                            : "text-soft-orange"
-                        }`}
+                        className={`w-8 h-8 flex items-center justify-center rounded-full mr-3 border border-soft-orange ${openStep === step.number
+                          ? "bg-soft-orange text-white"
+                          : "text-soft-orange"
+                          }`}
                       >
                         {step.number}
                       </span>
@@ -426,9 +416,9 @@ export default function Home() {
                       </span>
                     </span>
                     {expandedStep === step.number ? (
-                      <FiChevronUp/>
+                      <FiChevronUp />
                     ) : (
-                      <FiChevronDown/>
+                      <FiChevronDown />
                     )}
                   </button>
                   {expandedStep === step.number && step.details.length > 0 && (
@@ -480,8 +470,7 @@ export default function Home() {
             Tanya Jawab
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur
-            blandit tempus porttitor.
+            Temukan jawaban dari pertanyaan umum seputar penggunaan LaporinAja dan cara berkontribusi untuk lingkungan sekitar.
           </p>
         </div>
 
@@ -519,7 +508,13 @@ export default function Home() {
                   Kami siap membantu Anda. Jangan ragu untuk menghubungi tim
                   kami kapan saja.
                 </p>
-                <Button color="softorange">Hubungi Kami</Button>
+                <Button
+                  color="softorange"
+                  href="https://wa.me/62895339023888?text=Halo%20Tim%20LaporinAja%F0%9F%91%8B%2C%0A%0ASaya%20memiliki%20pertanyaan%20terkait%3A%0A%0Apesan%0A%0ATerima%20kasih%20%F0%9F%99%8F."
+                  target="_blank"
+                >
+                  Hubungi Kami
+                </Button>
               </div>
             </div>
           </div>
