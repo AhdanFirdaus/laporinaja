@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
 import ProfileCard from "../components/Fragments/ProfileCard";
 import PrivacyPolicy from "../components/Fragments/PrivacyPolicy";
 import Sidebar from "../components/Layouts/Sidebar";
 import Terms from "../components/Fragments/Terms";
 import ComplaintsList from "../components/Fragments/ComplaintsList";
 import ReportForm from "../components/Fragments/ReportForm";
+import { FiUser, FiShield, FiBookOpen, FiMessageCircle, FiAlertCircle } from "react-icons/fi";
+import { useState } from "react";
 
 const mockUser = {
   avatar:
@@ -21,25 +22,25 @@ const mockUser = {
   },
 };
 
+// Menu items for the Sidebar
+  const menuItems = [
+    { key: "profile", icon: <FiUser />, label: "Profil" },
+    { key: "privacy", icon: <FiShield />, label: "Kebijakan Privasi" },
+    { key: "terms", icon: <FiBookOpen />, label: "Ketentuan" },
+    { key: "report", icon: <FiMessageCircle />, label: "Ajukan Keluhan" },
+    { key: "complaints", icon: <FiAlertCircle />, label: "Keluhan" },
+  ];
+
+const titleMap = {
+  profile: "Profil Anda",
+  privacy: "Kebijakan Privasi",
+  terms: "Ketentuan Pengguna",
+  report: "Ajukan Keluhan",
+  complaints: "Daftar Keluhan",
+};
+
 const ProfilePage = () => {
   const [view, setView] = useState("profile");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Default to true for desktop
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsSidebarOpen(window.innerWidth >= 768);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const titleMap = {
-    profile: "Profil Anda",
-    privacy: "Kebijakan Privasi",
-    terms: "Ketentuan Pengguna",
-    report: "Ajukan Keluhan",
-    complaints: "Daftar Keluhan",
-  };
 
   const renderContent = () => {
     switch (view) {
@@ -60,20 +61,18 @@ const ProfilePage = () => {
 
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar with dynamic width and state control */}
-      <div className="fixed top-0 left-0 z-50">
-        <Sidebar
-          onSelect={setView}
-          currentView={view}
-          isOpen={isSidebarOpen}
-          setIsOpen={setIsSidebarOpen}
-        />
-      </div>
+      {/* Sidebar */}
+      <Sidebar
+        title="LaporinAja."
+        menuItems={menuItems}
+        currentView={view}
+        onSelect={setView}
+        showLogout={true}
+      />
 
-      {/* Main content with dynamic margin based on sidebar state */}
+      {/* Main content */}
       <main
-        className={`flex-1 p-6 bg-gray-50 overflow-y-auto transition-all duration-300
-          ${isSidebarOpen ? "ml-64" : "ml-16"} md:ml-64`}
+        className={`flex-1 p-6 bg-gray-50 overflow-y-auto transition-all duration-300 ml-16 md:ml-64`}
       >
         <h2 className="text-3xl font-bold font-second text-soft-orange mb-4">
           {titleMap[view]}
