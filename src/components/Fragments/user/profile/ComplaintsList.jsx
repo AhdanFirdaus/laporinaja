@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import semarangGeoJSON from "../../../../../public/semarang_kecamatan.json";
-import Modal from "../../../Elements/Modal"; 
+import semarangGeoJSON from "../../../public/semarang_kecamatan.json";
+import Modal from "../Elements/Modal";
+import Button from "../Elements/Button";
+import CardComplaint from "./CardComplaint";
+import DetailComplaintModal from "./DetailComplaintModal";
 
 const keluhanData = {
   "Semarang Tengah": 2,
@@ -14,16 +17,20 @@ const keluhanData = {
   // Tambah data lainnya...
 };
 
-// Enhanced complaint data with image placeholder
+// Enhanced complaint data with additional fields
 const complaintHistory = [
   {
     id: 1,
     userId: "USR123",
     label: "Menunggu",
     date: "2025-06-01",
-    title: "Jalan di daerah ini sangat berlubang, mohon segera diperbaiki.",
-    note: "Gambar jalan berlubang diunggah.",
-    imageUrl: "https://via.placeholder.com/300x200?text=Jalan+Berlubang",
+    title:
+      "Jalan di daerah ini sangat berlubang, mohon segera diperbaiki.Jalan di daerah ini sangat berlubang, mohon segera diperbaiki.Jalan di daerah ini sangat berlubang, mohon segera diperbaiki.Jalan di daerah ini sangat berlubang, mohon segera diperbaiki.",
+    note: "Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.",
+    imageUrl:
+      "https://images.unsplash.com/photo-1615143219212-fe08fb4a27e2?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    location: "Semarang Tengah",
+    category: "Infrastruktur",
   },
   {
     id: 2,
@@ -32,7 +39,10 @@ const complaintHistory = [
     date: "2025-06-03",
     title: "Lampu jalan mati sejak seminggu lalu, tolong diperbaiki.",
     note: "Foto lampu jalan mati tersedia.",
-    imageUrl: "https://via.placeholder.com/300x200?text=Lampu+Jalan+Mati",
+    imageUrl:
+      "https://images.unsplash.com/photo-1601696935626-431bbe118c31?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    location: "Semarang Utara",
+    category: "Penerangan",
   },
   {
     id: 3,
@@ -42,6 +52,21 @@ const complaintHistory = [
     title: "Sampah menumpuk di pinggir jalan, perlu segera dibersihkan.",
     note: "Catatan: Sudah dikoordinasikan dengan dinas kebersihan.",
     imageUrl: "https://via.placeholder.com/300x200?text=Sampah+Menumpuk",
+    location: "Pedurungan",
+    category: "Kebersihan",
+  },
+  {
+    id: 4,
+    userId: "USR123",
+    label: "Menunggu",
+    date: "2025-06-01",
+    title:
+      "Jalan di daerah ini sangat berlubang, mohon segera diperbaiki.Jalan di daerah ini sangat berlubang, mohon segera diperbaiki.Jalan di daerah ini sangat berlubang, mohon segera diperbaiki.Jalan di daerah ini sangat berlubang, mohon segera diperbaiki.",
+    note: "Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.",
+    imageUrl:
+      "https://images.unsplash.com/photo-1615143219212-fe08fb4a27e2?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    location: "Semarang Tengah",
+    category: "Infrastruktur",
   },
 ];
 
@@ -59,8 +84,8 @@ const ComplaintsList = () => {
     fillOpacity: 0.8,
   });
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleDetailClick = (complaint) => {
     setSelectedComplaint(complaint);
@@ -68,8 +93,8 @@ const ComplaintsList = () => {
   };
 
   const closeModal = () => {
-    setIsModalOpen(false);
     setSelectedComplaint(null);
+    setIsModalOpen(false);
   };
 
   return (
@@ -94,101 +119,31 @@ const ComplaintsList = () => {
         Lihat Keluhan
       </h2>
       {complaintHistory.length === 0 ? (
-        <p className="text-gray-500 text-lg italic text-center py-8">
+        <p className="text-gray-500 text-lg italic text-center py-8 w-full">
           Belum ada keluhan yang diajukan.
         </p>
       ) : (
-        <ul className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+        <ul className="columns-1 sm:columns-2 w-full">
           {complaintHistory.map((complaint) => (
-            <li
+            <CardComplaint
               key={complaint.id}
-              className="border border-gray-200 p-6 rounded-xl bg-white shadow-md hover:shadow-lg transition-shadow duration-300"
-            >
-              <div className="space-y-4">
-                {/* Top Section: Date and Label */}
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-400">{complaint.date}</span>
-                  <span
-                    className={`text-sm font-medium py-1 px-3 rounded-full ${
-                      complaint.label === "Menunggu"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : complaint.label === "Proses"
-                        ? "bg-blue-100 text-blue-800"
-                        : "bg-green-100 text-green-800"
-                    }`}
-                  >
-                    {complaint.label}
-                  </span>
-                </div>
-                {/* Title Section */}
-                <p className="text-md text-gray-600">
-                  <h3 className="line-clamp-3 break-all font-semibold">{complaint.title}</h3>
-                </p>
-                {/* Note Section */}
-                {complaint.note && (
-                  <p className="text-md text-gray-600">
-                    <span className="line-clamp-2 break-all">{complaint.note}</span>
-                  </p>
-                )}
-                {/* Button Section */}
-                <div className="flex justify-end mt-4">
-                  <button
-                    onClick={() => handleDetailClick(complaint)}
-                    className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors hover:underline cursor-pointer"
-                  >
-                    Lihat Detail
-                  </button>
-                </div>
-              </div>
-            </li>
+              complaint={complaint}
+              actions={[
+                {
+                  label: "Lihat Detail",
+                  onClick: handleDetailClick,
+                },
+              ]}
+            />
           ))}
         </ul>
       )}
-      {selectedComplaint && (
-        <Modal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          title={selectedComplaint.title}
-        //   maxHeight="80vh"
-          className="z-10 mx-6 my-6"
-          footer={
-            <button
-              onClick={closeModal}
-              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Tutup
-            </button>
-          }
-        >
-          <div className="space-y-4">
-            <p className="text-md text-gray-600">
-              <span className="font-medium">Tanggal:</span>{" "}
-              <span>{selectedComplaint.date}</span>
-            </p>
-            <p className="text-md text-gray-600">
-              <span className="font-medium">Status:</span>{" "}
-              <span>{selectedComplaint.label}</span>
-            </p>
-            <p className="text-md text-gray-600">
-              <span className="font-medium">User ID:</span>{" "}
-              <span>{selectedComplaint.userId}</span>
-            </p>
-            <p className="text-md text-gray-600">
-              <span className="font-medium">Catatan:</span>{" "}
-              <span>{selectedComplaint.note}</span>
-            </p>
-            {selectedComplaint.imageUrl && (
-              <div className="mt-4">
-                <img
-                  src={selectedComplaint.imageUrl}
-                  alt={selectedComplaint.title}
-                  className="w-full h-64 object-cover rounded-lg"
-                />
-              </div>
-            )}
-          </div>
-        </Modal>
-      )}
+
+      <DetailComplaintModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        complaint={selectedComplaint}
+      />
     </>
   );
 };
