@@ -120,9 +120,9 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             className="lg:w-1/2 text-center lg:text-left mb-10 lg:mb-0"
           >
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-700 leading-tight mb-4"><h1 class="text-4xl md:text-5xl font-bold text-gray-900">📢 LaporinAja</h1>
+            <h1 className="text-4xl sm:text-5xl font-bold text-gray-700 leading-tight mb-4"><span className="text-4xl md:text-5xl font-bold text-gray-900">📢 LaporinAja</span>
             </h1>
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-700 leading-tight mb-4"><h1 class="text-4xl md:text-5xl font-bold text-gray-900">Suara Warga, Aksi Nyata! 💪</h1>
+            <h1 className="text-4xl sm:text-5xl font-bold text-gray-700 leading-tight mb-4"><span className="text-4xl md:text-5xl font-bold text-gray-900">Suara Warga, Aksi Nyata! 💪</span>
             </h1>
             <p className="text-lg text-gray-600">
               Bersama kita wujudkan fasilitas umum yang layak, aman, dan nyaman.
