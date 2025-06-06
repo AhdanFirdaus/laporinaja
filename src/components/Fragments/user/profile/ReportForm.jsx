@@ -6,6 +6,7 @@ import Select from "../Elements/Select";
 import InputUpload from "../Elements/InputUpload";
 import CardComplaint from "../Fragments/CardComplaint";
 import DetailComplaintModal from "../Fragments/DetailComplaintModal";
+import Swal from "sweetalert2";
 
 const ReportForm = () => {
   const [formData, setFormData] = useState({
