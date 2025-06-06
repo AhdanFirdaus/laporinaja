@@ -149,7 +149,7 @@ const ReportForm = () => {
             label="Foto"
             name="photo"
             value={formData.photo}
-            onChange={handleButtonClick}
+            onChange={handleChange}
             onClear={handleClearFile}
           />
         </div>
