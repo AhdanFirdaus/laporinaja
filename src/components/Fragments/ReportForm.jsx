@@ -13,6 +13,7 @@ const ReportForm = () => {
     date: "",
     location: "",
     category: "",
+    customCategory: "", // New field for custom category input
     photo: null,
   });
 
@@ -33,6 +34,10 @@ const ReportForm = () => {
       ...formData,
       id: Date.now(),
       timestamp: new Date().toLocaleString(),
+      category:
+        formData.category === "Lainnya"
+          ? formData.customCategory
+          : formData.category, // Use customCategory if Lainnya is selected
     };
 
     setReportHistory([newReport, ...reportHistory]);
@@ -43,6 +48,7 @@ const ReportForm = () => {
       date: "",
       location: "",
       category: "",
+      customCategory: "",
       photo: null,
     });
 
@@ -143,6 +149,17 @@ const ReportForm = () => {
           options={categoryOptions}
           required
         />
+
+        {formData.category === "Lainnya" && (
+          <Input
+            label="Masukkan Kategori Lainnya"
+            name="customCategory"
+            value={formData.customCategory}
+            onChange={handleChange}
+            required
+            placeholder="Masukkan kategori lainnya"
+          />
+        )}
 
         <div className="mb-10">
           <InputUpload
