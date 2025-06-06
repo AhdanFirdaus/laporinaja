@@ -1,9 +1,9 @@
 import { useState, useRef } from "react";
-import { FiX } from "react-icons/fi";
 import Button from "../Elements/Button";
 import Input from "../Elements/Input";
 import Textarea from "../Elements/Textarea";
 import Select from "../Elements/Select";
+import InputUpload from "../Elements/InputUpload";
 import Swal from "sweetalert2";
 
 const ReportForm = () => {
@@ -145,37 +145,12 @@ const ReportForm = () => {
         />
 
         <div className="mb-10">
-          <label className="block font-medium mb-1 text-gray-700">Foto</label>
-          <div className="flex items-center border border-gray-800 px-3 py-2 rounded-lg focus-within:border-soft-orange focus-within:ring-0">
-            <Button type="button" onClick={handleButtonClick}>
-              Upload File
-            </Button>
-            <span className="text-sm text-gray-600 ml-3 truncate">
-              {formData.photo ? formData.photo.name : "No File Chosen"}
-            </span>
-            {formData.photo && (
-              <button
-                type="button"
-                onClick={handleClearFile}
-                className="ml-3 text-red-500 hover:text-red-700 text-2xl transition-all duration-200"
-                title="Hapus Foto"
-              >
-                <FiX />
-              </button>
-            )}
-          </div>
-          <input
-            id="photo-upload"
-            ref={fileInputRef}
-            type="file"
+          <InputUpload
+            label="Foto"
             name="photo"
-            accept="image/*"
-            onChange={(e) => {
-              handleChange(e);
-              // Jangan kosongkan value di sini karena akan bikin file tidak bisa dipilih ulang yang sama
-            }}
-            className="hidden"
-            required={!formData.photo}
+            value={formData.photo}
+            onChange={handleButtonClick}
+            onClear={handleClearFile}
           />
         </div>
 
