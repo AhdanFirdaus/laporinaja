@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import semarangGeoJSON from "../../../public/semarang_kecamatan.json";
-import Modal from "../Elements/Modal";
-import Button from "../Elements/Button";
-import CardComplaint from "./CardComplaint";
-import DetailComplaintModal from "./DetailComplaintModal";
+import semarangGeoJSON from "../../../../../public/semarang_kecamatan.json";
+import CardComplaint from "../../CardComplaint";
+import DetailComplaintModal from "../../DetailComplaintModal";
 
 const keluhanData = {
   "Semarang Tengah": 2,
