@@ -50,7 +50,7 @@ function Register() {
         />
 
         <InputUpload
-          label="Foto"
+          label="Foto KTP"
           name="photo"
           value={formData.photo}
           onChange={handleChange}
