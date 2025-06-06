@@ -39,7 +39,12 @@ function Footer() {
           <strong className="font-second text-2xl">LaporinAja</strong>.
         </p>
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-          <Button color="white" txtcolor="text-soft-orange">
+          <Button
+            color="white"
+            txtcolor="text-soft-orange"
+            href="https://wa.me/62895339023888?text=Halo%20Tim%20LaporinAja%F0%9F%91%8B%2C%0A%0ASaya%20memiliki%20pertanyaan%20terkait%3A%0A%0Apesan%0A%0ATerima%20kasih%20%F0%9F%99%8F."
+            target="_blank"
+          >
             Hubungi Kami
           </Button>
           <Button
