@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import Button from "../Elements/Button";
-import Modal from "../Elements/Modal";
-import Input from "../Elements/Input";
+import Button from "../../../Elements/Button";
+import Modal from "../../../Elements/Modal";
+import Input from "../../../Elements/Input";
 
 const ProfileCard = ({ user }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);

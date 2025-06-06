@@ -1,9 +1,9 @@
-import ProfileCard from "../components/Fragments/ProfileCard";
-import PrivacyPolicy from "../components/Fragments/PrivacyPolicy";
-import Sidebar from "../components/Layouts/Sidebar";
-import Terms from "../components/Fragments/Terms";
-import ComplaintsList from "../components/Fragments/ComplaintsList";
-import ReportForm from "../components/Fragments/ReportForm";
+import ProfileCard from "../components/Fragments/user/profile/ProfileCard";
+import PrivacyPolicy from "../components/Fragments/user/profile/PrivacyPolicy";
+import Sidebar from "../components/Fragments/Sidebar";
+import Terms from "../components/Fragments/user/profile/Terms";
+import ComplaintsList from "../components/Fragments/user/profile/ComplaintsList";
+import ReportForm from "../components/Fragments/user/profile/ReportForm";
 import { FiUser, FiShield, FiBookOpen, FiMessageCircle, FiAlertCircle } from "react-icons/fi";
 import { useState } from "react";
 
