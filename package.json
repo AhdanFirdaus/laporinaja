@@ -12,15 +12,17 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.8",
     "framer-motion": "^12.15.0",
+    "leaflet": "^1.9.4",
     "react": "^19.1.0",
     "react-compare-image": "^3.5.4",
     "react-dom": "^19.1.0",
     "react-icons": "^5.5.0",
+    "react-leaflet": "^5.0.0",
     "react-router": "^7.6.1",
     "react-router-dom": "^6.30.1",
-    "sweetalert2": "^11.22.0",
     "react-scroll": "^1.9.3",
     "styled-components": "^6.1.18",
+    "sweetalert2": "^11.22.0",
     "tailwindcss": "^4.1.8"
   },
   "devDependencies": {

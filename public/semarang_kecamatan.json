@@ -1,0 +1,35 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "NAMA_KEC": "Semarang Tengah"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[110.42, -6.98], [110.43, -6.98], [110.43, -6.97], [110.42, -6.97], [110.42, -6.98]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "NAMA_KEC": "Semarang Utara"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[110.42, -6.99], [110.43, -6.99], [110.43, -6.98], [110.42, -6.98], [110.42, -6.99]]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "NAMA_KEC": "Tugu"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[[110.40, -6.99], [110.41, -6.99], [110.41, -6.98], [110.40, -6.98], [110.40, -6.99]]]
+      }
+    }
+  ]
+}
