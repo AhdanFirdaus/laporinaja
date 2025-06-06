@@ -1,11 +1,11 @@
 import { useState, useRef } from "react";
-import Button from "../Elements/Button";
-import Input from "../Elements/Input";
-import Textarea from "../Elements/Textarea";
-import Select from "../Elements/Select";
-import InputUpload from "../Elements/InputUpload";
-import CardComplaint from "../Fragments/CardComplaint";
-import DetailComplaintModal from "../Fragments/DetailComplaintModal";
+import Button from "../../../Elements/Button";
+import Input from "../../../Elements/Input";
+import Textarea from "../../../Elements/Textarea";
+import Select from "../../../Elements/Select";
+import InputUpload from "../../../Elements/InputUpload";
+import CardComplaint from "../../../Fragments/CardComplaint";
+import DetailComplaintModal from "../../../Fragments/DetailComplaintModal";
 import Swal from "sweetalert2";
 
 const ReportForm = () => {
