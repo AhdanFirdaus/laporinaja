@@ -63,7 +63,7 @@ const ProfilePage = () => {
     <div className="flex min-h-screen">
       {/* Sidebar */}
       <Sidebar
-        title="LaporinAja."
+        title="LaporinAja"
         menuItems={menuItems}
         currentView={view}
         onSelect={setView}
