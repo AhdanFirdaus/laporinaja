@@ -1,17 +1,19 @@
 import { useState, useEffect } from "react";
 import {
-  FiMenu,
   FiX,
-  FiShield,
-  FiUser,
-  FiBookOpen,
-  FiAlertCircle,
-  FiMessageCircle,
   FiLogOut,
+  FiMenu
 } from "react-icons/fi";
 import Button from "../Elements/Button";
 
-const Sidebar = ({ onSelect, currentView }) => {
+const Sidebar = ({
+  onSelect,
+  currentView,
+  menuItems = [],
+  title = "Sidebar",
+  showLogout = false,
+  onLogout = () => {},
+}) => {
   const [isOpen, setIsOpen] = useState(() => window.innerWidth >= 768);
 
   useEffect(() => {
@@ -22,14 +24,6 @@ const Sidebar = ({ onSelect, currentView }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const menuItems = [
-    { key: "profile", icon: <FiUser />, label: "Profil" },
-    { key: "privacy", icon: <FiShield />, label: "Kebijakan Privasi" },
-    { key: "terms", icon: <FiBookOpen />, label: "Ketentuan" },
-    { key: "report", icon: <FiMessageCircle />, label: "Ajukan Keluhan" },
-    { key: "complaints", icon: <FiAlertCircle />, label: "Keluhan" },
-  ];
-
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
@@ -37,8 +31,7 @@ const Sidebar = ({ onSelect, currentView }) => {
   return (
     <aside
       className={`bg-white h-screen shadow-md flex flex-col justify-between transition-all duration-300
-        ${isOpen ? "w-64" : "w-16"} md:w-64 p-4 md:p-6 fixed top-0 left-0 z-50
-        ${!isOpen && "translate-x-0"} md:translate-x-0`}
+        ${isOpen ? "w-64" : "w-16"} md:w-64 p-4 md:p-6 fixed top-0 left-0 z-50`}
     >
       <div>
         <div className="flex items-center justify-center md:justify-between my-5 gap-10">
@@ -46,7 +39,7 @@ const Sidebar = ({ onSelect, currentView }) => {
             className={`text-4xl font-bold font-second text-center text-soft-orange
               ${isOpen ? "block" : "hidden"} md:block`}
           >
-            LaporinAja
+            {title}
           </h1>
           <button
             className="text-gray-700 md:hidden focus:outline-none z-50"
@@ -56,6 +49,7 @@ const Sidebar = ({ onSelect, currentView }) => {
             {isOpen ? <FiX size={24} /> : <FiMenu size={24} />}
           </button>
         </div>
+
         <nav className="space-y-4">
           {menuItems.map((item) => (
             <div
@@ -70,9 +64,7 @@ const Sidebar = ({ onSelect, currentView }) => {
                     ? "bg-soft-orange text-white"
                     : "text-gray-700 hover:bg-soft-orange hover:text-white"
                 }
-                ${
-                  isOpen ? "justify-start" : "justify-center"
-                } md:justify-start`}
+                ${isOpen ? "justify-start" : "justify-center"} md:justify-start`}
             >
               <div className="text-xl">{item.icon}</div>
               <span className={`${isOpen ? "block" : "hidden"} md:block`}>
@@ -83,26 +75,29 @@ const Sidebar = ({ onSelect, currentView }) => {
         </nav>
       </div>
 
-      <div className="space-y-6">
-        <Button
-          onClick={() => {
-            if (window.innerWidth < 768) setIsOpen(false);
-          }}
-          color="redoutline"
-          className={`flex items-center gap-3 w-full transition-all
-    ${isOpen ? "justify-start" : "justify-center"} md:justify-start`}
-          rounded="rounded-lg"
-          txtcolor="text-red-600"
-          font="font-normal"
-        >
-          <div className="text-xl">
-            <FiLogOut />
-          </div>
-          <span className={`${isOpen ? "block" : "hidden"} md:block`}>
-            Sign Out
-          </span>
-        </Button>
-      </div>
+      {showLogout && (
+        <div className="space-y-6">
+          <Button
+            onClick={() => {
+              if (window.innerWidth < 768) setIsOpen(false);
+              onLogout();
+            }}
+            color="redoutline"
+            className={`flex items-center gap-3 w-full transition-all
+              ${isOpen ? "justify-start" : "justify-center"} md:justify-start`}
+            rounded="rounded-lg"
+            txtcolor="text-red-600"
+            font="font-normal"
+          >
+            <div className="text-xl">
+              <FiLogOut />
+            </div>
+            <span className={`${isOpen ? "block" : "hidden"} md:block`}>
+              Sign Out
+            </span>
+          </Button>
+        </div>
+      )}
     </aside>
   );
 };
