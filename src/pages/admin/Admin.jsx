@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Sidebar from "../../components/Layouts/Sidebar";
+import Sidebar from "../../components/Fragments/Sidebar";
 import { FiAlertCircle, FiHome, FiUsers } from "react-icons/fi";
 import Dashboard from "../../components/Fragments/admin/Dashboard";
 import Complaints from "../../components/Fragments/admin/Complaints";
