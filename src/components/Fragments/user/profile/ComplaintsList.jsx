@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import semarangGeoJSON from "../../../public/semarang_kecamatan.json";
-import Modal from "../Elements/Modal"; 
+import semarangGeoJSON from "../../../../../public/semarang_kecamatan.json";
+import Modal from "../../../Elements/Modal"; 
 
 const keluhanData = {
   "Semarang Tengah": 2,
