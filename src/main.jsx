@@ -7,6 +7,7 @@ import Home from "./pages/Home"
 import ProfilePage from './pages/ProfilePage';
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Admin from "./pages/admin/Admin"
 
 const router = createBrowserRouter([
   {
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
     path: "/register",
     element: <Register />,
   },
+  {
+    path: "/admin",
+    element: <Admin />
+  }
 ]);
 
 createRoot(document.getElementById("root")).render(
