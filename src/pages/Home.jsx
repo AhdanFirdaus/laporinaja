@@ -209,7 +209,7 @@ export default function Home() {
                 )}
               </div>
               <div className="absolute bottom-[-5%] left-[5%] sm:bottom-[-10%] sm:left-[10%] w-1/3 sm:w-1/4 md:w-1/3 bg-soft-orange text-white text-center p-2 sm:p-4 rounded-lg z-30 shadow-md">
-                <h2 className="text-xl sm:text-2xl font-bold">123+</h2>
+                <h2 className="text-xl sm:text-2xl font-bold">1.250+</h2>
                 <p className="text-xs sm:text-sm">Keluhan Yang Teratasi</p>
               </div>
             </div>
