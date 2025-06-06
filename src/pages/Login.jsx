@@ -1,6 +1,6 @@
-import Input from '../components/Elements/Input';
-import Button from '../components/Elements/Button';
-import AuthLayout from '../components/Layouts/AuthLayout';
+import Input from "../components/Elements/Input";
+import Button from "../components/Elements/Button";
+import AuthLayout from "../components/Layouts/AuthLayout";
 
 function Login() {
   return (
@@ -27,7 +27,9 @@ function Login() {
           autoComplete="current-password"
         />
 
-        <Button type="submit" className='w-full'>Sign in</Button>
+        <Button type="submit" className="w-full">
+          Masuk
+        </Button>
       </form>
     </AuthLayout>
   );
