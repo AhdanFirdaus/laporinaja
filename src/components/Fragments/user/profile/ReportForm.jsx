@@ -15,10 +15,15 @@ const ReportForm = () => {
     date: "",
     location: "",
     category: "",
-    customCategory: "", // New field for custom category input
+    customCategory: "",
+    photo: null,
   });
 
   const [reportHistory, setReportHistory] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editId, setEditId] = useState(null);
+
+  const fileInputRef = useRef(null);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -31,17 +36,49 @@ const ReportForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const newReport = {
-      ...formData,
-      id: Date.now(),
-      timestamp: new Date().toLocaleString(),
-      category:
-        formData.category === "Lainnya"
-          ? formData.customCategory
-          : formData.category,
-    };
+    if (isEditing) {
+      const updatedReport = {
+        ...formData,
+        id: editId,
+        timestamp: new Date().toLocaleString(),
+        category:
+          formData.category === "Lainnya"
+            ? formData.customCategory
+            : formData.category,
+      };
 
-    setReportHistory([newReport, ...reportHistory]);
+      setReportHistory(
+        reportHistory.map((report) =>
+          report.id === editId ? updatedReport : report
+        )
+      );
+
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil!",
+        text: "Keluhan berhasil diperbarui.",
+        confirmButtonColor: "#52BA5E",
+      });
+    } else {
+      const newReport = {
+        ...formData,
+        id: Date.now(),
+        timestamp: new Date().toLocaleString(),
+        category:
+          formData.category === "Lainnya"
+            ? formData.customCategory
+            : formData.category,
+      };
+
+      setReportHistory([newReport, ...reportHistory]);
+
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil!",
+        text: "Keluhan berhasil diajukan.",
+        confirmButtonColor: "#52BA5E",
+      });
+    }
 
     setFormData({
       title: "",
@@ -50,14 +87,45 @@ const ReportForm = () => {
       location: "",
       category: "",
       customCategory: "",
+      photo: null,
     });
+    setIsEditing(false);
+    setEditId(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
-    Swal.fire({
-      icon: "success",
-      title: "Berhasil!",
-      text: "Keluhan berhasil diajukan.",
-      confirmButtonColor: "#52BA5E",
+  const handleEdit = (complaint) => {
+    setFormData({
+      title: complaint.title,
+      note: complaint.note,
+      date: complaint.date,
+      location: complaint.location,
+      category: complaint.category === complaint.customCategory ? "Lainnya" : complaint.category,
+      customCategory: complaint.category === complaint.customCategory ? complaint.customCategory : "",
+      photo: complaint.photo || null,
     });
+    setIsEditing(true);
+    setEditId(complaint.id);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleCancelEdit = () => {
+    setFormData({
+      title: "",
+      note: "",
+      date: "",
+      location: "",
+      category: "",
+      customCategory: "",
+      photo: null,
+    });
+    setIsEditing(false);
+    setEditId(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const handleDelete = (id) => {
@@ -83,15 +151,13 @@ const ReportForm = () => {
     });
   };
 
-  const fileInputRef = useRef(null);
-
   const handleClearFile = () => {
     setFormData({ ...formData, photo: null });
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
-  
+
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -138,7 +204,7 @@ const ReportForm = () => {
         />
 
         <Input
-          label="Lokasi"
+          label="Lokasi (Alamat, Kecamatan/Desa/Kelurahan)"
           name="location"
           value={formData.location}
           onChange={handleChange}
@@ -172,49 +238,58 @@ const ReportForm = () => {
             value={formData.photo}
             onChange={handleChange}
             onClear={handleClearFile}
+            ref={fileInputRef}
           />
         </div>
 
-        <div className="flex justify-end">
-          <Button type="submit">Kirim Keluhan</Button>
+        <div className="flex justify-end gap-4">
+          {isEditing && (
+            <Button type="button" onClick={handleCancelEdit} color="red">
+              Batal
+            </Button>
+          )}
+          <Button type="submit">{isEditing ? "Simpan Perubahan" : "Kirim Keluhan"}</Button>
         </div>
       </form>
 
-      {/* Riwayat Keluhan */}
       <div className="mt-12 border-t pt-8 bg-gray-50">
         <h2 className="text-3xl font-bold font-second text-soft-orange mb-6 tracking-tight">
           Riwayat Keluhan
         </h2>
-      {reportHistory.length === 0 ? (
-        <p className="text-gray-500 text-lg italic text-center py-8">
-          Belum ada keluhan yang diajukan.
-        </p>
-      ) : (
-        <ul className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
-          {reportHistory.map((report) => (
-            <CardComplaint
-              key={report.id}
-              complaint={report}
-              actions={[
-                {
-                  label: "Lihat Detail",
-                  onClick: handleDetailClick,
-                },
-                {
-                  label: "Hapus",
-                  onClick: (complaint) => handleDelete(complaint.id),
-                },
-              ]}
-            />
-          ))}
-        </ul>
-      )}
+        {reportHistory.length === 0 ? (
+          <p className="text-gray-500 text-lg italic text-center py-8">
+            Belum ada keluhan yang diajukan.
+          </p>
+        ) : (
+          <ul className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+            {reportHistory.map((report) => (
+              <CardComplaint
+                key={report.id}
+                complaint={report}
+                actions={[
+                  {
+                    label: "Lihat Detail",
+                    onClick: handleDetailClick,
+                  },
+                  {
+                    label: "Edit",
+                    onClick: handleEdit,
+                  },
+                  {
+                    label: "Hapus",
+                    onClick: (complaint) => handleDelete(complaint.id),
+                  },
+                ]}
+              />
+            ))}
+          </ul>
+        )}
 
-      <DetailComplaintModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        complaint={selectedComplaint}
-      />
+        <DetailComplaintModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          complaint={selectedComplaint}
+        />
       </div>
     </>
   );
