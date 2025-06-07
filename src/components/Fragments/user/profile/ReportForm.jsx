@@ -38,7 +38,7 @@ const ReportForm = () => {
       category:
         formData.category === "Lainnya"
           ? formData.customCategory
-          : formData.category, // Use customCategory if Lainnya is selected
+          : formData.category,
     };
 
     setReportHistory([newReport, ...reportHistory]);
