@@ -47,7 +47,6 @@ const Users = () => {
   <span>Domisili</span>
 </div>
 
-
       {/* List User */}
       <div className="w-full space-y-4">
         {userData.map((user, index) => (
