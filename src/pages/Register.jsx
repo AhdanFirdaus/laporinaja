@@ -39,6 +39,11 @@ function Register() {
       return;
     }
 
+    if (e.target.password.value < 6) {
+      alert('password harus lebih dari 6 !')
+      return 
+    }
+
     try {
       // Run OCR on the uploaded image
       const { data } = await Tesseract.recognize(file, "eng+ind", {
@@ -72,17 +77,44 @@ function Register() {
     });
 
     if (authError) {
-      setRegisterError('Registration failed: ' + authError.message);
+      alert('Registration failed: ' + authError.message);
       console.log(authError);
       return;
     }
 
     if (authData.user) {
       // Insert user data into the 'user' table
+      const [day, month, year] = parsedData.tanggalLahir.split("-");
+      const formated_tanggal = `${year}-${month}-${day}`;
       const { data, error } = await supabase
         .from('user')
-        .insert([{ id: authData.user.id, username : parsedData.nama, email : e.target.email.value, password : e.target.password.value }]);
+        .insert([{
+        id: authData.user.id,
+        email: e.target.email.value,
+        username: parsedData.nama,
+        nik: parsedData.nik,
+        gender: parsedData.jenisKelamin,
+        kelurahan: parsedData.kelurahan,
+        tanggal_lahir: formated_tanggal,
+        rt: parsedData.rtRw.split("/")[0]?.trim(),
+        rw: parsedData.rtRw.split("/")[1]?.trim(),
+        kecamatan: parsedData.kecamatan,
+        role: "user" // or any default role you prefer
+      }])
+      // UPLOAD FILE
+      const fileExt = file.name.split('.').pop(); // jpg, png, etc
+      const fileName = `${authData.user.id}.${fileExt}`; // e.g., 3a1c2b-... .jpg
+      const filePath = `${fileName}`;
 
+      const { error: uploadError } = await supabase
+        .storage
+        .from('fotoktp')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        alert('Upload gagal: ' + uploadError.message);
+        return;
+      }
       if (error) {
         console.error('Failed to save user data: ' + error.message);
         console.log(error);
@@ -90,6 +122,7 @@ function Register() {
         console.log(data);
       }
     }
+    
       alert("Form siap dikirim! Silahkan check email untuk verifikasi");
       
     } catch (error) {
