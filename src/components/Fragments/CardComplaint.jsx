@@ -1,11 +1,11 @@
-const CardComplaint = ({ complaint, actions = [] }) => {
+const CardComplaint = ({ complaint, actions = [], className = "" }) => {
   const label = complaint.label || "Menunggu";
 
   return (
     <li
-      className="border border-gray-200 p-6 mb-6 rounded-xl bg-white shadow hover:shadow-md transition-shadow duration-300"
-      style={{ height: "fit-content" }}
-    >
+  className={`border border-gray-200 p-6 mb-6 rounded-xl bg-white shadow hover:shadow-md transition-shadow duration-300 ${className}`}
+  style={{ height: "fit-content" }}
+>
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-400">{complaint.date}</span>
