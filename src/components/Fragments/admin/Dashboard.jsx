@@ -101,7 +101,7 @@ const Dashboard = () => {
           {cards.map((card, index) => (
             <div
               key={index}
-              className={`rounded-xl shadow-md p-4 sm:p-6 ${card.color} text-center flex flex-col justify-between transform hover:scale-105 transition-transform duration-300`}
+              className={`rounded-xl shadow p-4 sm:p-6 ${card.color} text-center flex flex-col justify-between transform hover:scale-105 transition-transform duration-300`}
             >
               <div className="flex items-center justify-center mb-3 sm:mb-4">
                 {card.icon}
@@ -118,7 +118,7 @@ const Dashboard = () => {
         </div>
 
         {/* Visitor Chart */}
-        <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 h-80 sm:h-96">
+        <div className="bg-white rounded-xl shadow p-4 sm:p-6 h-80 sm:h-96">
           <div className="h-full">
             <Line data={chartData} options={chartOptions} />
           </div>
