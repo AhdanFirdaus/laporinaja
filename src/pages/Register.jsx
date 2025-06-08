@@ -56,10 +56,10 @@ function Register() {
       console.log("Parsed KTP Data:", parsedData);
       const valid = isKecamatanValid(parsedData.kecamatan);
 
-      // if (!valid) {
-      //   alert("Kecamatan tidak valid!");
-      //   return; // stop submission
-      // }
+      if (!valid) {
+        alert("Kecamatan tidak valid!");
+        return; // stop kirim
+      }
 
       if (!extractedText.includes("NIK")) {
         alert("Gagal mengenali KTP. Pastikan foto jelas dan sesuai.");
