@@ -1,11 +1,7 @@
 import { useState } from "react";
 import DetailComplaintModal from "../DetailComplaintModal";
 import CardComplaint from "../CardComplaint";
-import Modal from "../../Elements/Modal";
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
-
-const MySwal = withReactContent(Swal);
+import { showConfirmation, showSuccess } from "../../Elements/Alert";
 
 const initialComplaints = [
     {
@@ -45,12 +41,6 @@ const Complaints = () => {
     const [selectedComplaint, setSelectedComplaint] = useState(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
-    const [confirmationModal, setConfirmationModal] = useState({
-        isOpen: false,
-        complaint: null,
-        nextLabel: "",
-    });
-
     const openDetailModal = (complaint) => {
         setSelectedComplaint(complaint);
         setIsDetailModalOpen(true);
@@ -61,71 +51,54 @@ const Complaints = () => {
         setSelectedComplaint(null);
     };
 
-    const openConfirmationModal = (complaint, nextLabel) => {
-        setConfirmationModal({
-            isOpen: true,
-            complaint,
-            nextLabel,
-        });
-    };
+const handleStatusChange = (complaint, nextLabel) => {
+    showConfirmation({
+        title: "Konfirmasi Perubahan Status",
+        text: `Apakah Anda yakin ingin mengubah status keluhan "${complaint.title}" ke ${nextLabel}?`,
+        confirmButtonText: "Ubah Status",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            setComplaints((prev) =>
+                prev.map((comp) =>
+                    comp.id === complaint.id ? { ...comp, label: nextLabel } : comp
+                )
+            );
 
-    const closeConfirmationModal = () => {
-        setConfirmationModal({
-            isOpen: false,
-            complaint: null,
-            nextLabel: "",
-        });
-    };
-
-    const confirmStatusChange = () => {
-        const { complaint, nextLabel } = confirmationModal;
-
-        setComplaints((prev) =>
-            prev.map((comp) =>
-                comp.id === complaint.id ? { ...comp, label: nextLabel } : comp
-            )
-        );
-
-        closeConfirmationModal();
-
-        MySwal.fire({
-            toast: true,
-            position: 'top-end',
-            icon: 'success',
-            title: `Status berhasil diubah ke ${nextLabel}`,
-            showConfirmButton: false,
-            timer: 2000,
-            timerProgressBar: true,
-        });
-    };
+            showSuccess({
+                title: "Berhasil!",
+                text: `Status berhasil diubah ke ${nextLabel}.`,
+            });
+        }
+    });
+};
 
     const getActions = (complaint) => {
         if (complaint.label === "Menunggu") {
             return [
                 {
-                    label: "Proses", // Proses
-                    onClick: () => openConfirmationModal(complaint, "Proses"),
+                    label: "Proses",
+                    onClick: () => handleStatusChange(complaint, "Proses"),
                 },
                 {
-                    label: "Lihat Detail", // Lihat Detail
+                    label: "Lihat Detail",
                     onClick: () => openDetailModal(complaint),
                 },
             ];
         } else if (complaint.label === "Proses") {
             return [
                 {
-                    label: "Selesai", // Selesai
-                    onClick: () => openConfirmationModal(complaint, "Selesai"),
+                    label: "Selesai",
+                    onClick: () => handleStatusChange(complaint, "Selesai"),
                 },
                 {
-                    label: "Lihat Detail", // Lihat Detail
+                    label: "Lihat Detail",
                     onClick: () => openDetailModal(complaint),
                 },
             ];
         } else {
             return [
                 {
-                    label: "Lihat Detail", // Lihat Detail
+                    label: "Lihat Detail",
                     onClick: () => openDetailModal(complaint),
                 },
             ];
@@ -167,44 +140,11 @@ const Complaints = () => {
             {renderSection("Proses", "Keluhan Diproses")}
             {renderSection("Selesai", "Keluhan Selesai")}
 
-            {/* Modal Detail */}
             <DetailComplaintModal
                 isOpen={isDetailModalOpen}
                 onClose={closeDetailModal}
                 complaint={selectedComplaint}
             />
-
-            {/* Modal Konfirmasi */}
-            <Modal
-                isOpen={confirmationModal.isOpen}
-                onClose={closeConfirmationModal}
-                title="Konfirmasi Perubahan Status"
-                className="w-full max-w-md mx-4 sm:mx-6 md:mx-8"
-                maxHeight="80vh"
-                footer={
-                    <div className="flex justify-end gap-3">
-                        <button
-                            className="px-4 py-2 rounded-md bg-gray-300 text-gray-700 hover:bg-gray-400"
-                            onClick={closeConfirmationModal}
-                        >
-                            Batal
-                        </button>
-                        <button
-                            className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
-                            onClick={confirmStatusChange}
-                        >
-                            Ubah Status
-                        </button>
-                    </div>
-                }
-            >
-                <p className="text-sm md:text-base text-gray-700">
-                    Apakah Anda yakin ingin mengubah status keluhan "
-                    <strong>{confirmationModal.complaint?.title}</strong>" ke{" "}
-                    <strong>{confirmationModal.nextLabel}</strong>?
-                </p>
-            </Modal>
-
         </div>
     );
 };

@@ -6,7 +6,7 @@ import Select from "../../../Elements/Select";
 import InputUpload from "../../../Elements/InputUpload";
 import CardComplaint from "../../../Fragments/CardComplaint";
 import DetailComplaintModal from "../../../Fragments/DetailComplaintModal";
-import Swal from "sweetalert2";
+import { showConfirmation, showSuccess } from "../../../Elements/Alert";
 
 const ReportForm = () => {
   const [formData, setFormData] = useState({
@@ -36,47 +36,30 @@ const ReportForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (isEditing) {
-      const updatedReport = {
-        ...formData,
-        id: editId,
-        timestamp: new Date().toLocaleString(),
-        category:
-          formData.category === "Lainnya"
-            ? formData.customCategory
-            : formData.category,
-      };
+    const updatedData = {
+      ...formData,
+      timestamp: new Date().toLocaleString(),
+      category:
+        formData.category === "Lainnya"
+          ? formData.customCategory
+          : formData.category,
+    };
 
-      setReportHistory(
-        reportHistory.map((report) =>
-          report.id === editId ? updatedReport : report
+    if (isEditing) {
+      updatedData.id = editId;
+      setReportHistory((prev) =>
+        prev.map((report) =>
+          report.id === editId ? updatedData : report
         )
       );
-
-      Swal.fire({
-        icon: "success",
-        title: "Berhasil!",
+      showSuccess({
         text: "Keluhan berhasil diperbarui.",
-        confirmButtonColor: "#52BA5E",
       });
     } else {
-      const newReport = {
-        ...formData,
-        id: Date.now(),
-        timestamp: new Date().toLocaleString(),
-        category:
-          formData.category === "Lainnya"
-            ? formData.customCategory
-            : formData.category,
-      };
-
-      setReportHistory([newReport, ...reportHistory]);
-
-      Swal.fire({
-        icon: "success",
-        title: "Berhasil!",
+      updatedData.id = Date.now();
+      setReportHistory([updatedData, ...reportHistory]);
+      showSuccess({
         text: "Keluhan berhasil diajukan.",
-        confirmButtonColor: "#52BA5E",
       });
     }
 
@@ -128,27 +111,19 @@ const ReportForm = () => {
     }
   };
 
-  const handleDelete = (id) => {
-    Swal.fire({
-      icon: "warning",
-      title: "Konfirmasi",
+  const handleDelete = async (id) => {
+    const result = await showConfirmation({
       text: "Apakah Anda yakin ingin menghapus keluhan ini?",
-      showCancelButton: true,
-      confirmButtonColor: "#52BA5E",
-      cancelButtonColor: "#d33",
       confirmButtonText: "Hapus",
-      cancelButtonText: "Batal",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setReportHistory(reportHistory.filter((report) => report.id !== id));
-        Swal.fire({
-          icon: "success",
-          title: "Dihapus!",
-          text: "Keluhan telah dihapus.",
-          confirmButtonColor: "#52BA5E",
-        });
-      }
     });
+
+    if (result.isConfirmed) {
+      setReportHistory(reportHistory.filter((report) => report.id !== id));
+      showSuccess({
+        title: "Dihapus!",
+        text: "Keluhan telah dihapus.",
+      });
+    }
   };
 
   const handleClearFile = () => {
