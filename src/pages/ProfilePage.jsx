@@ -5,7 +5,10 @@ import Terms from "../components/Fragments/user/profile/Terms";
 import ComplaintsList from "../components/Fragments/user/profile/ComplaintsList";
 import ReportForm from "../components/Fragments/user/profile/ReportForm";
 import { FiUser, FiShield, FiBookOpen, FiMessageCircle, FiAlertCircle } from "react-icons/fi";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import supabase from '../../supabaseClient'
+
+
 
 const mockUser = {
   avatar:
@@ -41,11 +44,88 @@ const titleMap = {
 
 const ProfilePage = () => {
   const [view, setView] = useState("profile");
+  const [userData, setUserData] = useState(null);      // ⬅ real profile
+  const [loading, setLoading] = useState(true);
+  const [error, setError]   = useState(null);
+
+  // ──────────────────────────────────────────────────────────────────────────
+  // 1. Fetch profile once after mount
+  // ──────────────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setLoading(true);
+
+      // 1‑a  get the signed‑in user (returns null if not signed in)
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+
+      if (authError) {
+        setError(authError.message);
+        setLoading(false);
+        return;
+      }
+      if (!user) {
+        setError("No active session");
+        setLoading(false);
+        return;
+      }
+
+      // 2‑a  query by the *primary‑key id* (== auth UID)
+      //      The table is called public.user, but you can just write "user"
+      const { data, error } = await supabase
+        .from("user")
+        .select(
+          `id,
+           username,
+           nik,
+           gender,
+           kelurahan,
+           email,
+           tanggal_lahir,
+           rt,
+           rw,
+           kecamatan,
+           role`
+        )
+        .eq("id", user.id)      // <-- safest, always unique
+        .single();              // we expect exactly one row
+
+      if (error) {
+        setError(error.message);
+      } else {
+        setUserData({
+          avatar:
+            user.user_metadata?.avatar_url ??
+            "https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg",
+          fullName: data.username ?? "(Tanpa Nama)",
+          email: data.email,
+          nik: data.nik,
+          birthDate: data.tanggal_lahir,
+          gender: data.gender,
+          address: {
+            rtRw: `RT ${data.rt} / RW ${data.rw}`,
+            kelurahan: data.kelurahan,
+            kecamatan: data.kecamatan,
+          },
+        });
+      }
+
+      setLoading(false);
+    };
+
+    fetchProfile();
+  }, []);
+
 
   const renderContent = () => {
+    if (loading) return <p>Memuat…</p>;
+    if (error)   return <p className="text-red-600">Error: {error}</p>;
+
     switch (view) {
       case "profile":
-        return <ProfileCard user={mockUser} />;
+        return <ProfileCard user={userData} />; // <-- real data
       case "privacy":
         return <PrivacyPolicy />;
       case "terms":
