@@ -103,12 +103,62 @@ const ProfileCard = ({ user }) => {
   }
 };
 
-  const handlePasswordSubmit = (e) => {
-    e.preventDefault();
-    // Add your password change logic here
-    console.log('Password form submitted:', passwordData);
+  const handlePasswordSubmit = async (e) => {
+  e.preventDefault();
+
+  const { currentPassword, newPassword, confirmPassword } = passwordData;
+
+  if (newPassword !== confirmPassword) {
+    alert("Password baru dan konfirmasi tidak cocok.");
+    return;
+  }
+
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      alert("Tidak ada pengguna yang sedang login.");
+      return;
+    }
+
+    // Step 1: Re-authenticate with current password
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword,
+    });
+
+    if (signInError) {
+      alert("Password saat ini salah.");
+      return;
+    }
+
+    // Step 2: Update the password
+    const { error: updateError } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+
+    if (updateError) {
+      alert("Gagal mengubah password. Silakan coba lagi.");
+      return;
+    }
+
+    alert("Password berhasil diubah.");
     setIsPasswordModalOpen(false);
-  };
+    // Optionally: clear form
+    setPasswordData({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
+
+  } catch (err) {
+    console.error("Error changing password:", err);
+    alert("Terjadi kesalahan tak terduga.");
+  }
+};
+
 
   return (
     <div className="flex flex-col gap-6 md:gap-8 p-6 md:p-8 bg-white rounded-lg shadow-md">
