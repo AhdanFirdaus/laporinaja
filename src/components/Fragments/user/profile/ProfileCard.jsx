@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Button from "../../../Elements/Button";
 import Modal from "../../../Elements/Modal";
 import Input from "../../../Elements/Input";
+import supabase from "../../../../../supabaseClient"
 
 const ProfileCard = ({ user }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -49,12 +50,58 @@ const ProfileCard = ({ user }) => {
     setPasswordData({ ...passwordData, [name]: value });
   };
 
-  const handleEditSubmit = (e) => {
-    e.preventDefault();
-    // Add your submit logic here
-    console.log('Form submitted:', formData);
+  const handleEditSubmit = async (e) => {
+  e.preventDefault();
+
+  const {
+    fullName,
+    email,
+    nik,
+    birthDate,
+    gender,
+    address: { rtRw, kelurahan, kecamatan },
+  } = formData;
+
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      console.error("User not logged in");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("user")
+      .update({
+        username: fullName,
+        email,
+        nik,
+        tanggal_lahir: birthDate,
+        gender,
+        rt: rtRw?.split("/")[0]?.trim()?.replace("RT", "").trim(),
+        rw: rtRw?.split("/")[1]?.trim()?.replace("RW", "").trim(),
+        kelurahan,
+        kecamatan,
+      })
+      .eq("id", user.id); // match by current user
+
+    if (error) {
+      console.error("Update failed:", error);
+      return;
+    }
+
+    console.log("Profile updated");
     setIsEditModalOpen(false);
-  };
+
+    // kurang cara refresh real time ?
+    // navigate("/profile")
+
+  } catch (err) {
+    console.error("Unexpected error:", err);
+  }
+};
 
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
