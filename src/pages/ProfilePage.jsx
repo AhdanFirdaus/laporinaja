@@ -7,6 +7,7 @@ import ReportForm from "../components/Fragments/user/profile/ReportForm";
 import { FiUser, FiShield, FiBookOpen, FiMessageCircle, FiAlertCircle } from "react-icons/fi";
 import { useState, useEffect } from "react";
 import supabase from '../../supabaseClient'
+import { useNavigate } from "react-router";
 
 
 
@@ -47,6 +48,19 @@ const ProfilePage = () => {
   const [userData, setUserData] = useState(null);      // ⬅ real profile
   const [loading, setLoading] = useState(true);
   const [error, setError]   = useState(null);
+  const navigate = useNavigate();
+
+
+  const handleLogout = async () => {
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    console.error("Gagal logout:", error.message);
+    return;
+  }
+
+  // Arahkan ke halaman login atau homepage
+  navigate("/login");
+};
 
   // ──────────────────────────────────────────────────────────────────────────
   // 1. Fetch profile once after mount
@@ -148,6 +162,7 @@ const ProfilePage = () => {
         currentView={view}
         onSelect={setView}
         showLogout={true}
+        onLogout={handleLogout}
       />
 
       {/* Main content */}
