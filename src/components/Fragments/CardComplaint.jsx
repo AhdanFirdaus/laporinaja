@@ -10,8 +10,7 @@ const CardComplaint = ({ complaint, actions = [], className = "" }) => {
 
   return (
     <li
-      className={`border border-gray-200 p-6 mb-6 rounded-xl bg-white shadow hover:shadow-md transition-shadow duration-300 ${className}`}
-      style={{ height: "fit-content", position: "relative" }}
+      className={`h-fit relative border border-gray-200 p-6 mb-6 rounded-xl bg-white shadow hover:shadow-md transition-shadow duration-300 ${className}`}
     >
       <div className="space-y-4">
         <div className="flex justify-between items-center">
@@ -57,7 +56,7 @@ const CardComplaint = ({ complaint, actions = [], className = "" }) => {
                     {action.label}
                   </button>
                   {isDropdownOpen && action.selectOptions && (
-                    <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                    <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-md z-50">
                       {action.selectOptions.map((option) => (
                         <button
                           key={option.value}
@@ -65,7 +64,7 @@ const CardComplaint = ({ complaint, actions = [], className = "" }) => {
                             option.onSelect();
                             setIsDropdownOpen(false);
                           }}
-                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 transition-colors"
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-soft-orange/20 transition-colors cursor-pointer"
                         >
                           {option.label}
                         </button>
