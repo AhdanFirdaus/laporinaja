@@ -195,7 +195,7 @@ const ProfileCard = ({ user, refreshUser }) => {
             <Button onClick={() => setIsEditModalOpen(false)} color="red">
               Batal
             </Button>
-            <Button onClick={handleEditSubmit} color="blue">
+            <Button onClick={handleEditSubmit}>
               Simpan Perubahan
             </Button>
           </div>

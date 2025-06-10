@@ -10,6 +10,7 @@ import Swal from "sweetalert2";
 import supabase from "../../../../../supabaseClient";
 import checkImageSize from "../../../../helper/checkImageSize"
 import { validateLocation } from "../../../../helper/validateLocation"
+import { showConfirmation, showSuccess } from "../../../Elements/Alert";
 
 const ReportForm = () => {
   const [formData, setFormData] = useState({
@@ -240,8 +241,14 @@ const ReportForm = () => {
   }
 };
 
-
-  const fileInputRef = useRef(null);
+    if (result.isConfirmed) {
+      setReportHistory(reportHistory.filter((report) => report.id !== id));
+      showSuccess({
+        title: "Dihapus!",
+        text: "Keluhan telah dihapus.",
+      });
+    }
+  };
 
   const handleClearFile = () => {
     setFormData({ ...formData, photo: null });
@@ -296,7 +303,7 @@ const ReportForm = () => {
         />
 
         <Input
-          label="Lokasi"
+          label="Lokasi (Alamat, Kecamatan/Desa/Kelurahan)"
           name="location"
           value={formData.location}
           onChange={handleChange}
@@ -330,11 +337,17 @@ const ReportForm = () => {
             value={formData.photo}
             onChange={handleChange}
             onClear={handleClearFile}
+            ref={fileInputRef}
           />
         </div>
 
-        <div className="flex justify-end">
-          <Button type="submit">Kirim Keluhan</Button>
+        <div className="flex justify-end gap-4">
+          {isEditing && (
+            <Button type="button" onClick={handleCancelEdit} color="red">
+              Batal
+            </Button>
+          )}
+          <Button type="submit">{isEditing ? "Simpan Perubahan" : "Kirim Keluhan"}</Button>
         </div>
       </form>
 
@@ -356,6 +369,10 @@ const ReportForm = () => {
                   {
                     label: "Lihat Detail",
                     onClick: handleDetailClick,
+                  },
+                  {
+                    label: "Edit",
+                    onClick: handleEdit,
                   },
                   {
                     label: "Hapus",

@@ -13,7 +13,6 @@ const keluhanData = {
   Tugu: 1,
   Pedurungan: 15,
   Ngaliyan: 3,
-  // Tambah data lainnya...
 };
 
 const getColor = (keluhan) => {
@@ -82,16 +81,20 @@ const ComplaintsList = () => {
     setIsModalOpen(false);
   };
 
+  // Extract kecamatan and categorize based on keluhan
+  const kecamatanList = Object.entries(keluhanData).map(
+    ([kecamatan, keluhan]) => ({
+      name: kecamatan,
+      keluhan,
+      color: getColor(keluhan),
+    })
+  );
+
+  const minimKeluhan = kecamatanList.filter((item) => item.color === "green");
+  const banyakKeluhan = kecamatanList.filter((item) => item.color !== "green");
+
   return (
     <>
-      <div className="flex flex-col sm:flex-row gap-3 justify-start my-6 text-center text-sm">
-        <span className="bg-green-500/20 text-green-500 py-2 px-4 rounded-full">
-          Minim Keluhan
-        </span>
-        <span className="bg-red-500/20 text-red-500 py-2 px-4 rounded-full">
-          Banyak Keluhan
-        </span>
-      </div>
       <MapContainer
         center={[-6.9871, 110.422]}
         zoom={12}
@@ -100,6 +103,41 @@ const ComplaintsList = () => {
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <GeoJSON data={semarangGeoJSON} style={style} />
       </MapContainer>
+      <div className="my-6">
+        <div className="flex flex-col md:flex-row shadow rounded-xl overflow-hidden">
+          {/* Minim Keluhan */}
+          <div className="w-full md:w-1/2 bg-green-500/10 p-4">
+            <h2 className="text-green-600 font-semibold text-lg mb-3">
+              Minim Keluhan
+            </h2>
+            <ul className="list-disc pl-6 space-y-2">
+              {minimKeluhan.map((item) => (
+                <li key={item.name} className="text-gray-700">
+                  {item.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Separator (garis tengah hanya di desktop) */}
+          <div className="hidden md:block w-px bg-gray-300"></div>
+
+          {/* Banyak Keluhan */}
+          <div className="w-full md:w-1/2 bg-red-500/10 p-4">
+            <h2 className="text-red-600 font-semibold text-lg mb-3">
+              Banyak Keluhan
+            </h2>
+            <ul className="list-disc pl-6 space-y-2">
+              {banyakKeluhan.map((item) => (
+                <li key={item.name} className="text-gray-700">
+                  {item.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+
       <h2 className="text-3xl font-bold font-second text-soft-orange my-6 tracking-tight">
         Lihat Keluhan
       </h2>
