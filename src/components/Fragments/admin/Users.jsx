@@ -2,6 +2,7 @@ import { useState } from "react";
 import Modal from "../../Elements/Modal";
 import { FiUser, FiArrowRight } from "react-icons/fi";
 import Button from "../../Elements/Button";
+import { showConfirmation, showSuccess } from "../../Elements/Alert";
 
 const Users = () => {
   const [userData, setUserData] = useState([
@@ -15,7 +16,7 @@ const Users = () => {
     },
     {
       name: "UID1235",
-      address: "Jl. Lorem Ipsum, Kec. Dolor, Kec. Sit Amet ",
+      address: "Jl. Lorem Ipsum, Kec. Dolor, Kec. Sit Amet",
       complaints: ["Sampah menumpuk di Jl. Sisingamangaraja"],
     },
     {
@@ -24,7 +25,7 @@ const Users = () => {
       complaints: ["Trotoar rusak dekat SMA 1"],
     },
     {
-      name: "UID1236",
+      name: "UID1237",
       address: "Jl. Lorem Ipsum, Kec. Dolor, Kec. Sit Amet",
       complaints: ["Trotoar rusak dekat SMA 1"],
     },
@@ -44,10 +45,22 @@ const Users = () => {
   };
 
   const handleDelete = (userName) => {
-    setUserData(userData.filter((user) => user.name !== userName));
-    if (selectedUser?.name === userName) {
-      closeModal();
-    }
+    showConfirmation({
+      title: "Konfirmasi Hapus Pengguna",
+      text: `Apakah Anda yakin ingin menghapus pengguna "${userName}"?`,
+      confirmButtonText: "Hapus",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setUserData(userData.filter((user) => user.name !== userName));
+        if (selectedUser?.name === userName) {
+          closeModal();
+        }
+        showSuccess({
+          title: "Berhasil!",
+          text: `Pengguna "${userName}" telah dihapus.`,
+        });
+      }
+    });
   };
 
   return (
