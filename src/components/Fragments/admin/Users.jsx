@@ -77,16 +77,16 @@ const Users = () => {
           <div
             key={index}
             onClick={() => openModal(user)}
-            className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer px-5 py-4 group"
+            className="bg-white border border-gray-200 rounded-xl shadow hover:shadow-md transition-all duration-200 cursor-pointer px-5 py-4 group"
           >
             <div className="flex justify-between items-center flex-col sm:flex-row">
               <div className="flex items-center gap-3">
-                <FiUser className="w-8 h-8 text-gray-500 group-hover:text-black transition" />
-                <div className="text-gray-800 font-medium">{user.name}</div>
+                <FiUser className="w-8 h-8 text-gray-500 group-hover:text-gray-700 transition" />
+                <div className="text-gray-500 font-medium">{user.name}</div>
               </div>
               <div className="text-center sm:text-right mt-1 sm:mt-0">
                 <div className="text-sm text-gray-600">{user.address}</div>
-                <div className="text-sm mt-1 inline-block bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                <div className="text-sm mt-1 inline-block bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">
                   {user.complaints.length} keluhan
                 </div>
               </div>
