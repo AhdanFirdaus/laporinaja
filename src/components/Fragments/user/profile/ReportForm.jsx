@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Button from "../../../Elements/Button";
 import Input from "../../../Elements/Input";
 import Textarea from "../../../Elements/Textarea";
@@ -7,6 +7,7 @@ import InputUpload from "../../../Elements/InputUpload";
 import CardComplaint from "../../../Fragments/CardComplaint";
 import DetailComplaintModal from "../../../Fragments/DetailComplaintModal";
 import Swal from "sweetalert2";
+import supabase from "../../../../../supabaseClient";
 
 const ReportForm = () => {
   const [formData, setFormData] = useState({
@@ -28,21 +29,79 @@ const ReportForm = () => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
+  // Menampilkan “loading” toast
+  const toast = Swal.fire({
+    title: "Mengirim keluhan…",
+    allowOutsideClick: false,
+    didOpen: () => Swal.showLoading(),
+  });
+
+  try {
+    const {
+  data: { user },
+} = await supabase.auth.getUser();
+    /** 1. Upload fotonya (optional) */
+    let photoPath = null;
+
+    if (formData.photo) {
+      // Generate nama file unik, contoh 162738192_photo.jpg
+      const ext = formData.photo.name.split(".").pop();
+const fileName = `${Date.now()}_${crypto.randomUUID()}.${ext}`;
+const filePath = `${user.id}/${fileName}`; // ✅ path includes user ID
+
+const { data: storageData, error: storageError } = await supabase
+  .storage
+  .from("foto-keluhan")
+  .upload(filePath, formData.photo);
+
+if (storageError) throw storageError;
+
+photoPath = storageData.path; 
+
+    }
+
+    /** 2. Insert data ke ‘keluhan’ table */
+    
+    
+    const { data, error: dbError } = await supabase.from("keluhan").insert({
+  title: formData.title,
+  note: formData.note,
+  incident_date: formData.date,
+  location: formData.location,
+  category:
+    formData.category === "Lainnya"
+      ? formData.customCategory
+      : formData.category,
+  custom_category:
+    formData.category === "Lainnya" ? formData.customCategory : null,
+  photo_path: photoPath,
+  status: "waiting",
+  user_id: user.id, // foreign key ke user id table
+})
+.select("id")
+.single()
+;
+
+    if (dbError) throw dbError;
+
+    /** 3. Update local ui */
     const newReport = {
       ...formData,
-      id: Date.now(),
+      id: data?.id,
       timestamp: new Date().toLocaleString(),
       category:
         formData.category === "Lainnya"
           ? formData.customCategory
-          : formData.category, // Use customCategory if Lainnya is selected
+          : formData.category,
+      photo_path: photoPath,
+      status: "waiting",
     };
-
     setReportHistory([newReport, ...reportHistory]);
 
+    /** 4. Reset form */
     setFormData({
       title: "",
       note: "",
@@ -50,17 +109,21 @@ const ReportForm = () => {
       location: "",
       category: "",
       customCategory: "",
+      photo: null,
     });
 
-    Swal.fire({
-      icon: "success",
-      title: "Berhasil!",
-      text: "Keluhan berhasil diajukan.",
-      confirmButtonColor: "#52BA5E",
-    });
-  };
+    toast.close();
+    Swal.fire("Berhasil!", "Keluhan Anda telah dikirim.", "success");
+  } catch (err) {
+    console.error(err);
+    toast.close();
+    Swal.fire("Gagal", err.message || "Terjadi kesalahan.", "error");
+  }
+};
+
 
   const handleDelete = (id) => {
+    console.log(id)
     Swal.fire({
       icon: "warning",
       title: "Konfirmasi",
