@@ -8,8 +8,8 @@ import CardComplaint from "../../../Fragments/CardComplaint";
 import DetailComplaintModal from "../../../Fragments/DetailComplaintModal";
 import Swal from "sweetalert2";
 import supabase from "../../../../../supabaseClient";
-import checkImageSize from "../../../../helper/checkImageSize"
-import { validateLocation } from "../../../../helper/validateLocation"
+import checkImageSize from "../../../../helper/checkImageSize";
+import { validateLocation } from "../../../../helper/validateLocation";
 import { showConfirmation, showSuccess } from "../../../Elements/Alert";
 
 const ReportForm = () => {
@@ -25,13 +25,14 @@ const ReportForm = () => {
   });
 
   const [reportHistory, setReportHistory] = useState([]);
-  const [user, setUser] = useState(null); // Add state to store user
+  const [user, setUser] = useState(null);
+  const fileInputRef = useRef(null); // Added useRef
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Fetch user and reports
   useEffect(() => {
     const fetchUserAndReports = async () => {
       try {
-        // Fetch the authenticated user
         const {
           data: { user },
           error: userError,
@@ -42,9 +43,8 @@ const ReportForm = () => {
           return;
         }
 
-        setUser(user); // Store user in state
+        setUser(user);
 
-        // Fetch reports for the authenticated user
         const { data, error } = await supabase
           .from("keluhan")
           .select("*")
@@ -54,7 +54,6 @@ const ReportForm = () => {
         if (error) {
           console.error("Failed to fetch complaints:", error);
         } else {
-          console.log(data)
           setReportHistory(data);
         }
       } catch (err) {
@@ -63,7 +62,7 @@ const ReportForm = () => {
     };
 
     fetchUserAndReports();
-  }, []); // Empty dependency array to run once on mount
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -76,7 +75,6 @@ const ReportForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Ensure user is available
     if (!user) {
       Swal.fire("Gagal", "User tidak ditemukan. Silakan login kembali.", "error");
       return;
@@ -92,41 +90,36 @@ const ReportForm = () => {
       let photoPath = null;
 
       if (formData.photo) {
-  const sizeCheck = checkImageSize(formData.photo);
-  console.log("File size:", formData.photo.size, "bytes");
+        const sizeCheck = checkImageSize(formData.photo);
+        if (!sizeCheck.valid) {
+          Swal.fire({
+            icon: "error",
+            title: "Upload Gagal",
+            text: sizeCheck.message,
+          });
+          return;
+        }
 
+        const ext = formData.photo.name.split(".").pop();
+        const fileName = `${Date.now()}_${crypto.randomUUID()}.${ext}`;
+        const filePath = `${user.id}/${fileName}`;
 
-  if (!sizeCheck.valid) {
-    Swal.fire({
-      icon: "error",
-      title: "Upload Gagal",
-      text: sizeCheck.message,
-    });
-    return; // ⛔ stop upload if image too large
-  }
-  
+        const { data: storageData, error: storageError } = await supabase
+          .storage
+          .from("foto-keluhan")
+          .upload(filePath, formData.photo);
 
-  const ext = formData.photo.name.split(".").pop();
-  const fileName = `${Date.now()}_${crypto.randomUUID()}.${ext}`;
-  const filePath = `${user.id}/${fileName}`;
+        if (storageError) {
+          Swal.fire({
+            icon: "error",
+            title: "Upload Gagal",
+            text: "Terjadi kesalahan saat mengunggah foto: " + storageError.message,
+          });
+          return;
+        }
 
-  const { data: storageData, error: storageError } = await supabase
-    .storage
-    .from("foto-keluhan")
-    .upload(filePath, formData.photo);
-
-  if (storageError) {
-    console.log(storageError)
-    Swal.fire({
-      icon: "error",
-      title: "Upload Gagal",
-      text: "Terjadi kesalahan saat mengunggah foto : " + storageError.message,
-    });
-    return;
-  }
-
-  photoPath = storageData.path;
-}
+        photoPath = storageData.path;
+      }
 
       const { data, error: dbError } = await supabase
         .from("keluhan")
@@ -151,15 +144,20 @@ const ReportForm = () => {
       if (dbError) throw dbError;
 
       const newReport = {
-        ...formData,
-        id: data?.id,
-        timestamp: new Date().toLocaleString(),
+        id: data.id,
+        title: formData.title,
+        note: formData.note,
+        incident_date: formData.date,
+        location: formData.location,
         category:
           formData.category === "Lainnya"
             ? formData.customCategory
             : formData.category,
+        custom_category:
+          formData.category === "Lainnya" ? formData.customCategory : null,
         photo_path: photoPath,
         status: "waiting",
+        user_id: user.id,
       };
       setReportHistory([newReport, ...reportHistory]);
 
@@ -171,7 +169,7 @@ const ReportForm = () => {
         category: "",
         customCategory: "",
         photo: null,
-        lan: "",
+        lat: "",
         lon: "",
       });
 
@@ -185,67 +183,54 @@ const ReportForm = () => {
   };
 
   const handleDelete = async (id) => {
-  const result = await Swal.fire({
-    icon: "warning",
-    title: "Konfirmasi",
-    text: "Apakah Anda yakin ingin menghapus keluhan ini?",
-    showCancelButton: true,
-    confirmButtonColor: "#52BA5E",
-    cancelButtonColor: "#d33",
-    confirmButtonText: "Hapus",
-    cancelButtonText: "Batal",
-  });
-
-  if (!result.isConfirmed) return;
-
-  // 1. Find the report to get photo path
-  const report = reportHistory.find((r) => r.id === id);
-  const photoPath = report?.photo_path;
-
-  try {
-    // 2. Delete from DB
-    const { error: deleteError } = await supabase
-      .from("keluhan")
-      .delete()
-      .eq("id", id);
-
-    if (deleteError) throw deleteError;
-
-    // 3. Delete from Storage if exists
-    if (photoPath) {
-      const { error: storageError } = await supabase
-        .storage
-        .from("foto-keluhan")
-        .remove([photoPath]);
-
-      if (storageError) throw storageError;
-    }
-
-    // 4. Update UI
-    setReportHistory(reportHistory.filter((r) => r.id !== id));
-
-    Swal.fire({
-      icon: "success",
-      title: "Dihapus!",
-      text: "Keluhan telah dihapus.",
+    const result = await Swal.fire({
+      icon: "warning",
+      title: "Konfirmasi",
+      text: "Apakah Anda yakin ingin menghapus keluhan ini?",
+      showCancelButton: true,
       confirmButtonColor: "#52BA5E",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Hapus",
+      cancelButtonText: "Batal",
     });
-  } catch (err) {
-    console.error("Gagal menghapus keluhan:", err);
-    Swal.fire({
-      icon: "error",
-      title: "Gagal",
-      text: "Terjadi kesalahan saat menghapus keluhan.",
-      confirmButtonColor: "#d33",
-    });
-  }
-};
 
-    if (result.isConfirmed) {
-      setReportHistory(reportHistory.filter((report) => report.id !== id));
-      showSuccess({
+    if (!result.isConfirmed) return;
+
+    const report = reportHistory.find((r) => r.id === id);
+    const photoPath = report?.photo_path;
+
+    try {
+      const { error: deleteError } = await supabase
+        .from("keluhan")
+        .delete()
+        .eq("id", id);
+
+      if (deleteError) throw deleteError;
+
+      if (photoPath) {
+        const { error: storageError } = await supabase
+          .storage
+          .from("foto-keluhan")
+          .remove([photoPath]);
+
+        if (storageError) throw storageError;
+      }
+
+      setReportHistory(reportHistory.filter((r) => r.id !== id));
+
+      Swal.fire({
+        icon: "success",
         title: "Dihapus!",
         text: "Keluhan telah dihapus.",
+        confirmButtonColor: "#52BA5E",
+      });
+    } catch (err) {
+      console.error("Gagal menghapus keluhan:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Gagal",
+        text: "Terjadi kesalahan saat menghapus keluhan.",
+        confirmButtonColor: "#d33",
       });
     }
   };
@@ -256,9 +241,6 @@ const ReportForm = () => {
       fileInputRef.current.value = "";
     }
   };
-
-  const [selectedComplaint, setSelectedComplaint] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleDetailClick = (complaint) => {
     setSelectedComplaint(complaint);
@@ -284,7 +266,6 @@ const ReportForm = () => {
           onChange={handleChange}
           required
         />
-
         <Textarea
           label="Catatan"
           name="note"
@@ -292,7 +273,6 @@ const ReportForm = () => {
           onChange={handleChange}
           required
         />
-
         <Input
           label="Tanggal Kejadian"
           type="date"
@@ -301,7 +281,6 @@ const ReportForm = () => {
           onChange={handleChange}
           required
         />
-
         <Input
           label="Lokasi (Alamat, Kecamatan/Desa/Kelurahan)"
           name="location"
@@ -309,7 +288,6 @@ const ReportForm = () => {
           onChange={handleChange}
           required
         />
-
         <Select
           label="Kategori"
           name="category"
@@ -318,7 +296,6 @@ const ReportForm = () => {
           options={categoryOptions}
           required
         />
-
         {formData.category === "Lainnya" && (
           <Input
             label="Masukkan Kategori Lainnya"
@@ -329,7 +306,6 @@ const ReportForm = () => {
             placeholder="Masukkan kategori lainnya"
           />
         )}
-
         <div className="mb-10">
           <InputUpload
             label="Foto"
@@ -340,14 +316,8 @@ const ReportForm = () => {
             ref={fileInputRef}
           />
         </div>
-
         <div className="flex justify-end gap-4">
-          {isEditing && (
-            <Button type="button" onClick={handleCancelEdit} color="red">
-              Batal
-            </Button>
-          )}
-          <Button type="submit">{isEditing ? "Simpan Perubahan" : "Kirim Keluhan"}</Button>
+          <Button type="submit">Kirim Keluhan</Button>
         </div>
       </form>
 
@@ -371,10 +341,6 @@ const ReportForm = () => {
                     onClick: handleDetailClick,
                   },
                   {
-                    label: "Edit",
-                    onClick: handleEdit,
-                  },
-                  {
                     label: "Hapus",
                     onClick: (complaint) => handleDelete(complaint.id),
                   },
@@ -383,7 +349,6 @@ const ReportForm = () => {
             ))}
           </ul>
         )}
-
         <DetailComplaintModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
