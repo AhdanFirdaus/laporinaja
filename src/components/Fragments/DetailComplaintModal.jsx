@@ -3,6 +3,7 @@ import Button from "../Elements/Button";
 
 const DetailComplaintModal = ({ isOpen, onClose, complaint }) => {
   if (!complaint) return null;
+  console.log(complaint)
 
   // Tetapkan default label jika tidak ada
   const label = complaint.label || "Menunggu";
@@ -42,7 +43,7 @@ const DetailComplaintModal = ({ isOpen, onClose, complaint }) => {
         </p>
         <p className="text-md text-gray-600">
           <span className="font-medium">Tanggal:</span>{" "}
-          <span>{complaint.date}</span>
+          <span>{complaint.incident_date}</span>
         </p>
         {complaint.imageUrl && (
           <div className="mt-4">

@@ -16,10 +16,49 @@ const ReportForm = () => {
     date: "",
     location: "",
     category: "",
-    customCategory: "", // New field for custom category input
+    customCategory: "",
   });
 
   const [reportHistory, setReportHistory] = useState([]);
+  const [user, setUser] = useState(null); // Add state to store user
+
+  // Fetch user and reports
+  useEffect(() => {
+    const fetchUserAndReports = async () => {
+      try {
+        // Fetch the authenticated user
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser();
+
+        if (userError || !user) {
+          console.error("Failed to fetch user or user not authenticated:", userError);
+          return;
+        }
+
+        setUser(user); // Store user in state
+
+        // Fetch reports for the authenticated user
+        const { data, error } = await supabase
+          .from("keluhan")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("incident_date", { ascending: false });
+
+        if (error) {
+          console.error("Failed to fetch complaints:", error);
+        } else {
+          console.log(data)
+          setReportHistory(data);
+        }
+      } catch (err) {
+        console.error("Error in fetchUserAndReports:", err);
+      }
+    };
+
+    fetchUserAndReports();
+  }, []); // Empty dependency array to run once on mount
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -30,121 +69,149 @@ const ReportForm = () => {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  // Menampilkan “loading” toast
-  const toast = Swal.fire({
-    title: "Mengirim keluhan…",
-    allowOutsideClick: false,
-    didOpen: () => Swal.showLoading(),
-  });
-
-  try {
-    const {
-  data: { user },
-} = await supabase.auth.getUser();
-    /** 1. Upload fotonya (optional) */
-    let photoPath = null;
-
-    if (formData.photo) {
-      // Generate nama file unik, contoh 162738192_photo.jpg
-      const ext = formData.photo.name.split(".").pop();
-const fileName = `${Date.now()}_${crypto.randomUUID()}.${ext}`;
-const filePath = `${user.id}/${fileName}`; // ✅ path includes user ID
-
-const { data: storageData, error: storageError } = await supabase
-  .storage
-  .from("foto-keluhan")
-  .upload(filePath, formData.photo);
-
-if (storageError) throw storageError;
-
-photoPath = storageData.path; 
-
+    // Ensure user is available
+    if (!user) {
+      Swal.fire("Gagal", "User tidak ditemukan. Silakan login kembali.", "error");
+      return;
     }
 
-    /** 2. Insert data ke ‘keluhan’ table */
-    
-    
-    const { data, error: dbError } = await supabase.from("keluhan").insert({
-  title: formData.title,
-  note: formData.note,
-  incident_date: formData.date,
-  location: formData.location,
-  category:
-    formData.category === "Lainnya"
-      ? formData.customCategory
-      : formData.category,
-  custom_category:
-    formData.category === "Lainnya" ? formData.customCategory : null,
-  photo_path: photoPath,
-  status: "waiting",
-  user_id: user.id, // foreign key ke user id table
-})
-.select("id")
-.single()
-;
-
-    if (dbError) throw dbError;
-
-    /** 3. Update local ui */
-    const newReport = {
-      ...formData,
-      id: data?.id,
-      timestamp: new Date().toLocaleString(),
-      category:
-        formData.category === "Lainnya"
-          ? formData.customCategory
-          : formData.category,
-      photo_path: photoPath,
-      status: "waiting",
-    };
-    setReportHistory([newReport, ...reportHistory]);
-
-    /** 4. Reset form */
-    setFormData({
-      title: "",
-      note: "",
-      date: "",
-      location: "",
-      category: "",
-      customCategory: "",
-      photo: null,
+    const toast = Swal.fire({
+      title: "Mengirim keluhan…",
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
     });
 
-    toast.close();
-    Swal.fire("Berhasil!", "Keluhan Anda telah dikirim.", "success");
+    try {
+      let photoPath = null;
+
+      if (formData.photo) {
+        const ext = formData.photo.name.split(".").pop();
+        const fileName = `${Date.now()}_${crypto.randomUUID()}.${ext}`;
+        const filePath = `${user.id}/${fileName}`;
+
+        const { data: storageData, error: storageError } = await supabase
+          .storage
+          .from("foto-keluhan")
+          .upload(filePath, formData.photo);
+
+        if (storageError) throw storageError;
+
+        photoPath = storageData.path;
+      }
+
+      const { data, error: dbError } = await supabase
+        .from("keluhan")
+        .insert({
+          title: formData.title,
+          note: formData.note,
+          incident_date: formData.date,
+          location: formData.location,
+          category:
+            formData.category === "Lainnya"
+              ? formData.customCategory
+              : formData.category,
+          custom_category:
+            formData.category === "Lainnya" ? formData.customCategory : null,
+          photo_path: photoPath,
+          status: "waiting",
+          user_id: user.id,
+        })
+        .select("id")
+        .single();
+
+      if (dbError) throw dbError;
+
+      const newReport = {
+        ...formData,
+        id: data?.id,
+        timestamp: new Date().toLocaleString(),
+        category:
+          formData.category === "Lainnya"
+            ? formData.customCategory
+            : formData.category,
+        photo_path: photoPath,
+        status: "waiting",
+      };
+      setReportHistory([newReport, ...reportHistory]);
+
+      setFormData({
+        title: "",
+        note: "",
+        date: "",
+        location: "",
+        category: "",
+        customCategory: "",
+        photo: null,
+      });
+
+      toast.close();
+      Swal.fire("Berhasil!", "Keluhan Anda telah dikirim.", "success");
+    } catch (err) {
+      console.error(err);
+      toast.close();
+      Swal.fire("Gagal", err.message || "Terjadi kesalahan.", "error");
+    }
+  };
+
+  const handleDelete = async (id) => {
+  const result = await Swal.fire({
+    icon: "warning",
+    title: "Konfirmasi",
+    text: "Apakah Anda yakin ingin menghapus keluhan ini?",
+    showCancelButton: true,
+    confirmButtonColor: "#52BA5E",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Hapus",
+    cancelButtonText: "Batal",
+  });
+
+  if (!result.isConfirmed) return;
+
+  // 1. Find the report to get photo path
+  const report = reportHistory.find((r) => r.id === id);
+  const photoPath = report?.photo_path;
+
+  try {
+    // 2. Delete from DB
+    const { error: deleteError } = await supabase
+      .from("keluhan")
+      .delete()
+      .eq("id", id);
+
+    if (deleteError) throw deleteError;
+
+    // 3. Delete from Storage if exists
+    if (photoPath) {
+      const { error: storageError } = await supabase
+        .storage
+        .from("foto-keluhan")
+        .remove([photoPath]);
+
+      if (storageError) throw storageError;
+    }
+
+    // 4. Update UI
+    setReportHistory(reportHistory.filter((r) => r.id !== id));
+
+    Swal.fire({
+      icon: "success",
+      title: "Dihapus!",
+      text: "Keluhan telah dihapus.",
+      confirmButtonColor: "#52BA5E",
+    });
   } catch (err) {
-    console.error(err);
-    toast.close();
-    Swal.fire("Gagal", err.message || "Terjadi kesalahan.", "error");
+    console.error("Gagal menghapus keluhan:", err);
+    Swal.fire({
+      icon: "error",
+      title: "Gagal",
+      text: "Terjadi kesalahan saat menghapus keluhan.",
+      confirmButtonColor: "#d33",
+    });
   }
 };
 
-
-  const handleDelete = (id) => {
-    console.log(id)
-    Swal.fire({
-      icon: "warning",
-      title: "Konfirmasi",
-      text: "Apakah Anda yakin ingin menghapus keluhan ini?",
-      showCancelButton: true,
-      confirmButtonColor: "#52BA5E",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Hapus",
-      cancelButtonText: "Batal",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setReportHistory(reportHistory.filter((report) => report.id !== id));
-        Swal.fire({
-          icon: "success",
-          title: "Dihapus!",
-          text: "Keluhan telah dihapus.",
-          confirmButtonColor: "#52BA5E",
-        });
-      }
-    });
-  };
 
   const fileInputRef = useRef(null);
 
@@ -154,7 +221,7 @@ photoPath = storageData.path;
       fileInputRef.current.value = "";
     }
   };
-  
+
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -243,41 +310,40 @@ photoPath = storageData.path;
         </div>
       </form>
 
-      {/* Riwayat Keluhan */}
       <div className="mt-12 border-t pt-8 bg-gray-50">
         <h2 className="text-3xl font-bold font-second text-soft-orange mb-6 tracking-tight">
           Riwayat Keluhan
         </h2>
-      {reportHistory.length === 0 ? (
-        <p className="text-gray-500 text-lg italic text-center py-8">
-          Belum ada keluhan yang diajukan.
-        </p>
-      ) : (
-        <ul className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
-          {reportHistory.map((report) => (
-            <CardComplaint
-              key={report.id}
-              complaint={report}
-              actions={[
-                {
-                  label: "Lihat Detail",
-                  onClick: handleDetailClick,
-                },
-                {
-                  label: "Hapus",
-                  onClick: (complaint) => handleDelete(complaint.id),
-                },
-              ]}
-            />
-          ))}
-        </ul>
-      )}
+        {reportHistory.length === 0 ? (
+          <p className="text-gray-500 text-lg italic text-center py-8">
+            Belum ada keluhan yang diajukan.
+          </p>
+        ) : (
+          <ul className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+            {reportHistory.map((report) => (
+              <CardComplaint
+                key={report.id}
+                complaint={report}
+                actions={[
+                  {
+                    label: "Lihat Detail",
+                    onClick: handleDetailClick,
+                  },
+                  {
+                    label: "Hapus",
+                    onClick: (complaint) => handleDelete(complaint.id),
+                  },
+                ]}
+              />
+            ))}
+          </ul>
+        )}
 
-      <DetailComplaintModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        complaint={selectedComplaint}
-      />
+        <DetailComplaintModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          complaint={selectedComplaint}
+        />
       </div>
     </>
   );
