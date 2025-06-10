@@ -8,6 +8,8 @@ import CardComplaint from "../../../Fragments/CardComplaint";
 import DetailComplaintModal from "../../../Fragments/DetailComplaintModal";
 import Swal from "sweetalert2";
 import supabase from "../../../../../supabaseClient";
+import checkImageSize from "../../../../helper/checkImageSize"
+import { validateLocation } from "../../../../helper/validateLocation"
 
 const ReportForm = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +19,8 @@ const ReportForm = () => {
     location: "",
     category: "",
     customCategory: "",
+    lat: "",
+    lon: "",
   });
 
   const [reportHistory, setReportHistory] = useState([]);
@@ -87,19 +91,41 @@ const ReportForm = () => {
       let photoPath = null;
 
       if (formData.photo) {
-        const ext = formData.photo.name.split(".").pop();
-        const fileName = `${Date.now()}_${crypto.randomUUID()}.${ext}`;
-        const filePath = `${user.id}/${fileName}`;
+  const sizeCheck = checkImageSize(formData.photo);
+  console.log("File size:", formData.photo.size, "bytes");
 
-        const { data: storageData, error: storageError } = await supabase
-          .storage
-          .from("foto-keluhan")
-          .upload(filePath, formData.photo);
 
-        if (storageError) throw storageError;
+  if (!sizeCheck.valid) {
+    Swal.fire({
+      icon: "error",
+      title: "Upload Gagal",
+      text: sizeCheck.message,
+    });
+    return; // ⛔ stop upload if image too large
+  }
+  
 
-        photoPath = storageData.path;
-      }
+  const ext = formData.photo.name.split(".").pop();
+  const fileName = `${Date.now()}_${crypto.randomUUID()}.${ext}`;
+  const filePath = `${user.id}/${fileName}`;
+
+  const { data: storageData, error: storageError } = await supabase
+    .storage
+    .from("foto-keluhan")
+    .upload(filePath, formData.photo);
+
+  if (storageError) {
+    console.log(storageError)
+    Swal.fire({
+      icon: "error",
+      title: "Upload Gagal",
+      text: "Terjadi kesalahan saat mengunggah foto : " + storageError.message,
+    });
+    return;
+  }
+
+  photoPath = storageData.path;
+}
 
       const { data, error: dbError } = await supabase
         .from("keluhan")
@@ -144,6 +170,8 @@ const ReportForm = () => {
         category: "",
         customCategory: "",
         photo: null,
+        lan: "",
+        lon: "",
       });
 
       toast.close();
