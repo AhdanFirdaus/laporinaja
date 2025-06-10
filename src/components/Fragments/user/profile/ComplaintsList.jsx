@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import semarangGeoJSON from "../../../../../public/semarang_kecamatan.json";
 import CardComplaint from "../../CardComplaint";
 import DetailComplaintModal from "../../DetailComplaintModal";
+import supabase from "../../../../../supabaseClient";
 
 const keluhanData = {
   "Semarang Tengah": 2,
@@ -14,58 +15,6 @@ const keluhanData = {
   Ngaliyan: 3,
 };
 
-const complaintHistory = [
-  {
-    id: 1,
-    userId: "USR123",
-    label: "Menunggu",
-    date: "2025-06-01",
-    title:
-      "Jalan di daerah ini sangat berlubang, mohon segera diperbaiki.Jalan di daerah ini sangat berlubang, mohon segera diperbaiki.Jalan di daerah ini sangat berlubang, mohon segera diperbaiki.Jalan di daerah ini sangat berlubang, mohon segera diperbaiki.",
-    note: "Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1615143219212-fe08fb4a27e2?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    location: "Semarang Tengah",
-    category: "Infrastruktur",
-  },
-  {
-    id: 2,
-    userId: "USR456",
-    label: "Proses",
-    date: "2025-06-03",
-    title: "Lampu jalan mati sejak seminggu lalu, tolong diperbaiki.",
-    note: "Foto lampu jalan mati tersedia.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1601696935626-431bbe118c31?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    location: "Semarang Utara",
-    category: "Penerangan",
-  },
-  {
-    id: 3,
-    userId: "USR789",
-    label: "Selesai",
-    date: "2025-06-04",
-    title: "Sampah menumpuk di pinggir jalan, perlu segera dibersihkan.",
-    note: "Catatan: Sudah dikoordinasikan dengan dinas kebersihan.",
-    imageUrl: "https://via.placeholder.com/300x200?text=Sampah+Menumpuk",
-    location: "Pedurungan",
-    category: "Kebersihan",
-  },
-  {
-    id: 4,
-    userId: "USR123",
-    label: "Menunggu",
-    date: "2025-06-01",
-    title:
-      "Jalan di daerah ini sangat berlubang, mohon segera diperbaiki.Jalan di daerah ini sangat berlubang, mohon segera diperbaiki.Jalan di daerah ini sangat berlubang, mohon segera diperbaiki.Jalan di daerah ini sangat berlubang, mohon segera diperbaiki.",
-    note: "Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.Gambar jalan berlubang diunggah.",
-    imageUrl:
-      "https://images.unsplash.com/photo-1615143219212-fe08fb4a27e2?q=80&w=1932&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    location: "Semarang Tengah",
-    category: "Infrastruktur",
-  },
-];
-
 const getColor = (keluhan) => {
   if (keluhan > 15) return "red";
   if (keluhan > 5) return "orange";
@@ -73,6 +22,33 @@ const getColor = (keluhan) => {
 };
 
 const ComplaintsList = () => {
+  const [complaintHistory, setComplaintHistory] = useState([]);
+  const [selectedComplaint, setSelectedComplaint] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Fetch complaints from Supabase
+  useEffect(() => {
+    const fetchComplaints = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("keluhan")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching complaints:", error.message);
+          return;
+        }
+
+        setComplaintHistory(data || []);
+      } catch (err) {
+        console.error("Unexpected error:", err.message);
+      }
+    };
+
+    fetchComplaints();
+  }, []);
+
   const style = (feature) => ({
     fillColor: getColor(keluhanData[feature.properties.NAMA_KEC] || 0),
     weight: 1,
@@ -80,11 +56,23 @@ const ComplaintsList = () => {
     fillOpacity: 0.8,
   });
 
-  const [selectedComplaint, setSelectedComplaint] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const handleDetailClick = async (complaint) => {
+    let imageUrl = null;
+    if (complaint.photo_path) {
+      try {
+        const { data } = await supabase.storage
+          .from("foto-keluhan") // Replace with your actual bucket name
+          .getPublicUrl(complaint.photo_path);
+        imageUrl = data.publicUrl;
+        console.log("================")
+        console.log(complaint.photo_path)
+        console.log(imageUrl)
+      } catch (err) {
+        console.error("Error fetching public URL:", err.message);
+      }
+    }
 
-  const handleDetailClick = (complaint) => {
-    setSelectedComplaint(complaint);
+    setSelectedComplaint({ ...complaint, imageUrl });
     setIsModalOpen(true);
   };
 
@@ -173,7 +161,6 @@ const ComplaintsList = () => {
           ))}
         </ul>
       )}
-
       <DetailComplaintModal
         isOpen={isModalOpen}
         onClose={closeModal}
