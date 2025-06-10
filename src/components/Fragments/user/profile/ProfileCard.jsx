@@ -2,12 +2,14 @@ import { useState } from 'react';
 import Button from "../../../Elements/Button";
 import Modal from "../../../Elements/Modal";
 import Input from "../../../Elements/Input";
+import supabase from "../../../../../supabaseClient";
+import { useNavigate } from 'react-router';
 
-const ProfileCard = ({ user }) => {
+const ProfileCard = ({ user, refreshUser }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const navigate = useNavigate();
 
-  // State for edit profile form
   const [formData, setFormData] = useState({
     fullName: user.fullName,
     email: user.email,
@@ -17,15 +19,14 @@ const ProfileCard = ({ user }) => {
     address: {
       rtRw: user.address.rtRw,
       kelurahan: user.address.kelurahan,
-      kecamatan: user.address.kecamatan
-    }
+      kecamatan: user.address.kecamatan,
+    },
   });
 
-  // State for password form
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
 
   const handleInputChange = (e) => {
@@ -36,8 +37,8 @@ const ProfileCard = ({ user }) => {
         ...formData,
         address: {
           ...formData.address,
-          [addressField]: value
-        }
+          [addressField]: value,
+        },
       });
     } else {
       setFormData({ ...formData, [name]: value });
@@ -49,18 +50,93 @@ const ProfileCard = ({ user }) => {
     setPasswordData({ ...passwordData, [name]: value });
   };
 
-  const handleEditSubmit = (e) => {
+  const handleEditSubmit = async (e) => {
     e.preventDefault();
-    // Add your submit logic here
-    console.log('Form submitted:', formData);
-    setIsEditModalOpen(false);
+    const { fullName, email, nik, birthDate, gender, address: { rtRw, kelurahan, kecamatan } } = formData;
+
+    try {
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (!currentUser) {
+        alert("User tidak login.");
+        return;
+      }
+
+      const { error } = await supabase
+        .from("user")
+        .update({
+          username: fullName,
+          email,
+          nik,
+          tanggal_lahir: birthDate,
+          gender,
+          rt: rtRw?.split("/")[0]?.trim()?.replace("RT", "").trim(),
+          rw: rtRw?.split("/")[1]?.trim()?.replace("RW", "").trim(),
+          kelurahan,
+          kecamatan,
+        })
+        .eq("id", currentUser.id);
+
+      if (error) {
+        alert("Gagal memperbarui profil: " + error.message);
+        return;
+      }
+
+      // Call refreshUser to update parent state
+      await refreshUser();
+
+      alert("Profil berhasil diperbarui!");
+      setIsEditModalOpen(false);
+      navigate("/profile");
+    } catch (err) {
+      alert("Terjadi kesalahan tak terduga: " + err.message);
+    }
   };
 
-  const handlePasswordSubmit = (e) => {
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault();
-    // Add your password change logic here
-    console.log('Password form submitted:', passwordData);
-    setIsPasswordModalOpen(false);
+    const { currentPassword, newPassword, confirmPassword } = passwordData;
+
+    if (newPassword !== confirmPassword) {
+      alert("Password baru dan konfirmasi tidak cocok.");
+      return;
+    }
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert("Tidak ada pengguna yang sedang login.");
+        return;
+      }
+
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword,
+      });
+
+      if (signInError) {
+        alert("Password saat ini salah.");
+        return;
+      }
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (updateError) {
+        alert("Gagal mengubah password: " + updateError.message);
+        return;
+      }
+
+      alert("Password berhasil diubah.");
+      setIsPasswordModalOpen(false);
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    } catch (err) {
+      alert("Terjadi kesalahan tak terduga: " + err.message);
+    }
   };
 
   return (
@@ -87,7 +163,6 @@ const ProfileCard = ({ user }) => {
         </div>
       </div>
 
-      {/* Detail Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 text-xs md:text-sm text-gray-700">
         <div>
           <p className="font-semibold uppercase">NIK</p>
@@ -110,7 +185,6 @@ const ProfileCard = ({ user }) => {
         </div>
       </div>
 
-      {/* Edit Profile Modal */}
       <Modal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
@@ -118,7 +192,7 @@ const ProfileCard = ({ user }) => {
         className="w-full max-w-4xl mx-4 sm:mx-6 md:mx-8"
         footer={
           <div className="flex justify-end gap-2">
-            <Button onClick={() => setIsEditModalOpen(false)} color='red'>
+            <Button onClick={() => setIsEditModalOpen(false)} color="red">
               Batal
             </Button>
             <Button onClick={handleEditSubmit}>
@@ -187,7 +261,6 @@ const ProfileCard = ({ user }) => {
         </form>
       </Modal>
 
-      {/* Change Password Modal */}
       <Modal
         isOpen={isPasswordModalOpen}
         onClose={() => setIsPasswordModalOpen(false)}
@@ -196,10 +269,10 @@ const ProfileCard = ({ user }) => {
         maxHeight="80vh"
         footer={
           <div className="flex justify-end gap-2">
-            <Button onClick={() => setIsPasswordModalOpen(false)} color='red'>
+            <Button onClick={() => setIsPasswordModalOpen(false)} color="red">
               Batal
             </Button>
-            <Button onClick={handlePasswordSubmit} color='blue'>
+            <Button onClick={handlePasswordSubmit} color="blue">
               Simpan Password
             </Button>
           </div>

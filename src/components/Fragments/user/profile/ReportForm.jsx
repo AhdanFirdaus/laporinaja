@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Button from "../../../Elements/Button";
 import Input from "../../../Elements/Input";
 import Textarea from "../../../Elements/Textarea";
@@ -6,6 +6,10 @@ import Select from "../../../Elements/Select";
 import InputUpload from "../../../Elements/InputUpload";
 import CardComplaint from "../../../Fragments/CardComplaint";
 import DetailComplaintModal from "../../../Fragments/DetailComplaintModal";
+import Swal from "sweetalert2";
+import supabase from "../../../../../supabaseClient";
+import checkImageSize from "../../../../helper/checkImageSize"
+import { validateLocation } from "../../../../helper/validateLocation"
 import { showConfirmation, showSuccess } from "../../../Elements/Alert";
 
 const ReportForm = () => {
@@ -16,14 +20,50 @@ const ReportForm = () => {
     location: "",
     category: "",
     customCategory: "",
-    photo: null,
+    lat: "",
+    lon: "",
   });
 
   const [reportHistory, setReportHistory] = useState([]);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editId, setEditId] = useState(null);
+  const [user, setUser] = useState(null); // Add state to store user
 
-  const fileInputRef = useRef(null);
+  // Fetch user and reports
+  useEffect(() => {
+    const fetchUserAndReports = async () => {
+      try {
+        // Fetch the authenticated user
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser();
+
+        if (userError || !user) {
+          console.error("Failed to fetch user or user not authenticated:", userError);
+          return;
+        }
+
+        setUser(user); // Store user in state
+
+        // Fetch reports for the authenticated user
+        const { data, error } = await supabase
+          .from("keluhan")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("incident_date", { ascending: false });
+
+        if (error) {
+          console.error("Failed to fetch complaints:", error);
+        } else {
+          console.log(data)
+          setReportHistory(data);
+        }
+      } catch (err) {
+        console.error("Error in fetchUserAndReports:", err);
+      }
+    };
+
+    fetchUserAndReports();
+  }, []); // Empty dependency array to run once on mount
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
@@ -33,89 +73,173 @@ const ReportForm = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const updatedData = {
-      ...formData,
-      timestamp: new Date().toLocaleString(),
-      category:
-        formData.category === "Lainnya"
-          ? formData.customCategory
-          : formData.category,
-    };
-
-    if (isEditing) {
-      updatedData.id = editId;
-      setReportHistory((prev) =>
-        prev.map((report) =>
-          report.id === editId ? updatedData : report
-        )
-      );
-      showSuccess({
-        text: "Keluhan berhasil diperbarui.",
-      });
-    } else {
-      updatedData.id = Date.now();
-      setReportHistory([updatedData, ...reportHistory]);
-      showSuccess({
-        text: "Keluhan berhasil diajukan.",
-      });
+    // Ensure user is available
+    if (!user) {
+      Swal.fire("Gagal", "User tidak ditemukan. Silakan login kembali.", "error");
+      return;
     }
 
-    setFormData({
-      title: "",
-      note: "",
-      date: "",
-      location: "",
-      category: "",
-      customCategory: "",
-      photo: null,
+    const toast = Swal.fire({
+      title: "Mengirim keluhan…",
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
     });
-    setIsEditing(false);
-    setEditId(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
 
-  const handleEdit = (complaint) => {
-    setFormData({
-      title: complaint.title,
-      note: complaint.note,
-      date: complaint.date,
-      location: complaint.location,
-      category: complaint.category === complaint.customCategory ? "Lainnya" : complaint.category,
-      customCategory: complaint.category === complaint.customCategory ? complaint.customCategory : "",
-      photo: complaint.photo || null,
-    });
-    setIsEditing(true);
-    setEditId(complaint.id);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+    try {
+      let photoPath = null;
 
-  const handleCancelEdit = () => {
-    setFormData({
-      title: "",
-      note: "",
-      date: "",
-      location: "",
-      category: "",
-      customCategory: "",
-      photo: null,
+      if (formData.photo) {
+  const sizeCheck = checkImageSize(formData.photo);
+  console.log("File size:", formData.photo.size, "bytes");
+
+
+  if (!sizeCheck.valid) {
+    Swal.fire({
+      icon: "error",
+      title: "Upload Gagal",
+      text: sizeCheck.message,
     });
-    setIsEditing(false);
-    setEditId(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+    return; // ⛔ stop upload if image too large
+  }
+  
+
+  const ext = formData.photo.name.split(".").pop();
+  const fileName = `${Date.now()}_${crypto.randomUUID()}.${ext}`;
+  const filePath = `${user.id}/${fileName}`;
+
+  const { data: storageData, error: storageError } = await supabase
+    .storage
+    .from("foto-keluhan")
+    .upload(filePath, formData.photo);
+
+  if (storageError) {
+    console.log(storageError)
+    Swal.fire({
+      icon: "error",
+      title: "Upload Gagal",
+      text: "Terjadi kesalahan saat mengunggah foto : " + storageError.message,
+    });
+    return;
+  }
+
+  photoPath = storageData.path;
+}
+
+      const { data, error: dbError } = await supabase
+        .from("keluhan")
+        .insert({
+          title: formData.title,
+          note: formData.note,
+          incident_date: formData.date,
+          location: formData.location,
+          category:
+            formData.category === "Lainnya"
+              ? formData.customCategory
+              : formData.category,
+          custom_category:
+            formData.category === "Lainnya" ? formData.customCategory : null,
+          photo_path: photoPath,
+          status: "waiting",
+          user_id: user.id,
+        })
+        .select("id")
+        .single();
+
+      if (dbError) throw dbError;
+
+      const newReport = {
+        ...formData,
+        id: data?.id,
+        timestamp: new Date().toLocaleString(),
+        category:
+          formData.category === "Lainnya"
+            ? formData.customCategory
+            : formData.category,
+        photo_path: photoPath,
+        status: "waiting",
+      };
+      setReportHistory([newReport, ...reportHistory]);
+
+      setFormData({
+        title: "",
+        note: "",
+        date: "",
+        location: "",
+        category: "",
+        customCategory: "",
+        photo: null,
+        lan: "",
+        lon: "",
+      });
+
+      toast.close();
+      Swal.fire("Berhasil!", "Keluhan Anda telah dikirim.", "success");
+    } catch (err) {
+      console.error(err);
+      toast.close();
+      Swal.fire("Gagal", err.message || "Terjadi kesalahan.", "error");
     }
   };
 
   const handleDelete = async (id) => {
-    const result = await showConfirmation({
-      text: "Apakah Anda yakin ingin menghapus keluhan ini?",
-      confirmButtonText: "Hapus",
+  const result = await Swal.fire({
+    icon: "warning",
+    title: "Konfirmasi",
+    text: "Apakah Anda yakin ingin menghapus keluhan ini?",
+    showCancelButton: true,
+    confirmButtonColor: "#52BA5E",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Hapus",
+    cancelButtonText: "Batal",
+  });
+
+  if (!result.isConfirmed) return;
+
+  // 1. Find the report to get photo path
+  const report = reportHistory.find((r) => r.id === id);
+  const photoPath = report?.photo_path;
+
+  try {
+    // 2. Delete from DB
+    const { error: deleteError } = await supabase
+      .from("keluhan")
+      .delete()
+      .eq("id", id);
+
+    if (deleteError) throw deleteError;
+
+    // 3. Delete from Storage if exists
+    if (photoPath) {
+      const { error: storageError } = await supabase
+        .storage
+        .from("foto-keluhan")
+        .remove([photoPath]);
+
+      if (storageError) throw storageError;
+    }
+
+    // 4. Update UI
+    setReportHistory(reportHistory.filter((r) => r.id !== id));
+
+    Swal.fire({
+      icon: "success",
+      title: "Dihapus!",
+      text: "Keluhan telah dihapus.",
+      confirmButtonColor: "#52BA5E",
     });
+  } catch (err) {
+    console.error("Gagal menghapus keluhan:", err);
+    Swal.fire({
+      icon: "error",
+      title: "Gagal",
+      text: "Terjadi kesalahan saat menghapus keluhan.",
+      confirmButtonColor: "#d33",
+    });
+  }
+};
 
     if (result.isConfirmed) {
       setReportHistory(reportHistory.filter((report) => report.id !== id));
