@@ -27,7 +27,7 @@ const Admin = () => {
   const renderContent = () => {
     switch (view) {
       case "dashboard":
-        return <Dashboard />;
+        return <Dashboard setView={setView} />; // Changed from onNavigate to setView
       case "complaints":
         return <Complaints />;
       case "users":
@@ -50,13 +50,15 @@ const Admin = () => {
       />
 
       {/* Main content */}
-      <main
-        className={`flex-1 p-6 bg-gray-50 overflow-y-auto transition-all duration-300 ml-16 md:ml-64`}
-      >
+      <main className="flex-1 p-6 bg-gray-50 overflow-y-auto transition-all duration-300 ml-16 md:ml-64">
         <h2 className="text-3xl font-bold font-second text-soft-orange mb-4">
           {titleMap[view]}
         </h2>
-        <div className="pb-10">{renderContent()}</div>
+        <div className="pb-10">
+          {view === "dashboard" && <Dashboard setView={setView} />} {/* Changed from onNavigate to setView */}
+          {view === "complaints" && <Complaints />}
+          {view === "users" && <Users />}
+        </div>
       </main>
     </div>
   );
