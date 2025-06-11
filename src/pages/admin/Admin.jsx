@@ -31,7 +31,7 @@ const Admin = () => {
       case "complaints":
         return <Complaints />;
       case "users":
-        return <Users />;
+        return <Users setView={setView} />;
       default:
         return null;
     }
@@ -57,7 +57,7 @@ const Admin = () => {
         <div className="pb-10">
           {view === "dashboard" && <Dashboard setView={setView} />} {/* Changed from onNavigate to setView */}
           {view === "complaints" && <Complaints />}
-          {view === "users" && <Users />}
+          {view === "users" && <Users setView={setView} />}
         </div>
       </main>
     </div>

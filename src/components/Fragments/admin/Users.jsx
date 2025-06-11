@@ -5,7 +5,7 @@ import Button from "../../Elements/Button";
 import { showConfirmation, showSuccess } from "../../Elements/Alert";
 import supabase from "../../../../supabaseClient";
 
-const Users = () => {
+const Users = ({ setView }) => {
   const [userData, setUserData] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,7 +29,7 @@ const Users = () => {
         // Fetch complaints for all users
         const { data: complaints, error: complaintError } = await supabase
           .from("keluhan")
-          .select("user_id, title");
+          .select("user_id, title,id");
 
         if (complaintError) {
           console.error("Error fetching complaints:", complaintError);
@@ -43,7 +43,7 @@ const Users = () => {
           kecamatan: user.kecamatan,
           complaints: complaints
             .filter(complaint => complaint.user_id === user.id)
-            .map(complaint => complaint.title)
+            .map(complaint => [complaint.id, complaint.title])
         }));
 
         setUserData(usersWithComplaints);
@@ -54,6 +54,11 @@ const Users = () => {
 
     fetchUsers();
   }, []);
+
+  const handleEachModal = (id) => {
+  console.log("id clicked:", id);
+  setView("complaints")
+};
 
   const openModal = (user) => {
     setSelectedUser(user);
@@ -206,14 +211,17 @@ const Users = () => {
             <div>
               <p className="font-semibold mb-1">Keluhan:</p>
               <div className="space-y-2">
-                {selectedUser.complaints.map((comp, idx) => (
+                {selectedUser.complaints.map(([id, title]) => (
                   <div
-                    key={idx}
+                    key={id}
                     className="flex items-center gap-2 group text-gray-700"
                   >
                     <span className="text-base sm:text-lg leading-none">•</span>
-                    <span className="truncate hover:underline cursor-pointer text-sm sm:text-base">
-                      {comp}
+                    <span
+                      className="truncate hover:underline cursor-pointer text-sm sm:text-base"
+                      onClick={() => handleEachModal(id)}
+                    >
+                      {title}
                     </span>
                     <FiArrowRight
                       size={12}
