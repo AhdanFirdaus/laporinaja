@@ -12,6 +12,8 @@ import {
   Filler, // Import Filler plugin
 } from "chart.js";
 import { FiUsers, FiAlertCircle, FiClock, FiCheckCircle } from "react-icons/fi";
+import { useEffect, useState } from "react";
+import supabase from "../../../../supabaseClient"
 
 // Register Chart.js components, including Filler
 ChartJS.register(
@@ -26,32 +28,69 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
+  const [userCount, setUserCount] = useState(0);
+  const [totalKeluhan, setTotalKeluhan] = useState(0);
+  const [waitingKeluhan, setWaitingKeluhan] = useState(0);
+  const [doneKeluhan, setDoneKeluhan] = useState(0);
   // Updated cards array with react-icons
+  useEffect(() => {
+    const fetchStats = async () => {
+      // User count
+      const { count: userCountData } = await supabase
+        .from("user")
+        .select("*", { count: "exact", head: true });
+
+      // Total keluhan
+      const { count: totalKeluhanData } = await supabase
+        .from("keluhan")
+        .select("*", { count: "exact", head: true });
+
+      // Keluhan with status = waiting
+      const { count: waitingCount } = await supabase
+        .from("keluhan")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "waiting");
+
+      // Keluhan with status = done
+      const { count: doneCount } = await supabase
+        .from("keluhan")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "done");
+
+      setUserCount(userCountData || 0);
+      setTotalKeluhan(totalKeluhanData || 0);
+      setWaitingKeluhan(waitingCount || 0);
+      setDoneKeluhan(doneCount || 0);
+    };
+
+    fetchStats();
+  }, []);
+
   const cards = [
     {
       title: "Pengguna",
-      value: "30",
+      value: userCount,
       button: "Lihat Pengguna",
       color: "bg-blue-100",
       icon: <FiUsers className="text-3xl text-blue-600" />,
     },
     {
       title: "Total Keluhan",
-      value: "17",
+      value: totalKeluhan,
       button: "Lihat Keluhan",
       color: "bg-red-100",
       icon: <FiAlertCircle className="text-3xl text-red-600" />,
     },
     {
       title: "Keluhan Belum Diproses",
-      value: "7",
+      value: waitingKeluhan,
       button: "Lihat Keluhan",
       color: "bg-yellow-100",
       icon: <FiClock className="text-3xl text-yellow-600" />,
     },
     {
       title: "Keluhan Terselesaikan",
-      value: "12",
+      value: doneKeluhan,
       button: "Lihat Status",
       color: "bg-green-100",
       icon: <FiCheckCircle className="text-3xl text-green-600" />,
