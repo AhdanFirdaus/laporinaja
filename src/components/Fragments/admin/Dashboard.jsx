@@ -9,11 +9,11 @@ import {
   Tooltip,
   Legend,
   CategoryScale,
-  Filler, // Import Filler plugin
+  Filler,
 } from "chart.js";
 import { FiUsers, FiAlertCircle, FiClock, FiCheckCircle } from "react-icons/fi";
 import { useEffect, useState } from "react";
-import supabase from "../../../../supabaseClient"
+import supabase from "../../../../supabaseClient";
 
 // Register Chart.js components, including Filler
 ChartJS.register(
@@ -24,15 +24,15 @@ ChartJS.register(
   Tooltip,
   Legend,
   CategoryScale,
-  Filler // Register Filler plugin
+  Filler
 );
 
-const Dashboard = () => {
+const Dashboard = ({ setView }) => {
   const [userCount, setUserCount] = useState(0);
   const [totalKeluhan, setTotalKeluhan] = useState(0);
   const [waitingKeluhan, setWaitingKeluhan] = useState(0);
   const [doneKeluhan, setDoneKeluhan] = useState(0);
-  // Updated cards array with react-icons
+
   useEffect(() => {
     const fetchStats = async () => {
       // User count
@@ -73,27 +73,31 @@ const Dashboard = () => {
       button: "Lihat Pengguna",
       color: "bg-blue-100",
       icon: <FiUsers className="text-3xl text-blue-600" />,
+      onClick: () => setView("users"),
     },
     {
       title: "Total Keluhan",
       value: totalKeluhan,
-      button: "Lihat Keluhan",
-      color: "bg-red-100",
-      icon: <FiAlertCircle className="text-3xl text-red-600" />,
-    },
-    {
-      title: "Keluhan Belum Diproses",
-      value: waitingKeluhan,
-      button: "Lihat Keluhan",
+      button: "Lihat Semua",
       color: "bg-yellow-100",
-      icon: <FiClock className="text-3xl text-yellow-600" />,
+      icon: <FiAlertCircle className="text-3xl text-yellow-600" />,
+      onClick: () => setView("complaints"),
     },
     {
-      title: "Keluhan Terselesaikan",
+      title: "Keluhan Menunggu",
+      value: waitingKeluhan,
+      button: "Keluhan Waiting",
+      color: "bg-orange-100",
+      icon: <FiClock className="text-3xl text-orange-600" />,
+      onClick: () => setView("complaints"),
+    },
+    {
+      title: "Keluhan Selesai",
       value: doneKeluhan,
-      button: "Lihat Status",
+      button: "Keluhan Done",
       color: "bg-green-100",
       icon: <FiCheckCircle className="text-3xl text-green-600" />,
+      onClick: () => setView("complaints"),
     },
   ];
 
@@ -140,7 +144,8 @@ const Dashboard = () => {
           {cards.map((card, index) => (
             <div
               key={index}
-              className={`rounded-xl shadow p-4 sm:p-6 ${card.color} text-center flex flex-col justify-between transform hover:scale-105 transition-transform duration-300`}
+              className={`rounded-xl shadow p-4 sm:p-6 ${card.color} text-center flex flex-col justify-between transform hover:scale-105 transition-transform duration-300 cursor-pointer`}
+              onClick={card.onClick} // Card click handler
             >
               <div className="flex items-center justify-center mb-3 sm:mb-4">
                 {card.icon}
@@ -151,7 +156,15 @@ const Dashboard = () => {
               <p className="text-xl sm:text-3xl font-bold text-gray-800">
                 {card.value}
               </p>
-              <Button className="mt-3 sm:mt-4">{card.button}</Button>
+              <Button
+                className="mt-3 sm:mt-4"
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent card's onClick from firing
+                  card.onClick(); // Trigger the specific card's onClick
+                }}
+              >
+                {card.button}
+              </Button>
             </div>
           ))}
         </div>
