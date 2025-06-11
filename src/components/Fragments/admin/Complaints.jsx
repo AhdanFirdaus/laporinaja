@@ -1,49 +1,48 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect} from "react";
 import DetailComplaintModal from "../DetailComplaintModal";
 import CardComplaint from "../CardComplaint";
 import { showConfirmation, showSuccess } from "../../Elements/Alert";
+import supabase from "../../../../supabaseClient";
 
-const initialComplaints = [
-    {
-        id: 1,
-        title: "Jalan rusak di Jl. Gajahmada",
-        note: "Sudah lebih dari seminggu tidak diperbaiki",
-        location: "Jl. Gajahmada",
-        category: "Jalan",
-        date: "2025-06-06",
-        label: "Menunggu",
-        imageUrl: "/img/jalan-rusak.jpg",
-    },
-    {
-        id: 2,
-        title: "Lampu jalan mati",
-        note: "Lampu mati di tikungan Jl. Pahlawan, sangat gelap",
-        location: "Jl. Pahlawan",
-        category: "Penerangan",
-        date: "2025-06-05",
-        label: "Selesai", 
-        imageUrl: "/img/lampu-mati.jpg",
-    },
-    {
-        id: 3,
-        title: "Sampah menumpuk",
-        note: "Tumpukan sampah di dekat pasar belum diangkut",
-        location: "Pasar Johar",
-        category: "Sampah",
-        date: "2025-06-01",
-        label: "Selesai",
-        imageUrl: "/img/sampah.jpg",
-    },
-];
 
 const Complaints = () => {
-    const [complaints, setComplaints] = useState(initialComplaints);
+    const [complaints, setComplaints] = useState([]);
     const [selectedComplaint, setSelectedComplaint] = useState(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState({});
     const complaintsPerPage = 5;
 
-    const statusOptions = ["Menunggu", "Proses", "Selesai", "Ditolak"];
+
+
+    const statusOptions = ["waiting", "processing", "done", "reject"];
+
+    const fetchComplaints = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("keluhan")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching complaints:", error.message);
+    } else {
+      const formatted = data.map((item) => ({
+        id: item.id,
+        title: item.title,
+        note: item.note,
+        location: item.location,
+        category: item.category,
+        date: item.incident_date,
+        label: item.status,
+        imageUrl: item.photo_path || "/img/placeholder.jpg",
+      }));
+      setComplaints(formatted);
+      console.log(complaints) // it displayed
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchComplaints();
+  }, [fetchComplaints]);
 
     const openDetailModal = (complaint) => {
         setSelectedComplaint(complaint);
@@ -203,7 +202,7 @@ const Complaints = () => {
 
     return (
         <div>
-            {renderSection("Menunggu", "Keluhan Menunggu")}
+            {renderSection("waiting", "Keluhan Menunggu")}
             {renderSection("Proses", "Keluhan Diproses")}
             {renderSection("Selesai", "Keluhan Selesai")}
             {renderSection("Ditolak", "Keluhan Ditolak")}
