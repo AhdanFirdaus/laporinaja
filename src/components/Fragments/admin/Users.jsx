@@ -70,17 +70,34 @@ const Users = ({ setView }) => {
     setSelectedUser(null);
   };
 
-  const handleDelete = (username) => {
+    const handleDelete = async (username) => {
     showConfirmation({
       title: "Konfirmasi Hapus Pengguna",
       text: `Apakah Anda yakin ingin menghapus pengguna "${username}"?`,
       confirmButtonText: "Hapus",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        setUserData(userData.filter((user) => user.username !== username));
+        // 🔥 Delete from Supabase
+        const { error } = await supabase
+          .from("user") // adjust table name if needed
+          .delete()
+          .eq("username", username);
+
+        if (error) {
+          console.error("Gagal menghapus dari Supabase:", error.message);
+          showError({
+            title: "Gagal!",
+            text: "Pengguna tidak berhasil dihapus. Silakan coba lagi.",
+          });
+          return;
+        }
+
+        // ✅ Update local state and close modal
+        setUserData((prev) => prev.filter((user) => user.username !== username));
         if (selectedUser?.username === username) {
           closeModal();
         }
+
         showSuccess({
           title: "Berhasil!",
           text: `Pengguna "${username}" telah dihapus.`,
@@ -118,6 +135,7 @@ const Users = ({ setView }) => {
     }
     return pageNumbers;
   };
+
 
   return (
     <div className="w-full space-y-4">
@@ -202,7 +220,7 @@ const Users = ({ setView }) => {
           <div className="text-gray-700 space-y-4 text-sm sm:text-base">
             <div>
               <p className="font-semibold">Nama:</p>
-              <p>{selectedUser.username}</p>
+              <p>{selectedUser.id}</p>
             </div>
             <div>
               <p className="font-semibold">Domisili:</p>
