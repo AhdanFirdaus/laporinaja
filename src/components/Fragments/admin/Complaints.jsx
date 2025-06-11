@@ -5,6 +5,12 @@ import { showConfirmation, showSuccess } from "../../Elements/Alert";
 import supabase from "../../../../supabaseClient";
 import { image } from "framer-motion/client";
 
+const labelToStatus = {
+  waiting: "waiting",
+  Proses: "processing",
+  Selesai: "done",
+  Ditolak: "reject",
+};
 
 const Complaints = () => {
     const [complaints, setComplaints] = useState([]);
@@ -73,25 +79,51 @@ const Complaints = () => {
     setSelectedComplaint(null);
   };
 
-  const handleStatusChange = useCallback((complaint, nextLabel) => {
+    const handleStatusChange = useCallback(
+  (complaint, nextLabel) => {
+    console.log("-------------------------")
     showConfirmation({
       title: "Konfirmasi Perubahan Status",
       text: `Apakah Anda yakin ingin mengubah status keluhan "${complaint.title}" ke ${nextLabel}?`,
       confirmButtonText: "Ubah Status",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setComplaints((prev) =>
-          prev.map((comp) =>
-            comp.id === complaint.id ? { ...comp, label: nextLabel } : comp
-          )
-        );
-        showSuccess({
-          title: "Berhasil!",
-          text: `Status berhasil diubah ke ${nextLabel}.`,
+    }).then(async (result) => {
+      if (!result.isConfirmed) return;
+
+      // 1️⃣ Convert label → enum value expected by DB
+      const newStatus = labelToStatus[nextLabel];
+      console.log(nextLabel)
+
+      // 2️⃣ Update row in Supabase
+      const { error } = await supabase
+        .from("keluhan")
+        .update({ status: nextLabel })
+        .eq("id", complaint.id);
+
+      if (error) {
+        console.error("Gagal mengubah status di Supabase:", error.message);
+        showError({
+          title: "Gagal!",
+          text: "Status tidak berhasil diperbarui. Silakan coba lagi.",
         });
+        return;
       }
+
+      // 3️⃣ Reflect change in local state
+      setComplaints((prev) =>
+        prev.map((comp) =>
+          comp.id === complaint.id ? { ...comp, label: nextLabel } : comp
+        )
+      );
+
+      // 4️⃣ Show success toast
+      showSuccess({
+        title: "Berhasil!",
+        text: `Status berhasil diubah ke ${nextLabel}.`,
+      });
     });
-  }, []);
+  },
+  []
+);
 
     const handleDeleteComplaint = useCallback((complaint) => {
     console.log("=>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
@@ -263,9 +295,9 @@ const Complaints = () => {
     return (
         <div>
             {renderSection("waiting", "Keluhan Menunggu")}
-            {renderSection("Proses", "Keluhan Diproses")}
-            {renderSection("Selesai", "Keluhan Selesai")}
-            {renderSection("Ditolak", "Keluhan Ditolak")}
+            {renderSection("processing", "Keluhan Diproses")}
+            {renderSection("done", "Keluhan Selesai")}
+            {renderSection("reject", "Keluhan Ditolak")}
             <DetailComplaintModal
                 isOpen={isDetailModalOpen}
                 onClose={closeDetailModal}
