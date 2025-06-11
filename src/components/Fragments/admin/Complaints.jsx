@@ -3,6 +3,7 @@ import DetailComplaintModal from "../DetailComplaintModal";
 import CardComplaint from "../CardComplaint";
 import { showConfirmation, showSuccess } from "../../Elements/Alert";
 import supabase from "../../../../supabaseClient";
+import { image } from "framer-motion/client";
 
 
 const Complaints = () => {
@@ -44,10 +45,28 @@ const Complaints = () => {
     fetchComplaints();
   }, [fetchComplaints]);
 
-    const openDetailModal = (complaint) => {
-        setSelectedComplaint(complaint);
-        setIsDetailModalOpen(true);
+    const openDetailModal = async (complaint) => {
+    const { data, error } = supabase.storage
+        .from("foto-keluhan")
+        .getPublicUrl(complaint.imageUrl);
+    console.log("hai")
+    console.log(complaint)
+    console.log(data)
+    console.log(complaint.photo_path)
+    if (error) {
+        console.error("Failed to get image URL:", error.message);
+        return;
+    }
+
+    const updatedComplaint = {
+        ...complaint,
+        imageUrl: data.publicUrl,
     };
+
+    setSelectedComplaint(updatedComplaint);
+    setIsDetailModalOpen(true);
+};
+
 
     const closeDetailModal = () => {
         setIsDetailModalOpen(false);
@@ -75,20 +94,47 @@ const Complaints = () => {
     }, []);
 
     const handleDeleteComplaint = useCallback((complaint) => {
-        showConfirmation({
-            title: "Konfirmasi Hapus Keluhan",
-            text: `Apakah Anda yakin ingin menghapus keluhan "${complaint.title}"?`,
-            confirmButtonText: "Hapus",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                setComplaints((prev) => prev.filter((comp) => comp.id !== complaint.id));
-                showSuccess({
-                    title: "Berhasil!",
-                    text: `Keluhan "${complaint.title}" telah dihapus.`,
-                });
+    console.log("=>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    console.log(complaint);
+    
+    showConfirmation({
+        title: "Konfirmasi Hapus Keluhan",
+        text: `Apakah Anda yakin ingin menghapus keluhan "${complaint.title}"?`,
+        confirmButtonText: "Hapus",
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            // Delete from Supabase
+            const { error } = await supabase
+                .from("keluhan")
+                .delete()
+                .eq("id", complaint.id);
+
+            if (error) {
+                console.error("Gagal menghapus dari Supabase:", error.message);
+                return;
             }
-        });
-    }, []);
+
+            const {image_error} = await supabase
+            .storage
+            .from("foto-keluhan")
+            .remove([complaint.imageUrl]);
+
+            if (image_error) {
+                console.error("Gagal menghapus dari Supabase:", image_error.message);
+                return;
+            }
+
+
+            // Update UI after successful deletion
+            setComplaints((prev) => prev.filter((comp) => comp.id !== complaint.id));
+            showSuccess({
+                title: "Berhasil!",
+                text: `Keluhan "${complaint.title}" telah dihapus.`,
+            });
+        }
+    });
+}, []);
+
 
     const getActions = useCallback((complaint) => {
         return [
