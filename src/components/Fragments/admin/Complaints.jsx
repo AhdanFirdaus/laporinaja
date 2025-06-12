@@ -167,7 +167,7 @@ const Complaints = () => {
     return (
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-gray-700">{title}</h2>
+          <h2 className=" font-semibold text-gray-700">{title}</h2>
           <span className="text-sm bg-gray-200 text-gray-700 font-semibold px-3 py-1 rounded-full">
             {filtered.length}
           </span>
@@ -178,6 +178,11 @@ const Complaints = () => {
               key={complaint.id}
               complaint={complaint}
               actions={getActions(complaint)}
+              className={
+                complaint.label === "Selesai" || complaint.label === "Ditolak"
+                  ? "bg-gray-200 text-gray-500"
+                  : ""
+              }
             />
           ))}
         </ul>
