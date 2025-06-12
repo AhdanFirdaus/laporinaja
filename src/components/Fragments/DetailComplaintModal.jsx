@@ -1,12 +1,19 @@
 import Modal from "../Elements/Modal";
 import Button from "../Elements/Button";
 
+const statusLabels = {
+  waiting: "Menunggu",
+  processing: "Diproses",
+  done: "Selesai",
+  reject: "Ditolak",
+};
+
 const DetailComplaintModal = ({ isOpen, onClose, complaint }) => {
   if (!complaint) return null;
-  console.log(complaint)
+  console.log(complaint);
 
-  // Tetapkan default label jika tidak ada
-  const label = complaint.label || "Menunggu";
+  // Ambil label dari mapping, fallback ke "Menunggu" jika tidak ditemukan
+  const label = statusLabels[complaint.label] || "Menunggu";
 
   return (
     <Modal
