@@ -400,7 +400,7 @@ export default function Home() {
                         expandedStep === step.number ? null : step.number
                       ); // Toggle details
                     }}
-                    className="flex items-center justify-between w-full text-left focus:outline-none"
+                    className="flex items-center justify-between w-full text-left focus:outline-none cursor-pointer"
                   >
                     <span className="flex items-center">
                       <span
