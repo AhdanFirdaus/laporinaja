@@ -230,7 +230,7 @@ const Users = ({ setView, handleEachModal }) => {
                     key={id}
                     className="flex items-center gap-2 group text-gray-700"
                   >
-                    <span className="text-base sm:text-lg leading-none">•</span>
+                    <span className="text-base leading-none">•</span>
                     <span
                       className="truncate hover:underline cursor-pointer text-sm sm:text-base"
                       onClick={() => handleEachModal(id)}
@@ -239,7 +239,7 @@ const Users = ({ setView, handleEachModal }) => {
                     </span>
                     <FiArrowRight
                       size={12}
-                      className="transform transition-transform duration-200 group-hover:-rotate-45 sm:size-14"
+                      className="transform transition-transform duration-200 group-hover:-rotate-45"
                     />
                   </div>
                 ))}
