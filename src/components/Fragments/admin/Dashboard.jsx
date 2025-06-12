@@ -32,6 +32,9 @@ const Dashboard = ({ setView }) => {
   const [totalKeluhan, setTotalKeluhan] = useState(0);
   const [waitingKeluhan, setWaitingKeluhan] = useState(0);
   const [doneKeluhan, setDoneKeluhan] = useState(0);
+  const [visitCounts, setVisitCounts] = useState(Array(12).fill(0)); // initialize 12 month
+
+  
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -64,6 +67,35 @@ const Dashboard = ({ setView }) => {
     };
 
     fetchStats();
+  }, []);
+
+  useEffect(() => {
+    const fetchVisits = async () => {
+      const { data, error } = await supabase
+        .from("visits")
+        .select("month");
+
+      if (error) {
+        console.error("Error fetching visit data:", error);
+        return;
+      }
+      console.log("{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{")
+      console.log(data)
+      // Count visits per month
+      const counts = Array(12).fill(0); // Jan to Dec
+      data.forEach(({ month }) => {
+        const monthIndex = parseInt(month.split("-")[1], 10) - 1;
+        if (monthIndex >= 0 && monthIndex < 12) {
+          counts[monthIndex]++;
+        }
+      });
+
+      setVisitCounts(counts);
+      console.log("++++++++++++++++++++++++++++++++++")
+      console.log(visitCounts)
+    };
+
+    fetchVisits();
   }, []);
 
   const cards = [
@@ -103,11 +135,11 @@ const Dashboard = ({ setView }) => {
 
   // Chart data for Pengunjung (Visitors)
   const chartData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun","jul","aug","sep","okt","nov","dec"],
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     datasets: [
       {
         label: "Pengunjung",
-        data: [120, 150, 180, 200, 170, 200],
+        data: visitCounts,
         borderColor: "rgba(255, 99, 71, 1)",
         backgroundColor: "rgba(255, 99, 71, 0.2)",
         fill: true,
@@ -120,9 +152,7 @@ const Dashboard = ({ setView }) => {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: {
-        position: "top",
-      },
+      legend: { position: "top" },
       title: {
         display: true,
         text: "Statistik Pengunjung",
@@ -130,9 +160,7 @@ const Dashboard = ({ setView }) => {
       },
     },
     scales: {
-      y: {
-        beginAtZero: true,
-      },
+      y: { beginAtZero: true },
     },
   };
 
@@ -174,9 +202,7 @@ const Dashboard = ({ setView }) => {
           <div className="h-full">
             <Line data={chartData} options={chartOptions} />
           </div>
-          <div className="mt-4 text-center">
-            <Button>Lihat Statistik Lengkap</Button>
-          </div>
+          
         </div>
       </main>
     </div>
