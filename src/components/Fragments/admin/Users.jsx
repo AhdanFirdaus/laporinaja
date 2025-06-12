@@ -1,40 +1,60 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Modal from "../../Elements/Modal";
 import { FiUser, FiArrowRight } from "react-icons/fi";
 import Button from "../../Elements/Button";
 import { showConfirmation, showSuccess } from "../../Elements/Alert";
+import supabase from "../../../../supabaseClient";
 
-const Users = () => {
-  const [userData, setUserData] = useState([
-    {
-      name: "UID1234",
-      address: "Jl. Lorem Ipsum, Kec. Dolor, Kec. Sit Amet",
-      complaints: [
-        "Jalan berlubang di Jl. Diponegoro",
-        "Lampu jalan mati di Jl. Kartini",
-      ],
-    },
-    {
-      name: "UID1235",
-      address: "Jl. Lorem Ipsum, Kec. Dolor, Kec. Sit Amet",
-      complaints: ["Sampah menumpuk di Jl. Sisingamangaraja"],
-    },
-    {
-      name: "UID1236",
-      address: "Jl. Lorem Ipsum, Kec. Dolor, Kec. Sit Amet",
-      complaints: ["Trotoar rusak dekat SMA 1"],
-    },
-    {
-      name: "UID1237",
-      address: "Jl. Lorem Ipsum, Kec. Dolor, Kec. Sit Amet",
-      complaints: ["Trotoar rusak dekat SMA 1"],
-    },
-  ]);
-
+const Users = ({ setView, handleEachModal }) => {
+  const [userData, setUserData] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 5;
+
+  // Fetch users from Supabase
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        // Fetch users
+        const { data: users, error: userError } = await supabase
+          .from("user")
+          .select("id, username, kecamatan");
+
+        if (userError) {
+          console.error("Error fetching users:", userError);
+          return;
+        }
+
+        // Fetch complaints for all users
+        const { data: complaints, error: complaintError } = await supabase
+          .from("keluhan")
+          .select("user_id, title,id");
+
+        if (complaintError) {
+          console.error("Error fetching complaints:", complaintError);
+          return;
+        }
+
+        // Map users with their complaints
+        const usersWithComplaints = users.map(user => ({
+          id: user.id,
+          username: user.username,
+          kecamatan: user.kecamatan,
+          complaints: complaints
+            .filter(complaint => complaint.user_id === user.id)
+            .map(complaint => [complaint.id, complaint.title])
+        }));
+
+        setUserData(usersWithComplaints);
+      } catch (err) {
+        console.error("Unexpected error:", err);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
 
   const openModal = (user) => {
     setSelectedUser(user);
@@ -46,20 +66,37 @@ const Users = () => {
     setSelectedUser(null);
   };
 
-  const handleDelete = (userName) => {
+    const handleDelete = async (username) => {
     showConfirmation({
       title: "Konfirmasi Hapus Pengguna",
-      text: `Apakah Anda yakin ingin menghapus pengguna "${userName}"?`,
+      text: `Apakah Anda yakin ingin menghapus pengguna "${username}"?`,
       confirmButtonText: "Hapus",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        setUserData(userData.filter((user) => user.name !== userName));
-        if (selectedUser?.name === userName) {
+        // 🔥 Delete from Supabase
+        const { error } = await supabase
+          .from("user") // adjust table name if needed
+          .delete()
+          .eq("username", username);
+
+        if (error) {
+          console.error("Gagal menghapus dari Supabase:", error.message);
+          showError({
+            title: "Gagal!",
+            text: "Pengguna tidak berhasil dihapus. Silakan coba lagi.",
+          });
+          return;
+        }
+
+        // ✅ Update local state and close modal
+        setUserData((prev) => prev.filter((user) => user.username !== username));
+        if (selectedUser?.username === username) {
           closeModal();
         }
+
         showSuccess({
           title: "Berhasil!",
-          text: `Pengguna "${userName}" telah dihapus.`,
+          text: `Pengguna "${username}" telah dihapus.`,
         });
       }
     });
@@ -95,6 +132,7 @@ const Users = () => {
     return pageNumbers;
   };
 
+
   return (
     <div className="w-full space-y-4">
       {/* Label kolom atas */}
@@ -115,12 +153,12 @@ const Users = () => {
               <div className="flex items-center gap-3">
                 <FiUser className="w-6 h-6 sm:w-8 sm:h-8 text-gray-500 group-hover:text-gray-700 transition" />
                 <div className="text-gray-500 font-medium text-sm sm:text-base">
-                  {user.name}
+                  {user.id}
                 </div>
               </div>
               <div className="text-center sm:text-right">
                 <div className="text-xs sm:text-sm text-gray-600">
-                  {user.address}
+                  {user.kecamatan}
                 </div>
                 <div className="text-xs sm:text-sm mt-1 inline-block bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">
                   {user.complaints.length} keluhan
@@ -160,7 +198,7 @@ const Users = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
-        title={`Profil ${selectedUser?.name}`}
+        title={`Profil ${selectedUser?.id}`}
         className="w-full max-w-md sm:max-w-lg mx-4"
         maxHeight="80vh"
         footer={
@@ -168,7 +206,7 @@ const Users = () => {
             <Button onClick={closeModal} color="red">
               Batal
             </Button>
-            <Button onClick={() => handleDelete(selectedUser?.name)}>
+            <Button onClick={() => handleDelete(selectedUser?.username)}>
               Hapus Pengguna
             </Button>
           </div>
@@ -178,27 +216,30 @@ const Users = () => {
           <div className="text-gray-700 space-y-4 text-sm sm:text-base">
             <div>
               <p className="font-semibold">Nama:</p>
-              <p>{selectedUser.name}</p>
+              <p>{selectedUser.id}</p>
             </div>
             <div>
-              <p className="font-semibold">Alamat:</p>
-              <p>{selectedUser.address}</p>
+              <p className="font-semibold">Domisili:</p>
+              <p>{selectedUser.kecamatan}</p>
             </div>
             <div>
               <p className="font-semibold mb-1">Keluhan:</p>
               <div className="space-y-2">
-                {selectedUser.complaints.map((comp, idx) => (
+                {selectedUser.complaints.map(([id, title]) => (
                   <div
-                    key={idx}
+                    key={id}
                     className="flex items-center gap-2 group text-gray-700"
                   >
-                    <span className="text-base sm:text-lg leading-none">•</span>
-                    <span className="truncate hover:underline cursor-pointer text-sm sm:text-base">
-                      {comp}
+                    <span className="text-base leading-none">•</span>
+                    <span
+                      className="truncate hover:underline cursor-pointer text-sm sm:text-base"
+                      onClick={() => handleEachModal(id)}
+                    >
+                      {title}
                     </span>
                     <FiArrowRight
                       size={12}
-                      className="transform transition-transform duration-200 group-hover:-rotate-45 sm:size-14"
+                      className="transform transition-transform duration-200 group-hover:-rotate-45"
                     />
                   </div>
                 ))}
