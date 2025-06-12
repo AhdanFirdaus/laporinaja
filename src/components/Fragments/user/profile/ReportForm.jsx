@@ -26,9 +26,11 @@ const ReportForm = () => {
 
   const [reportHistory, setReportHistory] = useState([]);
   const [user, setUser] = useState(null);
-  const fileInputRef = useRef(null); // Added useRef
+  const fileInputRef = useRef(null);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentSectionPage, setCurrentSectionPage] = useState(1);
+  const complaintsPerPage = 6;
 
   useEffect(() => {
     const fetchUserAndReports = async () => {
@@ -247,6 +249,38 @@ const ReportForm = () => {
     setIsModalOpen(true);
   };
 
+  const totalPages = Math.ceil(reportHistory.length / complaintsPerPage);
+  const indexOfLastComplaint = currentSectionPage * complaintsPerPage;
+  const indexOfFirstComplaint = indexOfLastComplaint - complaintsPerPage;
+  const currentComplaints = reportHistory.slice(
+    indexOfFirstComplaint,
+    indexOfLastComplaint
+  );
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentSectionPage(pageNumber);
+  };
+
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`px-2 py-1 sm:px-3 sm:py-1 rounded-full text-sm sm:text-base ${
+            currentSectionPage === i
+              ? "bg-soft-orange text-white"
+              : "bg-gray-200 text-gray-700 hover:bg-soft-orange/20 cursor-pointer"
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+    return pageNumbers;
+  };
+
   const categoryOptions = [
     "Jalan dan Trotoar",
     "Penerangan Jalan Umum",
@@ -322,32 +356,59 @@ const ReportForm = () => {
       </form>
 
       <div className="mt-12 border-t pt-8 bg-gray-50">
-        <h2 className="text-3xl font-bold font-second text-soft-orange mb-6 tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-bold font-second text-soft-orange mb-6 tracking-tight">
           Riwayat Keluhan
         </h2>
         {reportHistory.length === 0 ? (
-          <p className="text-gray-500 text-lg italic text-center py-8">
+          <p className="text-gray-500 text-base sm:text-lg italic text-center py-8">
             Belum ada keluhan yang diajukan.
           </p>
         ) : (
-          <ul className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
-            {reportHistory.map((report) => (
-              <CardComplaint
-                key={report.id}
-                complaint={report}
-                actions={[
-                  {
-                    label: "Lihat Detail",
-                    onClick: handleDetailClick,
-                  },
-                  {
-                    label: "Hapus",
-                    onClick: (complaint) => handleDelete(complaint.id),
-                  },
-                ]}
-              />
-            ))}
-          </ul>
+          <>
+            <ul className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+              {currentComplaints.map((report) => (
+                <CardComplaint
+                  key={report.id}
+                  complaint={report}
+                  actions={[
+                    {
+                      label: "Lihat Detail",
+                      onClick: handleDetailClick,
+                    },
+                    {
+                      label: "Hapus",
+                      onClick: (complaint) => handleDelete(complaint.id),
+                    },
+                  ]}
+                />
+              ))}
+            </ul>
+            {reportHistory.length > complaintsPerPage && (
+              <div className="flex justify-center mt-4 space-x-1 sm:space-x-2 items-center flex-wrap gap-y-2">
+                <button
+                  onClick={() =>
+                    handlePageChange(Math.max(currentSectionPage - 1, 1))
+                  }
+                  disabled={currentSectionPage === 1}
+                  className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-soft-orange/20 cursor-pointer text-sm sm:text-base"
+                >
+                  Previous
+                </button>
+                <div className="flex space-x-1 sm:space-x-2 flex-wrap justify-center gap-y-2">
+                  {renderPageNumbers()}
+                </div>
+                <button
+                  onClick={() =>
+                    handlePageChange(Math.min(currentSectionPage + 1, totalPages))
+                  }
+                  disabled={currentSectionPage === totalPages}
+                  className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-soft-orange/20 cursor-pointer text-sm sm:text-base"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </>
         )}
         <DetailComplaintModal
           isOpen={isModalOpen}

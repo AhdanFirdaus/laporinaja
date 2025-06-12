@@ -82,7 +82,7 @@ const Users = () => {
         <button
           key={i}
           onClick={() => handlePageChange(i)}
-          className={`px-3 py-1 rounded-full ${
+          className={`px-2 py-1 sm:px-3 sm:py-1 rounded-full text-sm sm:text-base ${
             currentPage === i
               ? "bg-soft-orange text-white"
               : "bg-gray-200 text-gray-700 hover:bg-soft-orange/20 cursor-pointer"
@@ -98,7 +98,7 @@ const Users = () => {
   return (
     <div className="w-full space-y-4">
       {/* Label kolom atas */}
-      <div className="flex justify-between items-center text-sm sm:text-base font-semibold text-gray-600 border-b border-gray-200 pb-2">
+      <div className="flex justify-between items-center text-xs sm:text-sm md:text-base font-semibold text-gray-600 border-b border-gray-200 pb-2">
         <span>Username</span>
         <span>Domisili</span>
       </div>
@@ -109,16 +109,20 @@ const Users = () => {
           <div
             key={index}
             onClick={() => openModal(user)}
-            className="bg-white border border-gray-200 rounded-xl shadow hover:shadow-md transition-all duration-200 cursor-pointer px-5 py-4 group"
+            className="bg-white border border-gray-200 rounded-xl shadow hover:shadow-md transition-all duration-200 cursor-pointer px-4 py-3 sm:px-5 sm:py-4"
           >
-            <div className="flex justify-between items-center flex-col sm:flex-row">
+            <div className="flex justify-between items-center flex-col sm:flex-row gap-2 sm:gap-0">
               <div className="flex items-center gap-3">
-                <FiUser className="w-8 h-8 text-gray-500 group-hover:text-gray-700 transition" />
-                <div className="text-gray-500 font-medium">{user.name}</div>
+                <FiUser className="w-6 h-6 sm:w-8 sm:h-8 text-gray-500 group-hover:text-gray-700 transition" />
+                <div className="text-gray-500 font-medium text-sm sm:text-base">
+                  {user.name}
+                </div>
               </div>
-              <div className="text-center sm:text-right mt-1 sm:mt-0">
-                <div className="text-sm text-gray-600">{user.address}</div>
-                <div className="text-sm mt-1 inline-block bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">
+              <div className="text-center sm:text-right">
+                <div className="text-xs sm:text-sm text-gray-600">
+                  {user.address}
+                </div>
+                <div className="text-xs sm:text-sm mt-1 inline-block bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">
                   {user.complaints.length} keluhan
                 </div>
               </div>
@@ -129,21 +133,23 @@ const Users = () => {
 
       {/* Pagination */}
       {userData.length > usersPerPage && (
-        <div className="flex justify-center mt-4 space-x-2 items-center">
+        <div className="flex justify-center mt-4 space-x-1 sm:space-x-2 items-center flex-wrap gap-y-2">
           <button
             onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
             disabled={currentPage === 1}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-soft-orange/20 cursor-pointer"
+            className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-soft-orange/20 cursor-pointer text-sm sm:text-base"
           >
             Previous
           </button>
-          {renderPageNumbers()}
+          <div className="flex space-x-1 sm:space-x-2 flex-wrap justify-center gap-y-2">
+            {renderPageNumbers()}
+          </div>
           <button
             onClick={() =>
               handlePageChange(Math.min(currentPage + 1, totalPages))
             }
             disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-soft-orange/20 cursor-pointer"
+            className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-soft-orange/20 cursor-pointer text-sm sm:text-base"
           >
             Next
           </button>
@@ -155,7 +161,7 @@ const Users = () => {
         isOpen={isModalOpen}
         onClose={closeModal}
         title={`Profil ${selectedUser?.name}`}
-        className="w-full max-w-lg mx-4 sm:mx-6 md:mx-8"
+        className="w-full max-w-md sm:max-w-lg mx-4"
         maxHeight="80vh"
         footer={
           <div className="flex justify-end gap-3">
@@ -169,7 +175,7 @@ const Users = () => {
         }
       >
         {selectedUser && (
-          <div className="text-gray-700 space-y-4 text-sm md:text-base">
+          <div className="text-gray-700 space-y-4 text-sm sm:text-base">
             <div>
               <p className="font-semibold">Nama:</p>
               <p>{selectedUser.name}</p>
@@ -186,13 +192,13 @@ const Users = () => {
                     key={idx}
                     className="flex items-center gap-2 group text-gray-700"
                   >
-                    <span className="text-lg leading-none">•</span>
-                    <span className="truncate hover:underline cursor-pointer">
+                    <span className="text-base sm:text-lg leading-none">•</span>
+                    <span className="truncate hover:underline cursor-pointer text-sm sm:text-base">
                       {comp}
                     </span>
                     <FiArrowRight
-                      size={14}
-                      className="transform transition-transform duration-200 group-hover:-rotate-45"
+                      size={12}
+                      className="transform transition-transform duration-200 group-hover:-rotate-45 sm:size-14"
                     />
                   </div>
                 ))}

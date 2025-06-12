@@ -150,7 +150,7 @@ const Complaints = () => {
           <button
             key={i}
             onClick={() => handlePageChange(i)}
-            className={`px-3 py-1 rounded-full ${
+            className={`px-2 py-1 sm:px-3 sm:py-1 rounded-full text-sm sm:text-base ${
               currentSectionPage === i
                 ? "bg-soft-orange text-white"
                 : "bg-gray-200 text-gray-700 hover:bg-soft-orange/20 cursor-pointer"
@@ -167,8 +167,10 @@ const Complaints = () => {
     return (
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
-          <h2 className=" font-semibold text-gray-700">{title}</h2>
-          <span className="text-sm bg-gray-200 text-gray-700 font-semibold px-3 py-1 rounded-full">
+          <h2 className="font-semibold text-gray-700 text-base sm:text-lg md:text-xl">
+            {title}
+          </h2>
+          <span className="text-xs sm:text-sm bg-gray-200 text-gray-700 font-semibold px-2 sm:px-3 py-1 rounded-full">
             {filtered.length}
           </span>
         </div>
@@ -187,23 +189,25 @@ const Complaints = () => {
           ))}
         </ul>
         {filtered.length > complaintsPerPage && (
-          <div className="flex justify-center mt-4 space-x-2 items-center">
+          <div className="flex justify-center mt-4 space-x-1 sm:space-x-2 items-center flex-wrap gap-y-2">
             <button
               onClick={() =>
                 handlePageChange(Math.max(currentSectionPage - 1, 1))
               }
               disabled={currentSectionPage === 1}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-soft-orange/20 cursor-pointer"
+              className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-soft-orange/20 cursor-pointer text-sm sm:text-base"
             >
               Previous
             </button>
-            {renderPageNumbers()}
+            <div className="flex space-x-1 sm:space-x-2 flex-wrap justify-center gap-y-2">
+              {renderPageNumbers()}
+            </div>
             <button
               onClick={() =>
                 handlePageChange(Math.min(currentSectionPage + 1, totalPages))
               }
               disabled={currentSectionPage === totalPages}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-soft-orange/20 cursor-pointer"
+              className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-soft-orange/20 cursor-pointer text-sm sm:text-base"
             >
               Next
             </button>
