@@ -24,7 +24,7 @@ const Navbar = () => {
               to="tentang"
               smooth={true}
               duration={500}
-              offset={-80} // Adjust based on navbar height
+              offset={-80}
               className="text-gray-700 hover:text-soft-orange cursor-pointer"
             >
               Tentang
@@ -56,7 +56,9 @@ const Navbar = () => {
             >
               Tanya Jawab
             </ScrollLink>
-            <Button className="font-bold">Masuk</Button>
+            <RouterLink to="/login">
+              <Button className="font-bold">Masuk</Button>
+            </RouterLink>
           </div>
 
           {/* Hamburger for Mobile */}
@@ -115,13 +117,14 @@ const Navbar = () => {
               >
                 Tanya Jawab
               </ScrollLink>
-              <Button
-                color="rose"
-                className="font-bold w-full text-center"
-                onClick={() => setIsOpen(false)}
-              >
-                Masuk
-              </Button>
+              <RouterLink to="/login" onClick={() => setIsOpen(false)}>
+                <Button
+                  color="rose"
+                  className="font-bold w-full text-center"
+                >
+                  Masuk
+                </Button>
+              </RouterLink>
             </div>
           </div>
         )}

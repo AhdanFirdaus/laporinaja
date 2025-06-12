@@ -486,7 +486,7 @@ export default function Home() {
                 >
                   <button
                     onClick={() => toggleFAQ(index)}
-                    className="w-full flex justify-between items-center px-4 py-3 text-left font-medium focus:outline-none"
+                    className="w-full flex justify-between items-center px-4 py-3 text-left font-medium focus:outline-none cursor-pointer"
                   >
                     <span>{faq.question}</span>
                     {activeIndex === index ? <FiMinus /> : <FiPlus />}
