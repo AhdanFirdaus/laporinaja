@@ -19,6 +19,13 @@ const titleMap = {
 
 const Admin = () => {
   const [view, setView] = useState("dashboard");
+  const [autoOpenComplaintId, setAutoOpenComplaintId] = useState(null);
+
+  const handleEachModal = (id) => {
+  setAutoOpenComplaintId(id); 
+  setView("complaints");
+};
+
 
   const handleLogout = () => {
     console.log("Logout clicked");
@@ -29,7 +36,10 @@ const Admin = () => {
       case "dashboard":
         return <Dashboard setView={setView} />; // Changed from onNavigate to setView
       case "complaints":
-        return <Complaints />;
+        return <Complaints  
+        autoOpenComplaintId={autoOpenComplaintId}
+        clearAutoOpenId={() => setAutoOpenComplaintId(null)}
+        />;
       case "users":
         return <Users setView={setView} />;
       default:
@@ -56,8 +66,11 @@ const Admin = () => {
         </h2>
         <div className="pb-10">
           {view === "dashboard" && <Dashboard setView={setView} />} {/* Changed from onNavigate to setView */}
-          {view === "complaints" && <Complaints />}
-          {view === "users" && <Users setView={setView} />}
+          {view === "complaints" && <Complaints  
+          autoOpenComplaintId={autoOpenComplaintId}
+          clearAutoOpenId={() => setAutoOpenComplaintId(null)}
+          />}
+          {view === "users" && <Users setView={setView} handleEachModal={handleEachModal} />}
         </div>
       </main>
     </div>
