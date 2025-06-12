@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import {
   FiX,
   FiLogOut,
-  FiMenu
+  FiMenu,
+  FiHome, // Added for Beranda button
 } from "react-icons/fi";
 import Button from "../Elements/Button";
 
@@ -13,6 +14,7 @@ const Sidebar = ({
   title = "Sidebar",
   showLogout = false,
   onLogout = () => {},
+  onHome = () => {}, // New prop for Beranda button action
 }) => {
   const [isOpen, setIsOpen] = useState(() => window.innerWidth >= 768);
 

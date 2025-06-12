@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 
-const AuthLayout = ({ title, children, bottomText, bottomLink, bottomHref }) => {
+const AuthLayout = ({ title, children, bottomText, bottomLink, bottomHref, secondaryLink, secondaryHref }) => {
   return (
     <div className="flex justify-center items-center min-h-screen px-4 sm:px-6 lg:px-8 bg-white">
       <div className="w-full max-w-md space-y-8">
@@ -12,12 +12,18 @@ const AuthLayout = ({ title, children, bottomText, bottomLink, bottomHref }) => 
 
         <div className="mt-6">
           {children}
-          <p className="mt-6 text-center text-sm text-gray-500">
-            {bottomText}{' '}
-            <Link to={bottomHref} className="font-semibold text-soft-orange hover:text-soft-orange/80">
-              {bottomLink}
-            </Link>
-          </p>
+          {(bottomText || bottomLink || secondaryLink) && (
+            <div className="mt-6 text-center text-sm text-gray-500">
+              {bottomText && bottomLink && bottomHref && (
+                <p>
+                  {bottomText}{' '}
+                  <Link to={bottomHref} className="font-semibold text-soft-orange hover:text-soft-orange/80">
+                    {bottomLink}
+                  </Link>
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
