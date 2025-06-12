@@ -12,7 +12,7 @@ const labelToStatus = {
   Ditolak: "reject",
 };
 
-const Complaints = () => {
+const Complaints = ({ autoOpenComplaintId, clearAutoOpenId }) => {
     const [complaints, setComplaints] = useState([]);
     const [selectedComplaint, setSelectedComplaint] = useState(null);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -50,6 +50,16 @@ const Complaints = () => {
   useEffect(() => {
     fetchComplaints();
   }, [fetchComplaints]);
+
+  useEffect(() => {
+  if (autoOpenComplaintId && complaints.length > 0) {
+    const matchedComplaint = complaints.find(c => c.id === autoOpenComplaintId);
+    if (matchedComplaint) {
+      openDetailModal(matchedComplaint);
+      clearAutoOpenId(); // Clear after opening
+    }
+  }
+}, [autoOpenComplaintId, complaints]);
 
     const openDetailModal = async (complaint) => {
     const { data, error } = supabase.storage
