@@ -103,7 +103,7 @@ const Dashboard = ({ setView }) => {
 
   // Chart data for Pengunjung (Visitors)
   const chartData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun","jul","aug","sep","okt","nov","dec"],
     datasets: [
       {
         label: "Pengunjung",

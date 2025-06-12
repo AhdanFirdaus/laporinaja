@@ -17,6 +17,12 @@ export default function Home() {
   const [showIcon, setShowIcon] = useState(true);
   const [activeIndex, setActiveIndex] = useState(null);
 
+  useEffect(() => {
+    fetch('/api/logVisit', {
+      method: 'POST'
+    }).catch(console.error);
+  }, []);
+
   const toggleFAQ = (index) => {
     setActiveIndex(index === activeIndex ? null : index);
   };
