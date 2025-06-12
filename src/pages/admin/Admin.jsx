@@ -4,6 +4,7 @@ import { FiAlertCircle, FiHome, FiUsers } from "react-icons/fi";
 import Dashboard from "../../components/Fragments/admin/Dashboard";
 import Complaints from "../../components/Fragments/admin/Complaints";
 import Users from "../../components/Fragments/admin/Users";
+import { useNavigate } from "react-router";
 
 const menuItems = [
   { key: "dashboard", icon: <FiHome />, label: "Dashboard" },
@@ -19,19 +20,30 @@ const titleMap = {
 
 const Admin = () => {
   const [view, setView] = useState("dashboard");
+  const [autoOpenComplaintId, setAutoOpenComplaintId] = useState(null);
+  const navigate = useNavigate(); // Tambahkan ini
+
+  const handleEachModal = (id) => {
+    setAutoOpenComplaintId(id);
+    setView("complaints");
+  };
 
   const handleLogout = () => {
-    console.log("Logout clicked");
+    // Tambahkan logika logout jika perlu (misalnya clear token, dll)
+    navigate("/login"); // Redirect ke halaman login
   };
 
   const renderContent = () => {
     switch (view) {
       case "dashboard":
-        return <Dashboard />;
+        return <Dashboard setView={setView} />; // Changed from onNavigate to setView
       case "complaints":
-        return <Complaints />;
+        return <Complaints
+          autoOpenComplaintId={autoOpenComplaintId}
+          clearAutoOpenId={() => setAutoOpenComplaintId(null)}
+        />;
       case "users":
-        return <Users />;
+        return <Users setView={setView} />;
       default:
         return null;
     }
@@ -50,13 +62,18 @@ const Admin = () => {
       />
 
       {/* Main content */}
-      <main
-        className={`flex-1 p-6 bg-gray-50 overflow-y-auto transition-all duration-300 ml-16 md:ml-64`}
-      >
+      <main className="flex-1 p-6 bg-gray-50 overflow-y-auto transition-all duration-300 ml-16 md:ml-64">
         <h2 className="text-3xl font-bold font-second text-soft-orange mb-4">
           {titleMap[view]}
         </h2>
-        <div className="pb-10">{renderContent()}</div>
+        <div className="pb-10">
+          {view === "dashboard" && <Dashboard setView={setView} />} {/* Changed from onNavigate to setView */}
+          {view === "complaints" && <Complaints
+            autoOpenComplaintId={autoOpenComplaintId}
+            clearAutoOpenId={() => setAutoOpenComplaintId(null)}
+          />}
+          {view === "users" && <Users setView={setView} handleEachModal={handleEachModal} />}
+        </div>
       </main>
     </div>
   );
