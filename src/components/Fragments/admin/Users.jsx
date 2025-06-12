@@ -5,7 +5,7 @@ import Button from "../../Elements/Button";
 import { showConfirmation, showSuccess } from "../../Elements/Alert";
 import supabase from "../../../../supabaseClient";
 
-const Users = ({ setView }) => {
+const Users = ({ setView, handleEachModal }) => {
   const [userData, setUserData] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,10 +53,6 @@ const Users = ({ setView }) => {
     fetchUsers();
   }, []);
 
-  const handleEachModal = (id) => {
-  console.log("id clicked:", id);
-  setView("complaints")
-};
 
   const openModal = (user) => {
     setSelectedUser(user);
