@@ -7,6 +7,7 @@ import ReactCompareImage from "react-compare-image";
 import * as Imgs from "../assets/images/Images";
 import Contoh from "../assets/videos/contoh.mp4";
 import Footer from "../components/Fragments/Footer";
+import Chatbot from "../components/Fragments/ChatBot";
 
 export default function Home() {
   const [currentImage, setCurrentImage] = useState(0);
@@ -520,6 +521,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* chatbot */}
+      <Chatbot/>
 
       {/* footer */}
       <Footer />
