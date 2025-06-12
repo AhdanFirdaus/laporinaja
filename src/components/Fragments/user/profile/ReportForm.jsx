@@ -11,6 +11,7 @@ import supabase from "../../../../../supabaseClient";
 import checkImageSize from "../../../../helper/checkImageSize";
 import { validateLocation } from "../../../../helper/validateLocation";
 import { showConfirmation, showSuccess } from "../../../Elements/Alert";
+import { isKecamatanValid } from "../../../../helper/isKecamatanValid";
 
 const ReportForm = () => {
   const [formData, setFormData] = useState({
@@ -123,13 +124,24 @@ const ReportForm = () => {
         photoPath = storageData.path;
       }
 
+      if (isKecamatanValid(formData.location.toLowerCase())) {
+
+      } else {
+          Swal.fire({
+            icon: "error",
+            title: "Upload Data Gagal",
+            text: "Terjadi kesalahan saat mengunggah data: kecamatan tidak valid",
+          });
+          return;
+      }
+
       const { data, error: dbError } = await supabase
         .from("keluhan")
         .insert({
           title: formData.title,
           note: formData.note,
           incident_date: formData.date,
-          location: formData.location,
+          location: formData.location.toLowerCase(),
           category:
             formData.category === "Lainnya"
               ? formData.customCategory
@@ -150,7 +162,7 @@ const ReportForm = () => {
         title: formData.title,
         note: formData.note,
         incident_date: formData.date,
-        location: formData.location,
+        location: formData.location.toLowerCase(),
         category:
           formData.category === "Lainnya"
             ? formData.customCategory

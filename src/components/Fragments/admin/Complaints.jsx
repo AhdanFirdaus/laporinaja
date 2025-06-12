@@ -1,52 +1,76 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import DetailComplaintModal from "../DetailComplaintModal";
 import CardComplaint from "../CardComplaint";
-import { showConfirmation, showSuccess } from "../../Elements/Alert";
+import { showConfirmation, showSuccess, showError } from "../../Elements/Alert";
+import supabase from "../../../../supabaseClient";
 
-const initialComplaints = [
-  {
-    id: 1,
-    title: "Jalan rusak di Jl. Gajahmada",
-    note: "Sudah lebih dari seminggu tidak diperbaiki",
-    location: "Jl. Gajahmada",
-    category: "Jalan",
-    date: "2025-06-06",
-    label: "Menunggu",
-    imageUrl: "/img/jalan-rusak.jpg",
-  },
-  {
-    id: 2,
-    title: "Lampu jalan mati",
-    note: "Lampu mati di tikungan Jl. Pahlawan, sangat gelap",
-    location: "Jl. Pahlawan",
-    category: "Penerangan",
-    date: "2025-06-05",
-    label: "Selesai",
-    imageUrl: "/img/lampu-mati.jpg",
-  },
-  {
-    id: 3,
-    title: "Sampah menumpuk",
-    note: "Tumpukan sampah di dekat pasar belum diangkut",
-    location: "Pasar Johar",
-    category: "Sampah",
-    date: "2025-06-01",
-    label: "Selesai",
-    imageUrl: "/img/sampah.jpg",
-  },
-];
+const statusLabels = {
+  waiting: "Menunggu",
+  processing: "Diproses",
+  done: "Selesai",
+  reject: "Ditolak",
+};
 
-const Complaints = () => {
-  const [complaints, setComplaints] = useState(initialComplaints);
+const Complaints = ({ autoOpenComplaintId, clearAutoOpenId }) => {
+  const [complaints, setComplaints] = useState([]);
   const [selectedComplaint, setSelectedComplaint] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState({});
   const complaintsPerPage = 5;
 
-  const statusOptions = ["Menunggu", "Proses", "Selesai", "Ditolak"];
+  const statusEnums = Object.keys(statusLabels);
 
-  const openDetailModal = (complaint) => {
-    setSelectedComplaint(complaint);
+  const fetchComplaints = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("keluhan")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching complaints:", error.message);
+    } else {
+      const formatted = data.map((item) => ({
+        id: item.id,
+        title: item.title,
+        note: item.note,
+        location: item.location,
+        category: item.category,
+        date: item.incident_date,
+        label: item.status, // use enum like 'waiting', 'done', etc.
+        imageUrl: item.photo_path || "/img/placeholder.jpg",
+      }));
+      setComplaints(formatted);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchComplaints();
+  }, [fetchComplaints]);
+
+  useEffect(() => {
+    if (autoOpenComplaintId && complaints.length > 0) {
+      const matched = complaints.find(c => c.id === autoOpenComplaintId);
+      if (matched) {
+        openDetailModal(matched);
+        clearAutoOpenId();
+      }
+    }
+  }, [autoOpenComplaintId, complaints]);
+
+  const openDetailModal = async (complaint) => {
+    const { data, error } = supabase.storage
+      .from("foto-keluhan")
+      .getPublicUrl(complaint.imageUrl);
+
+    if (error) {
+      console.error("Gagal ambil URL gambar:", error.message);
+      return;
+    }
+
+    setSelectedComplaint({
+      ...complaint,
+      imageUrl: data.publicUrl,
+    });
     setIsDetailModalOpen(true);
   };
 
@@ -55,105 +79,134 @@ const Complaints = () => {
     setSelectedComplaint(null);
   };
 
-  const handleStatusChange = useCallback((complaint, nextLabel) => {
+  const handleStatusChange = useCallback((complaint, newEnum) => {
+    const labelUI = statusLabels[newEnum];
+
     showConfirmation({
       title: "Konfirmasi Perubahan Status",
-      text: `Apakah Anda yakin ingin mengubah status keluhan "${complaint.title}" ke ${nextLabel}?`,
+      text: `Ubah status keluhan "${complaint.title}" ke ${labelUI}?`,
       confirmButtonText: "Ubah Status",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setComplaints((prev) =>
-          prev.map((comp) =>
-            comp.id === complaint.id ? { ...comp, label: nextLabel } : comp
-          )
-        );
-        showSuccess({
-          title: "Berhasil!",
-          text: `Status berhasil diubah ke ${nextLabel}.`,
+    }).then(async (result) => {
+      if (!result.isConfirmed) return;
+
+      const { error } = await supabase
+        .from("keluhan")
+        .update({ status: newEnum })
+        .eq("id", complaint.id);
+
+      if (error) {
+        console.error("Gagal update status:", error.message);
+        showError({
+          title: "Gagal!",
+          text: "Status gagal diubah. Coba lagi.",
         });
+        return;
       }
+
+      setComplaints((prev) =>
+        prev.map((c) =>
+          c.id === complaint.id ? { ...c, label: newEnum } : c
+        )
+      );
+
+      showSuccess({
+        title: "Berhasil!",
+        text: `Status diubah ke ${labelUI}.`,
+      });
     });
   }, []);
 
   const handleDeleteComplaint = useCallback((complaint) => {
     showConfirmation({
-      title: "Konfirmasi Hapus Keluhan",
-      text: `Apakah Anda yakin ingin menghapus keluhan "${complaint.title}"?`,
+      title: "Konfirmasi Hapus",
+      text: `Yakin ingin menghapus keluhan "${complaint.title}"?`,
       confirmButtonText: "Hapus",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        setComplaints((prev) =>
-          prev.filter((comp) => comp.id !== complaint.id)
-        );
-        showSuccess({
-          title: "Berhasil!",
-          text: `Keluhan "${complaint.title}" telah dihapus.`,
-        });
+    }).then(async (result) => {
+      if (!result.isConfirmed) return;
+
+      const { error } = await supabase
+        .from("keluhan")
+        .delete()
+        .eq("id", complaint.id);
+
+      if (error) {
+        console.error("Gagal hapus keluhan:", error.message);
+        return;
       }
+
+      const { error: imgError } = await supabase.storage
+        .from("foto-keluhan")
+        .remove([complaint.imageUrl]);
+
+      if (imgError) {
+        console.error("Gagal hapus gambar:", imgError.message);
+        return;
+      }
+
+      setComplaints((prev) => prev.filter((c) => c.id !== complaint.id));
+
+      showSuccess({
+        title: "Berhasil!",
+        text: `Keluhan "${complaint.title}" telah dihapus.`,
+      });
     });
   }, []);
 
   const getActions = useCallback(
-    (complaint) => {
-      return [
-        {
-          label: "Ubah Status",
-          selectOptions: statusOptions
-            .filter((status) => status !== complaint.label)
-            .map((status) => ({
-              value: status,
-              label: status,
-              onSelect: () => handleStatusChange(complaint, status),
-            })),
-        },
-        {
-          label: "Lihat Detail",
-          onClick: () => openDetailModal(complaint),
-        },
-        {
-          label: "Hapus",
-          onClick: () => handleDeleteComplaint(complaint),
-        },
-      ];
-    },
+    (complaint) => [
+      {
+        label: "Ubah Status",
+        selectOptions: statusEnums
+          .filter((status) => status !== complaint.label)
+          .map((status) => ({
+            value: status,
+            label: statusLabels[status],
+            onSelect: () => handleStatusChange(complaint, status),
+          })),
+      },
+      {
+        label: "Lihat Detail",
+        onClick: () => openDetailModal(complaint),
+      },
+      {
+        label: "Hapus",
+        onClick: () => handleDeleteComplaint(complaint),
+      },
+    ],
     [handleStatusChange, handleDeleteComplaint]
   );
 
-  const renderSection = (label, title) => {
-    const filtered = complaints.filter((c) => c.label === label);
-    const currentSectionPage = currentPage[label] || 1;
-    const indexOfLastComplaint = currentSectionPage * complaintsPerPage;
-    const indexOfFirstComplaint = indexOfLastComplaint - complaintsPerPage;
-    const currentComplaints = filtered.slice(
-      indexOfFirstComplaint,
-      indexOfLastComplaint
-    );
+  const renderSection = (labelEnum) => {
+    const sectionLabel = statusLabels[labelEnum];
+    const filtered = complaints.filter((c) => c.label === labelEnum);
+    const currentSectionPage = currentPage[labelEnum] || 1;
+    const indexOfLast = currentSectionPage * complaintsPerPage;
+    const currentComplaints = filtered.slice(indexOfLast - complaintsPerPage, indexOfLast);
     const totalPages = Math.ceil(filtered.length / complaintsPerPage);
 
     const handlePageChange = (page) => {
-      setCurrentPage((prev) => ({ ...prev, [label]: page }));
+      setCurrentPage((prev) => ({ ...prev, [labelEnum]: page }));
     };
 
     const renderPageNumbers = () => {
       const pageNumbers = [];
-      const maxVisiblePages = 5;
-      const halfVisible = Math.floor(maxVisiblePages / 2);
-      let startPage = Math.max(1, currentSectionPage - halfVisible);
-      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
-      if (endPage - startPage < maxVisiblePages - 1) {
-        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      const maxVisible = 5;
+      const half = Math.floor(maxVisible / 2);
+      let start = Math.max(1, currentSectionPage - half);
+      let end = Math.min(totalPages, start + maxVisible - 1);
+      if (end - start < maxVisible - 1) {
+        start = Math.max(1, end - maxVisible + 1);
       }
 
-      for (let i = startPage; i <= endPage; i++) {
+      for (let i = start; i <= end; i++) {
         pageNumbers.push(
           <button
             key={i}
             onClick={() => handlePageChange(i)}
-            className={`px-2 py-1 sm:px-3 sm:py-1 rounded-full text-sm sm:text-base ${
+            className={`px-2 py-1 rounded-full text-sm ${
               currentSectionPage === i
                 ? "bg-soft-orange text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-soft-orange/20 cursor-pointer"
+                : "bg-gray-200 text-gray-700 hover:bg-soft-orange/20"
             }`}
           >
             {i}
@@ -165,23 +218,21 @@ const Complaints = () => {
     };
 
     return (
-      <div className="mb-8">
+      <div className="mb-8" key={labelEnum}>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="font-semibold text-gray-700 text-base sm:text-lg md:text-xl">
-            {title}
-          </h2>
-          <span className="text-xs sm:text-sm bg-gray-200 text-gray-700 font-semibold px-2 sm:px-3 py-1 rounded-full">
+          <h2 className="font-semibold text-lg text-gray-700">{sectionLabel}</h2>
+          <span className="text-sm bg-gray-200 text-gray-700 font-semibold px-3 py-1 rounded-full">
             {filtered.length}
           </span>
         </div>
-        <ul className="space-y-4 overflow-visible">
+        <ul className="space-y-4">
           {currentComplaints.map((complaint) => (
             <CardComplaint
               key={complaint.id}
               complaint={complaint}
               actions={getActions(complaint)}
               className={
-                complaint.label === "Selesai" || complaint.label === "Ditolak"
+                complaint.label === "done" || complaint.label === "reject"
                   ? "bg-gray-200 text-gray-500"
                   : ""
               }
@@ -189,25 +240,19 @@ const Complaints = () => {
           ))}
         </ul>
         {filtered.length > complaintsPerPage && (
-          <div className="flex justify-center mt-4 space-x-1 sm:space-x-2 items-center flex-wrap gap-y-2">
+          <div className="flex justify-center mt-4 items-center space-x-2 flex-wrap gap-y-2">
             <button
-              onClick={() =>
-                handlePageChange(Math.max(currentSectionPage - 1, 1))
-              }
+              onClick={() => handlePageChange(Math.max(currentSectionPage - 1, 1))}
               disabled={currentSectionPage === 1}
-              className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-soft-orange/20 cursor-pointer text-sm sm:text-base"
+              className="px-3 py-1 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-soft-orange/20 text-sm"
             >
               Previous
             </button>
-            <div className="flex space-x-1 sm:space-x-2 flex-wrap justify-center gap-y-2">
-              {renderPageNumbers()}
-            </div>
+            <div className="flex space-x-2">{renderPageNumbers()}</div>
             <button
-              onClick={() =>
-                handlePageChange(Math.min(currentSectionPage + 1, totalPages))
-              }
+              onClick={() => handlePageChange(Math.min(currentSectionPage + 1, totalPages))}
               disabled={currentSectionPage === totalPages}
-              className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-soft-orange/20 cursor-pointer text-sm sm:text-base"
+              className="px-3 py-1 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-soft-orange/20 text-sm"
             >
               Next
             </button>
@@ -219,10 +264,7 @@ const Complaints = () => {
 
   return (
     <div>
-      {renderSection("Menunggu", "Keluhan Menunggu")}
-      {renderSection("Proses", "Keluhan Diproses")}
-      {renderSection("Selesai", "Keluhan Selesai")}
-      {renderSection("Ditolak", "Keluhan Ditolak")}
+      {statusEnums.map((status) => renderSection(status))}
       <DetailComplaintModal
         isOpen={isDetailModalOpen}
         onClose={closeDetailModal}
