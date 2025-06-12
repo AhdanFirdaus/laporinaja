@@ -242,7 +242,7 @@ const Chatbot = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={handleKeyPress}
-              className="flex-1 p-2 sm:p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-soft-orange transition-colors placeholder-gray-400 disabled:bg-gray-100 text-sm sm:text-base"
+              className="flex-1 p-2 sm:p-3 border focus:border-soft-orange rounded-lg focus:outline-none focus:ring focus:ring-soft-orange placeholder-gray-400 disabled:bg-gray-100 text-sm sm:text-base"
               placeholder="Tanya tentang LaporinAja..."
               disabled={isLoading}
             />
