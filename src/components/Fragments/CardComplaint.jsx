@@ -1,8 +1,16 @@
 import { useState } from "react";
+import LabelStatus from "../Elements/LabelStatus";
+
+const statusLabels = {
+  waiting: "Menunggu",
+  processing: "Proses",
+  done: "Selesai",
+  reject: "Ditolak",
+};
 
 const CardComplaint = ({ complaint, actions = [], className = "" }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const label = complaint.label || "Menunggu";
+  const label = statusLabels[complaint.label] || "Menunggu";
 
   const handleToggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
@@ -15,21 +23,7 @@ const CardComplaint = ({ complaint, actions = [], className = "" }) => {
       <div className="space-y-4">
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-400">{complaint.date}</span>
-          <span
-            className={`text-sm font-medium py-1 px-3 rounded-full ${
-              label === "Menunggu"
-                ? "bg-yellow-100 text-yellow-800"
-                : label === "Proses"
-                ? "bg-blue-100 text-blue-800"
-                : label === "Selesai"
-                ? "bg-green-100 text-green-800"
-                : label === "Ditolak"
-                ? "bg-red-100 text-red-800"
-                : ""
-            }`}
-          >
-            {label}
-          </span>
+          <LabelStatus label={label} />
         </div>
 
         <span className="text-md text-gray-600">

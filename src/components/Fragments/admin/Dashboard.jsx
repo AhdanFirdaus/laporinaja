@@ -9,9 +9,11 @@ import {
   Tooltip,
   Legend,
   CategoryScale,
-  Filler, // Import Filler plugin
+  Filler,
 } from "chart.js";
 import { FiUsers, FiAlertCircle, FiClock, FiCheckCircle } from "react-icons/fi";
+import { useEffect, useState } from "react";
+import supabase from "../../../../supabaseClient";
 
 // Register Chart.js components, including Filler
 ChartJS.register(
@@ -22,49 +24,122 @@ ChartJS.register(
   Tooltip,
   Legend,
   CategoryScale,
-  Filler // Register Filler plugin
+  Filler
 );
 
-const Dashboard = () => {
-  // Updated cards array with react-icons
+const Dashboard = ({ setView }) => {
+  const [userCount, setUserCount] = useState(0);
+  const [totalKeluhan, setTotalKeluhan] = useState(0);
+  const [waitingKeluhan, setWaitingKeluhan] = useState(0);
+  const [doneKeluhan, setDoneKeluhan] = useState(0);
+  const [visitCounts, setVisitCounts] = useState(Array(12).fill(0)); // initialize 12 month
+
+  
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      // User count
+      const { count: userCountData } = await supabase
+        .from("user")
+        .select("*", { count: "exact", head: true });
+
+      // Total keluhan
+      const { count: totalKeluhanData } = await supabase
+        .from("keluhan")
+        .select("*", { count: "exact", head: true });
+
+      // Keluhan with status = waiting
+      const { count: waitingCount } = await supabase
+        .from("keluhan")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "waiting");
+
+      // Keluhan with status = done
+      const { count: doneCount } = await supabase
+        .from("keluhan")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "done");
+
+      setUserCount(userCountData || 0);
+      setTotalKeluhan(totalKeluhanData || 0);
+      setWaitingKeluhan(waitingCount || 0);
+      setDoneKeluhan(doneCount || 0);
+    };
+
+    fetchStats();
+  }, []);
+
+  useEffect(() => {
+    const fetchVisits = async () => {
+      const { data, error } = await supabase
+        .from("visits")
+        .select("month");
+
+      if (error) {
+        console.error("Error fetching visit data:", error);
+        return;
+      }
+      console.log("{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{")
+      console.log(data)
+      // Count visits per month
+      const counts = Array(12).fill(0); // Jan to Dec
+      data.forEach(({ month }) => {
+        const monthIndex = parseInt(month.split("-")[1], 10) - 1;
+        if (monthIndex >= 0 && monthIndex < 12) {
+          counts[monthIndex]++;
+        }
+      });
+
+      setVisitCounts(counts);
+      console.log("++++++++++++++++++++++++++++++++++")
+      console.log(visitCounts)
+    };
+
+    fetchVisits();
+  }, []);
+
   const cards = [
     {
       title: "Pengguna",
-      value: "30",
+      value: userCount,
       button: "Lihat Pengguna",
       color: "bg-blue-100",
       icon: <FiUsers className="text-3xl text-blue-600" />,
+      onClick: () => setView("users"),
     },
     {
       title: "Total Keluhan",
-      value: "17",
-      button: "Lihat Keluhan",
-      color: "bg-red-100",
-      icon: <FiAlertCircle className="text-3xl text-red-600" />,
-    },
-    {
-      title: "Keluhan Belum Diproses",
-      value: "7",
-      button: "Lihat Keluhan",
+      value: totalKeluhan,
+      button: "Lihat Semua",
       color: "bg-yellow-100",
-      icon: <FiClock className="text-3xl text-yellow-600" />,
+      icon: <FiAlertCircle className="text-3xl text-yellow-600" />,
+      onClick: () => setView("complaints"),
     },
     {
-      title: "Keluhan Terselesaikan",
-      value: "12",
-      button: "Lihat Status",
+      title: "Keluhan Menunggu",
+      value: waitingKeluhan,
+      button: "Keluhan Waiting",
+      color: "bg-orange-100",
+      icon: <FiClock className="text-3xl text-orange-600" />,
+      onClick: () => setView("complaints"),
+    },
+    {
+      title: "Keluhan Selesai",
+      value: doneKeluhan,
+      button: "Keluhan Done",
       color: "bg-green-100",
       icon: <FiCheckCircle className="text-3xl text-green-600" />,
+      onClick: () => setView("complaints"),
     },
   ];
 
   // Chart data for Pengunjung (Visitors)
   const chartData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     datasets: [
       {
         label: "Pengunjung",
-        data: [120, 150, 180, 200, 170, 200],
+        data: visitCounts,
         borderColor: "rgba(255, 99, 71, 1)",
         backgroundColor: "rgba(255, 99, 71, 0.2)",
         fill: true,
@@ -77,9 +152,7 @@ const Dashboard = () => {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: {
-        position: "top",
-      },
+      legend: { position: "top" },
       title: {
         display: true,
         text: "Statistik Pengunjung",
@@ -87,9 +160,7 @@ const Dashboard = () => {
       },
     },
     scales: {
-      y: {
-        beginAtZero: true,
-      },
+      y: { beginAtZero: true },
     },
   };
 
@@ -101,7 +172,8 @@ const Dashboard = () => {
           {cards.map((card, index) => (
             <div
               key={index}
-              className={`rounded-xl shadow p-4 sm:p-6 ${card.color} text-center flex flex-col justify-between transform hover:scale-105 transition-transform duration-300`}
+              className={`rounded-xl shadow p-4 sm:p-6 ${card.color} text-center flex flex-col justify-between transform hover:scale-105 transition-transform duration-300 cursor-pointer`}
+              onClick={card.onClick} // Card click handler
             >
               <div className="flex items-center justify-center mb-3 sm:mb-4">
                 {card.icon}
@@ -112,7 +184,15 @@ const Dashboard = () => {
               <p className="text-xl sm:text-3xl font-bold text-gray-800">
                 {card.value}
               </p>
-              <Button className="mt-3 sm:mt-4">{card.button}</Button>
+              <Button
+                className="mt-3 sm:mt-4"
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent card's onClick from firing
+                  card.onClick(); // Trigger the specific card's onClick
+                }}
+              >
+                {card.button}
+              </Button>
             </div>
           ))}
         </div>
@@ -122,9 +202,7 @@ const Dashboard = () => {
           <div className="h-full">
             <Line data={chartData} options={chartOptions} />
           </div>
-          <div className="mt-4 text-center">
-            <Button>Lihat Statistik Lengkap</Button>
-          </div>
+          
         </div>
       </main>
     </div>
