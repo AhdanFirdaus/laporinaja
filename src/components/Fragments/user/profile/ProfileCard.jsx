@@ -4,6 +4,7 @@ import Modal from "../../../Elements/Modal";
 import Input from "../../../Elements/Input";
 import supabase from "../../../../../supabaseClient";
 import { useNavigate } from 'react-router';
+import Swal from 'sweetalert2';
 
 const ProfileCard = ({ user, refreshUser }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -57,7 +58,12 @@ const ProfileCard = ({ user, refreshUser }) => {
     try {
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       if (!currentUser) {
-        alert("User tidak login.");
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: "User tidak login.",
+          confirmButtonColor: "#d33",
+        });
         return;
       }
 
@@ -77,18 +83,32 @@ const ProfileCard = ({ user, refreshUser }) => {
         .eq("id", currentUser.id);
 
       if (error) {
-        alert("Gagal memperbarui profil: " + error.message);
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: `Gagal memperbarui profil: ${error.message}`,
+          confirmButtonColor: "#d33",
+        });
         return;
       }
 
-      // Call refreshUser to update parent state
       await refreshUser();
 
-      alert("Profil berhasil diperbarui!");
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil!",
+        text: "Profil berhasil diperbarui!",
+        confirmButtonColor: "#52BA5E",
+      });
       setIsEditModalOpen(false);
       navigate("/profile");
     } catch (err) {
-      alert("Terjadi kesalahan tak terduga: " + err.message);
+      Swal.fire({
+        icon: "error",
+        title: "Gagal",
+        text: `Terjadi kesalahan tak terduga: ${err.message}`,
+        confirmButtonColor: "#d33",
+      });
     }
   };
 
@@ -97,14 +117,24 @@ const ProfileCard = ({ user, refreshUser }) => {
     const { currentPassword, newPassword, confirmPassword } = passwordData;
 
     if (newPassword !== confirmPassword) {
-      alert("Password baru dan konfirmasi tidak cocok.");
+      Swal.fire({
+        icon: "error",
+        title: "Gagal",
+        text: "Password baru dan konfirmasi tidak cocok.",
+        confirmButtonColor: "#d33",
+      });
       return;
     }
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        alert("Tidak ada pengguna yang sedang login.");
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: "Tidak ada pengguna yang sedang login.",
+          confirmButtonColor: "#d33",
+        });
         return;
       }
 
@@ -114,7 +144,12 @@ const ProfileCard = ({ user, refreshUser }) => {
       });
 
       if (signInError) {
-        alert("Password saat ini salah.");
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: "Password saat ini salah.",
+          confirmButtonColor: "#d33",
+        });
         return;
       }
 
@@ -123,11 +158,21 @@ const ProfileCard = ({ user, refreshUser }) => {
       });
 
       if (updateError) {
-        alert("Gagal mengubah password: " + updateError.message);
+        Swal.fire({
+          icon: "error",
+          title: "Gagal",
+          text: `Gagal mengubah password: ${updateError.message}`,
+          confirmButtonColor: "#d33",
+        });
         return;
       }
 
-      alert("Password berhasil diubah.");
+      Swal.fire({
+        icon: "success",
+        title: "Berhasil!",
+        text: "Password berhasil diubah.",
+        confirmButtonColor: "#52BA5E",
+      });
       setIsPasswordModalOpen(false);
       setPasswordData({
         currentPassword: "",
@@ -135,7 +180,12 @@ const ProfileCard = ({ user, refreshUser }) => {
         confirmPassword: "",
       });
     } catch (err) {
-      alert("Terjadi kesalahan tak terduga: " + err.message);
+      Swal.fire({
+        icon: "error",
+        title: "Gagal",
+        text: `Terjadi kesalahan tak terduga: ${err.message}`,
+        confirmButtonColor: "#d33",
+      });
     }
   };
 
@@ -189,7 +239,7 @@ const ProfileCard = ({ user, refreshUser }) => {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         title="Edit Profile"
-        className="w-full max-w-4xl mx-4 sm:mx-6 md:mx-8"
+        className="w-full max-w-4xl mx-4 sm:mx-6 md:8"
         footer={
           <div className="flex justify-end gap-2">
             <Button onClick={() => setIsEditModalOpen(false)} color="red">
