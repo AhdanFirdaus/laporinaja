@@ -27,6 +27,7 @@ const ComplaintsList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentSectionPage, setCurrentSectionPage] = useState(1);
   const complaintsPerPage = 6;
+  const [keluhanData, setKeluhanData] = useState({});
 
   useEffect(() => {
     const fetchComplaints = async () => {
@@ -49,6 +50,34 @@ const ComplaintsList = () => {
 
     fetchComplaints();
   }, []);
+
+  useEffect(() => {
+  const fetchKeluhanCountByLocation = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("keluhan")
+        .select("location");
+
+      if (error) {
+        console.error("Error fetching locations:", error.message);
+        return;
+      }
+
+      // Group and count complaints by location
+      const counts = data.reduce((acc, curr) => {
+        const loc = curr.location;
+        acc[loc] = (acc[loc] || 0) + 1;
+        return acc;
+      }, {});
+
+      setKeluhanData(counts);
+    } catch (err) {
+      console.error("Unexpected error:", err.message);
+    }
+  };
+
+  fetchKeluhanCountByLocation();
+}, []);
 
   const style = (feature) => ({
     fillColor: getColor(keluhanData[feature.properties.NAMA_KEC] || 0),
