@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import Input from "../components/Elements/Input";
 import Button from "../components/Elements/Button";
@@ -8,6 +8,17 @@ import supabase from "../../supabaseClient";
 function Login() {
   const [loginError, setLoginError] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check for an existing session when the component mounts
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate("/profile");
+      }
+    };
+    checkSession();
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,7 +38,7 @@ function Login() {
       }
 
       // Redirect to profile after successful login
-      navigate("/profile");
+      navigate("/");
     } catch (err) {
       setLoginError("An unexpected error occurred. Please try again.");
       console.error(err);
@@ -46,9 +57,9 @@ function Login() {
           label="Email"
           id="email"
           name="email"
-          type="email" // Changed to type="email" for better validation
+          type="email"
           autoComplete="email"
-          required // Added for form validation
+          required
         />
         <Input
           label="Password"
@@ -56,7 +67,7 @@ function Login() {
           name="password"
           type="password"
           autoComplete="current-password"
-          required // Added for form validation
+          required
         />
         {loginError && <p className="text-red-500">{loginError}</p>}
         <Button type="submit" className="w-full">

@@ -137,7 +137,7 @@ export default function Home() {
             <p className="text-lg text-gray-600 mb-6">
               Laporkan kendala di sekitarmu dan jadilah bagian dari perubahan nyata. ✨
             </p>
-            <Button className="text-lg">Lebih Lanjut</Button>
+            <Button className="text-lg" to="carapemakaian">Lebih Lanjut</Button>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
