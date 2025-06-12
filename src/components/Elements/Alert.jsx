@@ -32,4 +32,17 @@ export const showSuccess = ({
     text,
     confirmButtonColor,
   });
-};  
+};
+
+export const showError = ({
+  title = "Gagal!",
+  text = "Terjadi kesalahan.",
+  confirmButtonColor = "#d33",
+}) => {
+  return Swal.fire({
+    icon: "error",
+    title,
+    text,
+    confirmButtonColor,
+  });
+};
