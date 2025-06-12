@@ -3,33 +3,83 @@
   "features": [
     {
       "type": "Feature",
-      "properties": {
-        "NAMA_KEC": "Semarang Tengah"
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [[[110.42, -6.98], [110.43, -6.98], [110.43, -6.97], [110.42, -6.97], [110.42, -6.98]]]
-      }
+      "properties": { "nama_kec": "banyumanik" },
+      "geometry": { "type": "Polygon", "coordinates": [[[110.45, -7.00], [110.46, -7.00], [110.46, -6.99], [110.45, -6.99], [110.45, -7.00]]] }
     },
     {
       "type": "Feature",
-      "properties": {
-        "NAMA_KEC": "Semarang Utara"
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [[[110.42, -6.99], [110.43, -6.99], [110.43, -6.98], [110.42, -6.98], [110.42, -6.99]]]
-      }
+      "properties": { "nama_kec": "candisari" },
+      "geometry": { "type": "Polygon", "coordinates": [[[110.44, -6.99], [110.45, -6.99], [110.45, -6.98], [110.44, -6.98], [110.44, -6.99]]] }
     },
     {
       "type": "Feature",
-      "properties": {
-        "NAMA_KEC": "Tugu"
-      },
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [[[110.40, -6.99], [110.41, -6.99], [110.41, -6.98], [110.40, -6.98], [110.40, -6.99]]]
-      }
+      "properties": { "nama_kec": "gajahmungkur" },
+      "geometry": { "type": "Polygon", "coordinates": [[[110.43, -6.99], [110.44, -6.99], [110.44, -6.98], [110.43, -6.98], [110.43, -6.99]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "nama_kec": "gayamsari" },
+      "geometry": { "type": "Polygon", "coordinates": [[[110.42, -6.99], [110.43, -6.99], [110.43, -6.98], [110.42, -6.98], [110.42, -6.99]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "nama_kec": "genuk" },
+      "geometry": { "type": "Polygon", "coordinates": [[[110.41, -6.99], [110.42, -6.99], [110.42, -6.98], [110.41, -6.98], [110.41, -6.99]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "nama_kec": "gunungpati" },
+      "geometry": { "type": "Polygon", "coordinates": [[[110.40, -6.99], [110.41, -6.99], [110.41, -6.98], [110.40, -6.98], [110.40, -6.99]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "nama_kec": "mijen" },
+      "geometry": { "type": "Polygon", "coordinates": [[[110.39, -6.99], [110.40, -6.99], [110.40, -6.98], [110.39, -6.98], [110.39, -6.99]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "nama_kec": "ngaliyan" },
+      "geometry": { "type": "Polygon", "coordinates": [[[110.38, -6.99], [110.39, -6.99], [110.39, -6.98], [110.38, -6.98], [110.38, -6.99]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "nama_kec": "pedurungan" },
+      "geometry": { "type": "Polygon", "coordinates": [[[110.37, -6.99], [110.38, -6.99], [110.38, -6.98], [110.37, -6.98], [110.37, -6.99]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "nama_kec": "semarang barat" },
+      "geometry": { "type": "Polygon", "coordinates": [[[110.36, -6.99], [110.37, -6.99], [110.37, -6.98], [110.36, -6.98], [110.36, -6.99]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "nama_kec": "semarang selatan" },
+      "geometry": { "type": "Polygon", "coordinates": [[[110.35, -6.99], [110.36, -6.99], [110.36, -6.98], [110.35, -6.98], [110.35, -6.99]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "nama_kec": "semarang tengah" },
+      "geometry": { "type": "Polygon", "coordinates": [[[110.34, -6.99], [110.35, -6.99], [110.35, -6.98], [110.34, -6.98], [110.34, -6.99]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "nama_kec": "semarang timur" },
+      "geometry": { "type": "Polygon", "coordinates": [[[110.33, -6.99], [110.34, -6.99], [110.34, -6.98], [110.33, -6.98], [110.33, -6.99]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "nama_kec": "semarang utara" },
+      "geometry": { "type": "Polygon", "coordinates": [[[110.32, -6.99], [110.33, -6.99], [110.33, -6.98], [110.32, -6.98], [110.32, -6.99]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "nama_kec": "tembalang" },
+      "geometry": { "type": "Polygon", "coordinates": [[[110.31, -6.99], [110.32, -6.99], [110.32, -6.98], [110.31, -6.98], [110.31, -6.99]]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "nama_kec": "tugu" },
+      "geometry": { "type": "Polygon", "coordinates": [[[110.30, -6.99], [110.31, -6.99], [110.31, -6.98], [110.30, -6.98], [110.30, -6.99]]] }
     }
   ]
 }

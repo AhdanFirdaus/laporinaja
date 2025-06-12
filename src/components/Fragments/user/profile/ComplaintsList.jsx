@@ -6,16 +6,10 @@ import CardComplaint from "../../CardComplaint";
 import DetailComplaintModal from "../../DetailComplaintModal";
 import supabase from "../../../../../supabaseClient";
 
-const keluhanData = {
-  "Semarang Tengah": 2,
-  "Semarang Utara": 18,
-  "Semarang Timur": 8,
-  Tugu: 1,
-  Pedurungan: 15,
-  Ngaliyan: 3,
-};
+
 
 const getColor = (keluhan) => {
+  console.log(keluhan)
   if (keluhan > 15) return "red";
   if (keluhan > 5) return "orange";
   return "green";
@@ -28,6 +22,7 @@ const ComplaintsList = () => {
   const [currentSectionPage, setCurrentSectionPage] = useState(1);
   const complaintsPerPage = 6;
   const [keluhanData, setKeluhanData] = useState({});
+  const [geoData, setGeoData] = useState(null);
 
   useEffect(() => {
     const fetchComplaints = async () => {
@@ -52,6 +47,13 @@ const ComplaintsList = () => {
   }, []);
 
   useEffect(() => {
+    fetch("/export.geojson")
+      .then((res) => res.json())
+      .then((data) => setGeoData(data))
+      .catch((err) => console.error("GeoJSON load error:", err));
+  }, []);
+
+  useEffect(() => {
   const fetchKeluhanCountByLocation = async () => {
     try {
       const { data, error } = await supabase
@@ -70,6 +72,8 @@ const ComplaintsList = () => {
         return acc;
       }, {});
 
+      console.log("$$$$$$$$$$$$$$$$$$$$")
+      console.log(counts)
       setKeluhanData(counts);
     } catch (err) {
       console.error("Unexpected error:", err.message);
@@ -80,7 +84,7 @@ const ComplaintsList = () => {
 }, []);
 
   const style = (feature) => ({
-    fillColor: getColor(keluhanData[feature.properties.NAMA_KEC] || 0),
+    fillColor: getColor(keluhanData[feature.properties.name]),
     weight: 1,
     color: "white",
     fillOpacity: 0.8,
@@ -162,7 +166,7 @@ const ComplaintsList = () => {
         className="w-full h-[300px] sm:h-[400px] md:h-[500px] rounded-2xl z-0"
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        <GeoJSON data={semarangGeoJSON} style={style} />
+        {geoData && <GeoJSON data={geoData} style={style} />}
       </MapContainer>
       <div className="my-6">
         <div className="flex flex-col md:flex-row shadow rounded-xl overflow-hidden">
