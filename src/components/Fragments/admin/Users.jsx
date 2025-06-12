@@ -33,6 +33,8 @@ const Users = () => {
 
   const [selectedUser, setSelectedUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 5;
 
   const openModal = (user) => {
     setSelectedUser(user);
@@ -63,6 +65,36 @@ const Users = () => {
     });
   };
 
+  // Pagination logic
+  const totalPages = Math.ceil(userData.length / usersPerPage);
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = userData.slice(indexOfFirstUser, indexOfLastUser);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const renderPageNumbers = () => {
+    const pageNumbers = [];
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`px-3 py-1 rounded-full ${
+            currentPage === i
+              ? "bg-soft-orange text-white"
+              : "bg-gray-200 text-gray-700 hover:bg-soft-orange/20 cursor-pointer"
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+    return pageNumbers;
+  };
+
   return (
     <div className="w-full space-y-4">
       {/* Label kolom atas */}
@@ -73,7 +105,7 @@ const Users = () => {
 
       {/* List User */}
       <div className="w-full space-y-4">
-        {userData.map((user, index) => (
+        {currentUsers.map((user, index) => (
           <div
             key={index}
             onClick={() => openModal(user)}
@@ -94,6 +126,29 @@ const Users = () => {
           </div>
         ))}
       </div>
+
+      {/* Pagination */}
+      {userData.length > usersPerPage && (
+        <div className="flex justify-center mt-4 space-x-2 items-center">
+          <button
+            onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-soft-orange/20 cursor-pointer"
+          >
+            Previous
+          </button>
+          {renderPageNumbers()}
+          <button
+            onClick={() =>
+              handlePageChange(Math.min(currentPage + 1, totalPages))
+            }
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-soft-orange/20 cursor-pointer"
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       {/* Modal Detail */}
       <Modal

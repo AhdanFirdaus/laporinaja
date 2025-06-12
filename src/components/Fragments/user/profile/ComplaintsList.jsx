@@ -61,12 +61,12 @@ const ComplaintsList = () => {
     if (complaint.photo_path) {
       try {
         const { data } = await supabase.storage
-          .from("foto-keluhan") // Replace with your actual bucket name
+          .from("foto-keluhan")
           .getPublicUrl(complaint.photo_path);
         imageUrl = data.publicUrl;
-        console.log("================")
-        console.log(complaint.photo_path)
-        console.log(imageUrl)
+        console.log("================");
+        console.log(complaint.photo_path);
+        console.log(imageUrl);
       } catch (err) {
         console.error("Error fetching public URL:", err.message);
       }
@@ -138,34 +138,36 @@ const ComplaintsList = () => {
         </div>
       </div>
 
-      <h2 className="text-3xl font-bold font-second text-soft-orange my-6 tracking-tight">
-        Lihat Keluhan
-      </h2>
-      {complaintHistory.length === 0 ? (
-        <p className="text-gray-500 text-lg italic text-center py-8 w-full">
-          Belum ada keluhan yang diajukan.
-        </p>
-      ) : (
-        <ul className="columns-1 sm:columns-2 w-full">
-          {complaintHistory.map((complaint) => (
-            <CardComplaint
-              key={complaint.id}
-              complaint={complaint}
-              actions={[
-                {
-                  label: "Lihat Detail",
-                  onClick: handleDetailClick,
-                },
-              ]}
-            />
-          ))}
-        </ul>
-      )}
-      <DetailComplaintModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        complaint={selectedComplaint}
-      />
+      <div className="mt-12 border-t pt-8 border-gray-400">
+        <h2 className="text-3xl font-bold font-second text-soft-orange mb-6 tracking-tight">
+          Lihat Keluhan
+        </h2>
+        {complaintHistory.length === 0 ? (
+          <p className="text-gray-500 text-lg italic text-center py-8">
+            Belum ada keluhan yang diajukan.
+          </p>
+        ) : (
+          <ul className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+            {complaintHistory.map((complaint) => (
+              <CardComplaint
+                key={complaint.id}
+                complaint={complaint}
+                actions={[
+                  {
+                    label: "Lihat Detail",
+                    onClick: handleDetailClick,
+                  },
+                ]}
+              />
+            ))}
+          </ul>
+        )}
+        <DetailComplaintModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          complaint={selectedComplaint}
+        />
+      </div>
     </>
   );
 };
