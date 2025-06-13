@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { FiMessageSquare, FiX, FiSend } from "react-icons/fi";
-import Swal from "sweetalert2";
+import { showError } from "../Elements/Alert";
 
 const parseMessageText = (text) => {
   const lines = text.split("\n").map((line, index) => {
@@ -116,10 +116,10 @@ const Chatbot = () => {
       .then((res) => res.text())
       .then((text) => setWebsiteContext(text))
       .catch(() => {
-        Swal.fire({
-          icon: "error",
+        showError({
           title: "Gagal memuat konteks",
           text: "Pastikan file webcontext.txt tersedia.",
+          confirmButtonColor: "#d33",
         });
       });
   }, []);
