@@ -6,7 +6,7 @@ import Select from "../../../Elements/Select";
 import InputUpload from "../../../Elements/InputUpload";
 import CardComplaint from "../../../Fragments/CardComplaint";
 import DetailComplaintModal from "../../../Fragments/DetailComplaintModal";
-import Swal from "sweetalert2";
+import { showConfirmation, showSuccess, showError } from "../../../Elements/Alert";
 import supabase from "../../../../../supabaseClient";
 import checkImageSize from "../../../../helper/checkImageSize";
 import { isKecamatanValid } from "../../../../helper/isKecamatanValid";
@@ -40,10 +40,10 @@ const ReportForm = () => {
         } = await supabase.auth.getUser();
 
         if (userError || !user) {
-          Swal.fire({
-            icon: "error",
+          showError({
             title: "Gagal memuat pengguna",
             text: userError?.message || "Pengguna belum terautentikasi.",
+            confirmButtonColor: "#d33",
           });
           return;
         }
@@ -57,24 +57,19 @@ const ReportForm = () => {
           .order("incident_date", { ascending: false });
 
         if (error) {
-          Swal.fire({
-            icon: "error",
+          showError({
             title: "Gagal memuat laporan",
-            text:
-              error.message || "Terjadi kesalahan saat mengambil data laporan.",
-            timer: 3000,
-            showConfirmButton: false,
+            text: error.message || "Terjadi kesalahan saat mengambil data laporan.",
+            confirmButtonColor: "#d33",
           });
         } else {
           setReportHistory(data);
         }
       } catch (err) {
-        Swal.fire({
-          icon: "error",
+        showError({
           title: "Terjadi Kesalahan",
           text: err?.message || "Gagal memuat data pengguna dan laporan.",
-          timer: 3000,
-          showConfirmButton: false,
+          confirmButtonColor: "#d33",
         });
       }
     };
@@ -94,18 +89,22 @@ const ReportForm = () => {
     e.preventDefault();
 
     if (!user) {
-      Swal.fire(
-        "Gagal",
-        "User tidak ditemukan. Silakan login kembali.",
-        "error"
-      );
+      showError({
+        title: "Gagal",
+        text: "User tidak ditemukan. Silakan login kembali.",
+        confirmButtonColor: "#d33",
+      });
       return;
     }
 
-    const toast = Swal.fire({
+    const toast = showConfirmation({
       title: "Mengirim keluhan…",
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading(),
+      text: "",
+      showCancelButton: false,
+      confirmButtonText: "",
+      cancelButtonText: "",
+      confirmButtonColor: "#52BA5E",
+      icon: "info",
     });
 
     try {
@@ -114,10 +113,11 @@ const ReportForm = () => {
       if (formData.photo) {
         const sizeCheck = checkImageSize(formData.photo);
         if (!sizeCheck.valid) {
-          Swal.fire({
-            icon: "error",
+          toast.close();
+          showError({
             title: "Upload Gagal",
             text: sizeCheck.message,
+            confirmButtonColor: "#d33",
           });
           return;
         }
@@ -132,11 +132,11 @@ const ReportForm = () => {
             .upload(filePath, formData.photo);
 
         if (storageError) {
-          Swal.fire({
-            icon: "error",
+          toast.close();
+          showError({
             title: "Upload Gagal",
-            text:
-              "Terjadi kesalahan saat mengunggah foto: " + storageError.message,
+            text: "Terjadi kesalahan saat mengunggah foto: " + storageError.message,
+            confirmButtonColor: "#d33",
           });
           return;
         }
@@ -144,12 +144,12 @@ const ReportForm = () => {
         photoPath = storageData.path;
       }
 
-      if (isKecamatanValid(formData.location.toLowerCase())) {
-      } else {
-        Swal.fire({
-          icon: "error",
+      if (!isKecamatanValid(formData.location.toLowerCase())) {
+        toast.close();
+        showError({
           title: "Upload Data Gagal",
-          text: "Terjadi kesalahan saat mengunggah data: kecamatan tidak valid",
+          text: "Kecamatan tidak valid",
+          confirmButtonColor: "#d33",
         });
         return;
       }
@@ -207,23 +207,30 @@ const ReportForm = () => {
       });
 
       toast.close();
-      Swal.fire("Berhasil!", "Keluhan Anda telah dikirim.", "success");
+      showSuccess({
+        title: "Berhasil!",
+        text: "Keluhan Anda telah dikirim.",
+        confirmButtonColor: "#52BA5E",
+      });
     } catch (err) {
       toast.close();
-      Swal.fire("Gagal", err.message || "Terjadi kesalahan.", "error");
+      showError({
+        title: "Gagal",
+        text: err.message || "Terjadi kesalahan.",
+        confirmButtonColor: "#d33",
+      });
     }
   };
 
   const handleDelete = async (id) => {
-    const result = await Swal.fire({
-      icon: "warning",
+    const result = await showConfirmation({
       title: "Konfirmasi",
       text: "Apakah Anda yakin ingin menghapus keluhan ini?",
-      showCancelButton: true,
-      confirmButtonColor: "#52BA5E",
-      cancelButtonColor: "#d33",
       confirmButtonText: "Hapus",
       cancelButtonText: "Batal",
+      confirmButtonColor: "#52BA5E",
+      cancelButtonColor: "#d33",
+      icon: "warning",
     });
 
     if (!result.isConfirmed) return;
@@ -249,15 +256,13 @@ const ReportForm = () => {
 
       setReportHistory(reportHistory.filter((r) => r.id !== id));
 
-      Swal.fire({
-        icon: "success",
+      showSuccess({
         title: "Dihapus!",
         text: "Keluhan telah dihapus.",
         confirmButtonColor: "#52BA5E",
       });
     } catch (err) {
-      Swal.fire({
-        icon: "error",
+      showError({
         title: "Gagal",
         text: "Terjadi kesalahan saat menghapus keluhan.",
         confirmButtonColor: "#d33",
@@ -311,7 +316,7 @@ const ReportForm = () => {
 
   const categoryOptions = [
     "Jalan dan Trotoar",
-    "Penerangan Jalan Umum",
+    "Peneranthus Jalan Umum",
     "Saluran Air",
     "Sampah",
     "Keamanan dan Ketertiban",
