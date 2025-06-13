@@ -52,7 +52,7 @@ const ProfileCard = ({ user, refreshUser }) => {
   };
 
   const handleEditSubmit = async (e) => {
-    e.preventDefault();
+    if (e?.preventDefault) e.preventDefault();
     const { fullName, email, nik, birthDate, gender, address: { rtRw, kelurahan, kecamatan } } = formData;
 
     try {

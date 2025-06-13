@@ -18,23 +18,22 @@ const Button = ({
   font = 'font-semibold',
   href,
   target = '_self',
-  to, // New prop for scroll target
+  to,
   ...props
 }) => {
   const colorClasses = colorMap[color] || colorMap.softorange;
   const baseClasses = `px-4 py-2 transition duration-300 cursor-pointer ${colorClasses} ${rounded} ${txtcolor} ${font} ${className}`;
 
-  // Handle scroll to section
-  const handleScroll = () => {
+  const handleScroll = (e) => {
     if (to) {
       scroller.scrollTo(to, {
         smooth: true,
         duration: 500,
-        offset: -80, // Match the offset used in Navbar
+        offset: -80,
       });
     }
     if (onClick) {
-      onClick(); // Call any additional onClick handler if provided
+      onClick(e);
     }
   };
 
