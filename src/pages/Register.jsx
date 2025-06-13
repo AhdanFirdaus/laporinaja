@@ -104,11 +104,13 @@ function Register() {
         return;
       }
 
+      const siteUrl = import.meta.env.VITE_SITE_URL;
+
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: e.target.email.value,
         password: e.target.password.value,
         options: {
-          emailRedirectTo: "http://localhost:3000/profile",
+          emailRedirectTo: `${siteUrl}`,
         },
       });
 
