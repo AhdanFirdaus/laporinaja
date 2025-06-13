@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Button from "../Elements/Button";
-import { FiMenu, FiX } from "react-icons/fi";
+import { FiMenu, FiX, FiUser } from "react-icons/fi";
 import { Link as RouterLink } from "react-router";
 import { Link as ScrollLink } from "react-scroll";
 import supabase from "../../../supabaseClient";
@@ -12,15 +12,19 @@ const Navbar = () => {
   useEffect(() => {
     // Check for an existing session when the component mounts
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       setSession(session);
     };
     checkSession();
 
     // Subscribe to auth state changes
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+      }
+    );
 
     // Cleanup subscription on component unmount
     return () => {
@@ -79,10 +83,9 @@ const Navbar = () => {
             </ScrollLink>
             {session ? (
               <RouterLink to="/profile">
-                <img
-                  src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                  alt="Profile Avatar"
-                  className="w-10 h-10 rounded-full object-cover"
+                <FiUser
+                  size={24}
+                  className="text-gray-700 hover:text-soft-orange"
                 />
               </RouterLink>
             ) : (
@@ -150,18 +153,14 @@ const Navbar = () => {
               </ScrollLink>
               {session ? (
                 <RouterLink to="/profile" onClick={() => setIsOpen(false)}>
-                  <img
-                    src="https://thumbs.dreamstime.com/b/default-profile-picture-avatar-photo-placeholder-vector-illustration-default-profile-picture-avatar-photo-placeholder-vector-189495158.jpg"
-                    alt="Profile Avatar"
-                    className="w-10 h-10 rounded-full object-cover"
+                  <FiUser
+                    size={24}
+                    className="text-gray-700 hover:text-soft-orange"
                   />
                 </RouterLink>
               ) : (
                 <RouterLink to="/login" onClick={() => setIsOpen(false)}>
-                  <Button
-                    color="rose"
-                    className="font-bold w-full text-center"
-                  >
+                  <Button color="rose" className="font-bold w-full text-center">
                     Masuk
                   </Button>
                 </RouterLink>
