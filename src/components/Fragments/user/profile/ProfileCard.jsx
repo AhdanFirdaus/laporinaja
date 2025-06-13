@@ -113,7 +113,7 @@ const ProfileCard = ({ user, refreshUser }) => {
   };
 
   const handlePasswordSubmit = async (e) => {
-    e.preventDefault();
+    if (e?.preventDefault) e.preventDefault();
     const { currentPassword, newPassword, confirmPassword } = passwordData;
 
     if (newPassword !== confirmPassword) {

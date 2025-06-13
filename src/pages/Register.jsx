@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Input from "../components/Elements/Input";
 import Button from "../components/Elements/Button";
 import InputUpload from "../components/Elements/InputUpload";
@@ -8,8 +8,24 @@ import supabase from "../../supabaseClient";
 import { parseKtpText } from '../helper/parseKtpParser';
 import { isKecamatanValid } from "../helper/isKecamatanValid";
 import Swal from 'sweetalert2';
+import { useNavigate } from "react-router"
 
 function Register() {
+
+  const navigate = useNavigate()
+
+  useEffect(() => {
+      const checkSession = async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+  
+        if (session) {
+          navigate("/")
+        }
+      };
+      checkSession()
+      
+    }, []);
+
   const [formData, setFormData] = useState({
     photo: null,
   });
@@ -113,8 +129,15 @@ function Register() {
 
       if (authData.user) {
         // Insert user data into the 'user' table
-        const [day, month, year] = parsedData.tanggalLahir.split("-");
-        const formated_tanggal = `${year}-${month}-${day}`;
+        let formated_tanggal = null;
+
+        if (parsedData.tanggalLahir) {
+          const [day, month, year] = parsedData.tanggalLahir.split("-");
+          formated_tanggal = `${year}-${month}-${day}`;
+        }
+        
+
+        
         const { data, error } = await supabase
           .from('user')
           .insert([{

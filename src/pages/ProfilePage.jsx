@@ -88,6 +88,18 @@ const ProfilePage = () => {
   };
 
   useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        navigate("/login")
+      }
+
+      if (session.user.id === "0340bc90-20c4-40c4-828c-6b89b8924d8d") {
+        navigate("/admin");
+      }
+    };
+    checkSession()
     fetchProfile();
   }, []);
 

@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "../../components/Fragments/Sidebar";
 import { FiAlertCircle, FiHome, FiUsers } from "react-icons/fi";
 import Dashboard from "../../components/Fragments/admin/Dashboard";
 import Complaints from "../../components/Fragments/admin/Complaints";
 import Users from "../../components/Fragments/admin/Users";
 import { useNavigate } from "react-router";
+import supabase from "../../../supabaseClient";
+
 
 const menuItems = [
   { key: "dashboard", icon: <FiHome />, label: "Dashboard" },
@@ -28,10 +30,32 @@ const Admin = () => {
     setView("complaints");
   };
 
-  const handleLogout = () => {
+  
+
+  const handleLogout = async () => {
     // Tambahkan logika logout jika perlu (misalnya clear token, dll)
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Gagal logout:", error.message);
+      return;
+    }
     navigate("/login"); // Redirect ke halaman login
   };
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        navigate("/login")
+      }
+
+      if (session.user.id !== "0340bc90-20c4-40c4-828c-6b89b8924d8d") {
+        navigate("/profile");
+      }
+    };
+    checkSession()
+  }, []);
 
   const renderContent = () => {
     switch (view) {
