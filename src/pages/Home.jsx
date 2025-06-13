@@ -68,27 +68,35 @@ export default function Home() {
   const steps = [
     {
       number: 1,
-      title: "Sign Up",
-      details: [
-        "Brief description of how to sign up.",
-        "Image or video of the sign-up page.",
-        "Tooltip explaining each field in the sign-up form.",
-      ],
+      title: "Kunjungi Website LaporinAja",
+      details: [],
     },
     {
       number: 2,
-      title: "Customize Your Profile",
-      details: [],
+      title: "Buat Akun",
+      details: [
+        "Daftarkan akun menggunakan KTP.",
+        "Masuk dengan akun yang telah didaftarkan.",
+      ],
     },
     {
       number: 3,
-      title: "Start Using Our Service",
-      details: [],
+      title: "Mulai Mengajukan Keluhan",
+      details: [
+        "Kunjungi avatar profil di sebelah kanan navigasi.",
+        "Klik menu 'Ajukan Keluhan'.",
+        "Isi formulir yang tersedia dan unggah foto sebagai bukti.",
+        "Kirim keluhan Anda.",
+      ],
     },
     {
       number: 4,
-      title: "Get Support",
-      details: [],
+      title: "Bantuan",
+      details: [
+        "Klik ikon pesan yang terdapat di bagian bawah halaman utama.",
+        "Mulai ajukan pertanyaan atau permintaan bantuan.",
+        "Bot dari kami akan secara otomatis memberikan respons.",
+      ],
     },
   ];
 
@@ -419,41 +427,60 @@ export default function Home() {
         <div className="container mx-auto flex flex-col lg:flex-row items-center justify-between max-w-[90%]">
           {/* Text Section */}
           <div className="w-full lg:w-1/2 mb-8 lg:mb-0 lg:pr-8">
-            <h2 className="text-3xl sm:text-4xl  font-bold font-second text-soft-orange mb-6">
+            <h2 className="text-3xl sm:text-4xl font-bold font-second text-soft-orange mb-6">
               Cara Pemakaian
             </h2>
             <div className="space-y-4">
               {steps.map((step) => (
                 <div key={step.number}>
-                  <button
-                    onClick={() => {
-                      setOpenStep(step.number);
-                      setExpandedStep(
-                        expandedStep === step.number ? null : step.number
-                      );
-                    }}
-                    className="flex items-center justify-between w-full text-left focus:outline-none cursor-pointer"
-                  >
-                    <span className="flex items-center">
-                      <span
-                        className={`w-8 h-8 flex items-center justify-center rounded-full mr-3 border border-soft-orange ${
-                          openStep === step.number
-                            ? "bg-soft-orange text-white"
-                            : "text-soft-orange"
-                        }`}
-                      >
-                        {step.number}
+                  {step.number === 1 ? (
+                    <div className="flex items-center justify-between w-full text-left">
+                      <span className="flex items-center">
+                        <span
+                          className={`w-8 h-8 flex items-center justify-center rounded-full mr-3 border border-soft-orange ${
+                            openStep === step.number
+                              ? "bg-soft-orange text-white"
+                              : "text-soft-orange"
+                          }`}
+                        >
+                          {step.number}
+                        </span>
+                        <span className="text-lg font-medium text-gray-700">
+                          {step.title}
+                        </span>
                       </span>
-                      <span className="text-lg font-medium text-gray-700">
-                        {step.title}
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setOpenStep(step.number);
+                        setExpandedStep(
+                          expandedStep === step.number ? null : step.number
+                        );
+                      }}
+                      className="flex items-center justify-between w-full text-left focus:outline-none cursor-pointer"
+                    >
+                      <span className="flex items-center">
+                        <span
+                          className={`w-8 h-8 flex items-center justify-center rounded-full mr-3 border border-soft-orange ${
+                            openStep === step.number
+                              ? "bg-soft-orange text-white"
+                              : "text-soft-orange"
+                          }`}
+                        >
+                          {step.number}
+                        </span>
+                        <span className="text-lg font-medium text-gray-700">
+                          {step.title}
+                        </span>
                       </span>
-                    </span>
-                    {expandedStep === step.number ? (
-                      <FiChevronUp />
-                    ) : (
-                      <FiChevronDown />
-                    )}
-                  </button>
+                      {expandedStep === step.number ? (
+                        <FiChevronUp />
+                      ) : (
+                        <FiChevronDown />
+                      )}
+                    </button>
+                  )}
                   {expandedStep === step.number && step.details.length > 0 && (
                     <ul className="mt-2 ml-11 space-y-1 text-gray-600 list-disc">
                       {step.details.map((detail, index) => (
