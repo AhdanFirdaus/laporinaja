@@ -2,7 +2,14 @@ import { useRef } from "react";
 import { FiX } from "react-icons/fi";
 import Button from "../Elements/Button";
 
-const InputUpload = ({ label = "Foto", name = "photo", accept = "image/*", value, onChange, onClear }) => {
+const InputUpload = ({
+  label = "Foto",
+  name = "photo",
+  accept = "image/*",
+  value,
+  onChange,
+  onClear,
+}) => {
   const fileInputRef = useRef(null);
 
   const handleButtonClick = () => {

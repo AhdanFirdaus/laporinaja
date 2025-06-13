@@ -1,7 +1,7 @@
 const MAX_FILE_SIZE_MB = 1;
 
 export default function checkImageSize(file) {
-  const maxSize = MAX_FILE_SIZE_MB * 1024 * 1024; // in bytes
+  const maxSize = MAX_FILE_SIZE_MB * 1024 * 1024;
 
   if (file.size > maxSize) {
     return {

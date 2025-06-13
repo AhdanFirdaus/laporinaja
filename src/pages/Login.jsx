@@ -10,9 +10,10 @@ function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check for an existing session when the component mounts
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session) {
         navigate("/profile");
       }
@@ -37,7 +38,6 @@ function Login() {
         return;
       }
 
-      // Redirect to profile after successful login
       navigate("/");
     } catch (err) {
       setLoginError("An unexpected error occurred. Please try again.");

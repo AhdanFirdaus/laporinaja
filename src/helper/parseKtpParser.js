@@ -1,74 +1,74 @@
 function cleanString(str) {
-  return str.replace(/[^a-zA-Z0-9 \/\-\.,]/g, '');
+  return str.replace(/[^a-zA-Z0-9 \/\-\.,]/g, "");
 }
 
 export function parseKtpText(text) {
   const result = {
-    nama: '',
-    nik: '',
-    jenisKelamin: '',
-    kelurahan: '',
-    tanggalLahir: '',
-    tempatLahir: '',
-    rtRw: '',
-    kecamatan: '',
-    agama: '',
-    statusPerkawinan: '',
-    pekerjaan: '',
-    kewarganegaraan: '',
-    berlakuHingga: '',
+    nama: "",
+    nik: "",
+    jenisKelamin: "",
+    kelurahan: "",
+    tanggalLahir: "",
+    tempatLahir: "",
+    rtRw: "",
+    kecamatan: "",
+    agama: "",
+    statusPerkawinan: "",
+    pekerjaan: "",
+    kewarganegaraan: "",
+    berlakuHingga: "",
   };
 
-  const lines = text.split('\n');
+  const lines = text.split("\n");
 
   for (let line of lines) {
     line = line.trim();
-    if (line.includes(':')) {
-      const [label, ...valueParts] = line.split(':');
+    if (line.includes(":")) {
+      const [label, ...valueParts] = line.split(":");
       const labelTrimmed = label.trim().toLowerCase();
-      const value = valueParts.join(':').trim();
+      const value = valueParts.join(":").trim();
 
       switch (labelTrimmed) {
-        case 'nik':
-          result.nik = value.replace(/\D/g, '');
+        case "nik":
+          result.nik = value.replace(/\D/g, "");
           break;
-        case 'nama':
+        case "nama":
           result.nama = cleanString(value);
           break;
-        case 'tempat/tgl lahir':
-          const parts = value.split(' ');
+        case "tempat/tgl lahir":
+          const parts = value.split(" ");
           const date = parts.pop();
           result.tanggalLahir = cleanString(date);
-          result.tempatLahir = cleanString(parts.join(' '));
+          result.tempatLahir = cleanString(parts.join(" "));
           break;
-        case 'jenis kelamin':
-          result.jenisKelamin = cleanString(value.split(' ')[0]);
+        case "jenis kelamin":
+          result.jenisKelamin = cleanString(value.split(" ")[0]);
           break;
-        case 'alamat':
+        case "alamat":
           result.alamat = cleanString(value);
           break;
-        case 'rt/rw':
+        case "rt/rw":
           result.rtRw = cleanString(value);
           break;
-        case 'kel/desa':
+        case "kel/desa":
           result.kelurahan = cleanString(value);
           break;
-        case 'kecamatan':
+        case "kecamatan":
           result.kecamatan = cleanString(value);
           break;
-        case 'agama':
+        case "agama":
           result.agama = cleanString(value);
           break;
-        case 'status perkawinan':
+        case "status perkawinan":
           result.statusPerkawinan = cleanString(value);
           break;
-        case 'pekerjaan':
+        case "pekerjaan":
           result.pekerjaan = cleanString(value);
           break;
-        case 'kewarganegaraan':
+        case "kewarganegaraan":
           result.kewarganegaraan = cleanString(value);
           break;
-        case 'berlaku hingga':
+        case "berlaku hingga":
           result.berlakuHingga = cleanString(value);
           break;
       }

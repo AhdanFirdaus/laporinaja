@@ -12,49 +12,65 @@ const Users = ({ setView, handleEachModal }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 5;
 
-  // Fetch users from Supabase
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        // Fetch users
         const { data: users, error: userError } = await supabase
           .from("user")
           .select("id, username, kecamatan");
 
         if (userError) {
-          console.error("Error fetching users:", userError);
+          Swal.fire({
+            icon: "error",
+            title: "Gagal Memuat User",
+            text:
+              error?.message || "Terjadi kesalahan saat mengambil data user.",
+            timer: 3000,
+            showConfirmButton: false,
+          });
           return;
         }
 
-        // Fetch complaints for all users
         const { data: complaints, error: complaintError } = await supabase
           .from("keluhan")
           .select("user_id, title,id");
 
         if (complaintError) {
-          console.error("Error fetching complaints:", complaintError);
+          Swal.fire({
+            icon: "error",
+            title: "Gagal Memuat Laporan",
+            text:
+              error?.message ||
+              "Terjadi kesalahan saat mengambil data laporan.",
+            timer: 3000,
+            showConfirmButton: false,
+          });
           return;
         }
 
-        // Map users with their complaints
-        const usersWithComplaints = users.map(user => ({
+        const usersWithComplaints = users.map((user) => ({
           id: user.id,
           username: user.username,
           kecamatan: user.kecamatan,
           complaints: complaints
-            .filter(complaint => complaint.user_id === user.id)
-            .map(complaint => [complaint.id, complaint.title])
+            .filter((complaint) => complaint.user_id === user.id)
+            .map((complaint) => [complaint.id, complaint.title]),
         }));
 
         setUserData(usersWithComplaints);
       } catch (err) {
-        console.error("Unexpected error:", err);
+        Swal.fire({
+          icon: "error",
+          title: "Kesalahan Tak Terduga",
+          text: err?.message || "Terjadi kesalahan yang tidak diketahui.",
+          timer: 3000,
+          showConfirmButton: false,
+        });
       }
     };
 
     fetchUsers();
   }, []);
-
 
   const openModal = (user) => {
     setSelectedUser(user);
@@ -66,21 +82,26 @@ const Users = ({ setView, handleEachModal }) => {
     setSelectedUser(null);
   };
 
-    const handleDelete = async (username) => {
+  const handleDelete = async (username) => {
     showConfirmation({
       title: "Konfirmasi Hapus Pengguna",
       text: `Apakah Anda yakin ingin menghapus pengguna "${username}"?`,
       confirmButtonText: "Hapus",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        // 🔥 Delete from Supabase
         const { error } = await supabase
-          .from("user") // adjust table name if needed
+          .from("user")
           .delete()
           .eq("username", username);
 
         if (error) {
-          console.error("Gagal menghapus dari Supabase:", error.message);
+          Swal.fire({
+            icon: "error",
+            title: "Gagal Menghapus dari Supabase",
+            text: error?.message || "Terjadi kesalahan saat menghapus data.",
+            timer: 3000,
+            showConfirmButton: false,
+          });
           showError({
             title: "Gagal!",
             text: "Pengguna tidak berhasil dihapus. Silakan coba lagi.",
@@ -88,8 +109,9 @@ const Users = ({ setView, handleEachModal }) => {
           return;
         }
 
-        // ✅ Update local state and close modal
-        setUserData((prev) => prev.filter((user) => user.username !== username));
+        setUserData((prev) =>
+          prev.filter((user) => user.username !== username)
+        );
         if (selectedUser?.username === username) {
           closeModal();
         }
@@ -102,7 +124,6 @@ const Users = ({ setView, handleEachModal }) => {
     });
   };
 
-  // Pagination logic
   const totalPages = Math.ceil(userData.length / usersPerPage);
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
@@ -132,10 +153,9 @@ const Users = ({ setView, handleEachModal }) => {
     return pageNumbers;
   };
 
-
   return (
     <div className="w-full space-y-4">
-      {/* Label kolom atas */}
+      {/* Top column label */}
       <div className="flex justify-between items-center text-xs sm:text-sm md:text-base font-semibold text-gray-600 border-b border-gray-200 pb-2">
         <span>Username</span>
         <span>Domisili</span>

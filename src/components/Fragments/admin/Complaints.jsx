@@ -27,7 +27,14 @@ const Complaints = ({ autoOpenComplaintId, clearAutoOpenId }) => {
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Error fetching complaints:", error.message);
+      Swal.fire({
+        icon: "error",
+        title: "Gagal Memuat Laporan",
+        text:
+          error?.message || "Terjadi kesalahan saat mengambil data laporan.",
+        timer: 3000,
+        showConfirmButton: false,
+      });
     } else {
       const formatted = data.map((item) => ({
         id: item.id,
@@ -36,7 +43,7 @@ const Complaints = ({ autoOpenComplaintId, clearAutoOpenId }) => {
         location: item.location,
         category: item.category,
         date: item.incident_date,
-        label: item.status, // use enum like 'waiting', 'done', etc.
+        label: item.status,
         imageUrl: item.photo_path || "/img/placeholder.jpg",
       }));
       setComplaints(formatted);
@@ -49,7 +56,7 @@ const Complaints = ({ autoOpenComplaintId, clearAutoOpenId }) => {
 
   useEffect(() => {
     if (autoOpenComplaintId && complaints.length > 0) {
-      const matched = complaints.find(c => c.id === autoOpenComplaintId);
+      const matched = complaints.find((c) => c.id === autoOpenComplaintId);
       if (matched) {
         openDetailModal(matched);
         clearAutoOpenId();
@@ -63,7 +70,13 @@ const Complaints = ({ autoOpenComplaintId, clearAutoOpenId }) => {
       .getPublicUrl(complaint.imageUrl);
 
     if (error) {
-      console.error("Gagal ambil URL gambar:", error.message);
+      Swal.fire({
+        icon: "error",
+        title: "Gagal Mengambil URL Gambar",
+        text: error?.message || "Terjadi kesalahan saat mengambil URL gambar.",
+        timer: 3000,
+        showConfirmButton: false,
+      });
       return;
     }
 
@@ -95,7 +108,6 @@ const Complaints = ({ autoOpenComplaintId, clearAutoOpenId }) => {
         .eq("id", complaint.id);
 
       if (error) {
-        console.error("Gagal update status:", error.message);
         showError({
           title: "Gagal!",
           text: "Status gagal diubah. Coba lagi.",
@@ -104,9 +116,7 @@ const Complaints = ({ autoOpenComplaintId, clearAutoOpenId }) => {
       }
 
       setComplaints((prev) =>
-        prev.map((c) =>
-          c.id === complaint.id ? { ...c, label: newEnum } : c
-        )
+        prev.map((c) => (c.id === complaint.id ? { ...c, label: newEnum } : c))
       );
 
       showSuccess({
@@ -130,7 +140,14 @@ const Complaints = ({ autoOpenComplaintId, clearAutoOpenId }) => {
         .eq("id", complaint.id);
 
       if (error) {
-        console.error("Gagal hapus keluhan:", error.message);
+        Swal.fire({
+          icon: "error",
+          title: "Gagal Menghapus Keluhan",
+          text:
+            error?.message || "Terjadi kesalahan saat menghapus data keluhan.",
+          timer: 3000,
+          showConfirmButton: false,
+        });
         return;
       }
 
@@ -139,7 +156,13 @@ const Complaints = ({ autoOpenComplaintId, clearAutoOpenId }) => {
         .remove([complaint.imageUrl]);
 
       if (imgError) {
-        console.error("Gagal hapus gambar:", imgError.message);
+        Swal.fire({
+          icon: "error",
+          title: "Gagal Menghapus Gambar",
+          text: imgError?.message || "Terjadi kesalahan saat menghapus gambar.",
+          timer: 3000,
+          showConfirmButton: false,
+        });
         return;
       }
 
@@ -181,7 +204,10 @@ const Complaints = ({ autoOpenComplaintId, clearAutoOpenId }) => {
     const filtered = complaints.filter((c) => c.label === labelEnum);
     const currentSectionPage = currentPage[labelEnum] || 1;
     const indexOfLast = currentSectionPage * complaintsPerPage;
-    const currentComplaints = filtered.slice(indexOfLast - complaintsPerPage, indexOfLast);
+    const currentComplaints = filtered.slice(
+      indexOfLast - complaintsPerPage,
+      indexOfLast
+    );
     const totalPages = Math.ceil(filtered.length / complaintsPerPage);
 
     const handlePageChange = (page) => {
@@ -220,7 +246,9 @@ const Complaints = ({ autoOpenComplaintId, clearAutoOpenId }) => {
     return (
       <div className="mb-8" key={labelEnum}>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="font-semibold text-lg text-gray-700">{sectionLabel}</h2>
+          <h2 className="font-semibold text-lg text-gray-700">
+            {sectionLabel}
+          </h2>
           <span className="text-sm bg-gray-200 text-gray-700 font-semibold px-3 py-1 rounded-full">
             {filtered.length}
           </span>
@@ -242,7 +270,9 @@ const Complaints = ({ autoOpenComplaintId, clearAutoOpenId }) => {
         {filtered.length > complaintsPerPage && (
           <div className="flex justify-center mt-4 items-center space-x-2 flex-wrap gap-y-2">
             <button
-              onClick={() => handlePageChange(Math.max(currentSectionPage - 1, 1))}
+              onClick={() =>
+                handlePageChange(Math.max(currentSectionPage - 1, 1))
+              }
               disabled={currentSectionPage === 1}
               className="px-3 py-1 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-soft-orange/20 text-sm"
             >
@@ -250,7 +280,9 @@ const Complaints = ({ autoOpenComplaintId, clearAutoOpenId }) => {
             </button>
             <div className="flex space-x-2">{renderPageNumbers()}</div>
             <button
-              onClick={() => handlePageChange(Math.min(currentSectionPage + 1, totalPages))}
+              onClick={() =>
+                handlePageChange(Math.min(currentSectionPage + 1, totalPages))
+              }
               disabled={currentSectionPage === totalPages}
               className="px-3 py-1 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-soft-orange/20 text-sm"
             >

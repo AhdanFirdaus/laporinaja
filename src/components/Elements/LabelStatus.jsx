@@ -1,6 +1,5 @@
 const LabelStatus = ({ label = "Menunggu" }) => {
-  const baseClass =
-    "text-sm font-medium py-1 px-3 rounded-full inline-block";
+  const baseClass = "text-sm font-medium py-1 px-3 rounded-full inline-block";
 
   const labelClass =
     label === "Menunggu"

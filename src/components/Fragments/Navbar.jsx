@@ -10,7 +10,6 @@ const Navbar = () => {
   const [session, setSession] = useState(null);
 
   useEffect(() => {
-    // Check for an existing session when the component mounts
     const checkSession = async () => {
       const {
         data: { session },
@@ -19,14 +18,12 @@ const Navbar = () => {
     };
     checkSession();
 
-    // Subscribe to auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session);
       }
     );
 
-    // Cleanup subscription on component unmount
     return () => {
       authListener.subscription.unsubscribe();
     };

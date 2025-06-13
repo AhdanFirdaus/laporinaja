@@ -6,10 +6,7 @@ import CardComplaint from "../../CardComplaint";
 import DetailComplaintModal from "../../DetailComplaintModal";
 import supabase from "../../../../../supabaseClient";
 
-
-
 const getColor = (keluhan) => {
-  console.log(keluhan)
   if (keluhan > 15) return "red";
   if (keluhan > 5) return "orange";
   return "green";
@@ -33,13 +30,27 @@ const ComplaintsList = () => {
           .order("created_at", { ascending: false });
 
         if (error) {
-          console.error("Error fetching complaints:", error.message);
+          Swal.fire({
+            icon: "error",
+            title: "Gagal Memuat Laporan",
+            text:
+              error?.message ||
+              "Terjadi kesalahan saat mengambil data laporan.",
+            timer: 3000,
+            showConfirmButton: false,
+          });
           return;
         }
 
         setComplaintHistory(data || []);
       } catch (err) {
-        console.error("Unexpected error:", err.message);
+        Swal.fire({
+          icon: "error",
+          title: "Kesalahan Tak Terduga",
+          text: err?.message || "Terjadi kesalahan yang tidak diketahui.",
+          timer: 3000,
+          showConfirmButton: false,
+        });
       }
     };
 
@@ -50,38 +61,40 @@ const ComplaintsList = () => {
     fetch("/export.geojson")
       .then((res) => res.json())
       .then((data) => setGeoData(data))
-      .catch((err) => console.error("GeoJSON load error:", err));
+      .catch((err) => {});
   }, []);
 
   useEffect(() => {
-  const fetchKeluhanCountByLocation = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("keluhan")
-        .select("location");
+    const fetchKeluhanCountByLocation = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("keluhan")
+          .select("location");
 
-      if (error) {
-        console.error("Error fetching locations:", error.message);
-        return;
+        if (error) {
+          return false;
+        }
+
+        const counts = data.reduce((acc, curr) => {
+          const loc = curr.location;
+          acc[loc] = (acc[loc] || 0) + 1;
+          return acc;
+        }, {});
+
+        setKeluhanData(counts);
+      } catch (err) {
+        Swal.fire({
+          icon: "error",
+          title: "Kesalahan Tak Terduga",
+          text: err?.message || "Terjadi kesalahan yang tidak diketahui.",
+          timer: 3000,
+          showConfirmButton: false,
+        });
       }
+    };
 
-      // Group and count complaints by location
-      const counts = data.reduce((acc, curr) => {
-        const loc = curr.location;
-        acc[loc] = (acc[loc] || 0) + 1;
-        return acc;
-      }, {});
-
-      console.log("$$$$$$$$$$$$$$$$$$$$")
-      console.log(counts)
-      setKeluhanData(counts);
-    } catch (err) {
-      console.error("Unexpected error:", err.message);
-    }
-  };
-
-  fetchKeluhanCountByLocation();
-}, []);
+    fetchKeluhanCountByLocation();
+  }, []);
 
   const style = (feature) => ({
     fillColor: getColor(keluhanData[feature.properties.name]),
@@ -98,11 +111,14 @@ const ComplaintsList = () => {
           .from("foto-keluhan")
           .getPublicUrl(complaint.photo_path);
         imageUrl = data.publicUrl;
-        console.log("================");
-        console.log(complaint.photo_path);
-        console.log(imageUrl);
       } catch (err) {
-        console.error("Error fetching public URL:", err.message);
+        Swal.fire({
+          icon: "error",
+          title: "Gagal Mengambil URL Publik",
+          text: err?.message || "Terjadi kesalahan saat mengambil URL.",
+          timer: 3000,
+          showConfirmButton: false,
+        });
       }
     }
 
@@ -238,7 +254,9 @@ const ComplaintsList = () => {
                 </div>
                 <button
                   onClick={() =>
-                    handlePageChange(Math.min(currentSectionPage + 1, totalPages))
+                    handlePageChange(
+                      Math.min(currentSectionPage + 1, totalPages)
+                    )
                   }
                   disabled={currentSectionPage === totalPages}
                   className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-soft-orange/20 cursor-pointer text-sm sm:text-base"

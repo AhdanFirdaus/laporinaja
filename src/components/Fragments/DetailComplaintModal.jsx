@@ -10,9 +10,7 @@ const statusLabels = {
 
 const DetailComplaintModal = ({ isOpen, onClose, complaint }) => {
   if (!complaint) return null;
-  console.log(complaint);
 
-  // Ambil label dari mapping, fallback ke "Menunggu" jika tidak ditemukan
   const label = statusLabels[complaint.label] || "Menunggu";
 
   return (

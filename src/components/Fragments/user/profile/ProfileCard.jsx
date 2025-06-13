@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState } from "react";
 import Button from "../../../Elements/Button";
 import Modal from "../../../Elements/Modal";
 import Input from "../../../Elements/Input";
 import supabase from "../../../../../supabaseClient";
-import { useNavigate } from 'react-router';
-import Swal from 'sweetalert2';
+import { useNavigate } from "react-router";
+import Swal from "sweetalert2";
 
 const ProfileCard = ({ user, refreshUser }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -25,15 +25,15 @@ const ProfileCard = ({ user, refreshUser }) => {
   });
 
   const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
   });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name.includes('address.')) {
-      const addressField = name.split('.')[1];
+    if (name.includes("address.")) {
+      const addressField = name.split(".")[1];
       setFormData({
         ...formData,
         address: {
@@ -53,10 +53,19 @@ const ProfileCard = ({ user, refreshUser }) => {
 
   const handleEditSubmit = async (e) => {
     if (e?.preventDefault) e.preventDefault();
-    const { fullName, email, nik, birthDate, gender, address: { rtRw, kelurahan, kecamatan } } = formData;
+    const {
+      fullName,
+      email,
+      nik,
+      birthDate,
+      gender,
+      address: { rtRw, kelurahan, kecamatan },
+    } = formData;
 
     try {
-      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      const {
+        data: { user: currentUser },
+      } = await supabase.auth.getUser();
       if (!currentUser) {
         Swal.fire({
           icon: "error",
@@ -127,7 +136,9 @@ const ProfileCard = ({ user, refreshUser }) => {
     }
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         Swal.fire({
           icon: "error",
@@ -209,7 +220,9 @@ const ProfileCard = ({ user, refreshUser }) => {
         </div>
         <div className="flex gap-2 mx-auto md:mx-0 flex-col sm:flex-row">
           <Button onClick={() => setIsEditModalOpen(true)}>Edit profile</Button>
-          <Button onClick={() => setIsPasswordModalOpen(true)}>Ubah password</Button>
+          <Button onClick={() => setIsPasswordModalOpen(true)}>
+            Ubah password
+          </Button>
         </div>
       </div>
 
@@ -245,9 +258,7 @@ const ProfileCard = ({ user, refreshUser }) => {
             <Button onClick={() => setIsEditModalOpen(false)} color="red">
               Batal
             </Button>
-            <Button onClick={handleEditSubmit}>
-              Simpan Perubahan
-            </Button>
+            <Button onClick={handleEditSubmit}>Simpan Perubahan</Button>
           </div>
         }
       >

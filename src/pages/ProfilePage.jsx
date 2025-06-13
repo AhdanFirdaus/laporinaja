@@ -4,10 +4,17 @@ import Sidebar from "../components/Fragments/Sidebar";
 import Terms from "../components/Fragments/user/profile/Terms";
 import ComplaintsList from "../components/Fragments/user/profile/ComplaintsList";
 import ReportForm from "../components/Fragments/user/profile/ReportForm";
-import { FiUser, FiShield, FiBookOpen, FiMessageCircle, FiAlertCircle } from "react-icons/fi";
+import {
+  FiUser,
+  FiShield,
+  FiBookOpen,
+  FiMessageCircle,
+  FiAlertCircle,
+} from "react-icons/fi";
 import { useState, useEffect } from "react";
-import supabase from '../../supabaseClient';
+import supabase from "../../supabaseClient";
 import { useNavigate } from "react-router";
+import Swal from "sweetalert2";
 
 const menuItems = [
   { key: "profile", icon: <FiUser />, label: "Profil" },
@@ -32,11 +39,13 @@ const ProfilePage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Function to fetch user data
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
       if (authError) {
         setError(authError.message);
         setLoading(false);
@@ -82,31 +91,36 @@ const ProfilePage = () => {
     }
   };
 
-  // Function to refresh user data (passed to ProfileCard)
   const refreshUser = async () => {
     await fetchProfile();
   };
 
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
       if (!session) {
-        navigate("/login")
+        navigate("/login");
       }
 
       if (session.user.id === "0340bc90-20c4-40c4-828c-6b89b8924d8d") {
         navigate("/admin");
       }
     };
-    checkSession()
+    checkSession();
     fetchProfile();
   }, []);
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
-      console.error("Gagal logout:", error.message);
+      Swal.fire({
+        icon: "error",
+        title: "Logout Gagal",
+        text: error.message,
+      });
       return;
     }
     navigate("/login");

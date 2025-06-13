@@ -7,7 +7,6 @@ import Users from "../../components/Fragments/admin/Users";
 import { useNavigate } from "react-router";
 import supabase from "../../../supabaseClient";
 
-
 const menuItems = [
   { key: "dashboard", icon: <FiHome />, label: "Dashboard" },
   { key: "complaints", icon: <FiAlertCircle />, label: "Keluhan" },
@@ -23,7 +22,7 @@ const titleMap = {
 const Admin = () => {
   const [view, setView] = useState("dashboard");
   const [autoOpenComplaintId, setAutoOpenComplaintId] = useState(null);
-  const navigate = useNavigate(); // Tambahkan ini
+  const navigate = useNavigate(); 
 
   const handleEachModal = (id) => {
     setAutoOpenComplaintId(id);
@@ -33,13 +32,12 @@ const Admin = () => {
   
 
   const handleLogout = async () => {
-    // Tambahkan logika logout jika perlu (misalnya clear token, dll)
     const { error } = await supabase.auth.signOut();
     if (error) {
       console.error("Gagal logout:", error.message);
       return;
     }
-    navigate("/login"); // Redirect ke halaman login
+    navigate("/login");
   };
 
   useEffect(() => {
@@ -60,7 +58,7 @@ const Admin = () => {
   const renderContent = () => {
     switch (view) {
       case "dashboard":
-        return <Dashboard setView={setView} />; // Changed from onNavigate to setView
+        return <Dashboard setView={setView} />; 
       case "complaints":
         return <Complaints
           autoOpenComplaintId={autoOpenComplaintId}

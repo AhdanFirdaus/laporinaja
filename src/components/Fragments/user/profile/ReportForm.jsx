@@ -9,8 +9,6 @@ import DetailComplaintModal from "../../../Fragments/DetailComplaintModal";
 import Swal from "sweetalert2";
 import supabase from "../../../../../supabaseClient";
 import checkImageSize from "../../../../helper/checkImageSize";
-import { validateLocation } from "../../../../helper/validateLocation";
-import { showConfirmation, showSuccess } from "../../../Elements/Alert";
 import { isKecamatanValid } from "../../../../helper/isKecamatanValid";
 
 const ReportForm = () => {
@@ -42,7 +40,11 @@ const ReportForm = () => {
         } = await supabase.auth.getUser();
 
         if (userError || !user) {
-          console.error("Failed to fetch user or user not authenticated:", userError);
+          Swal.fire({
+            icon: "error",
+            title: "Gagal memuat pengguna",
+            text: userError?.message || "Pengguna belum terautentikasi.",
+          });
           return;
         }
 
@@ -55,12 +57,25 @@ const ReportForm = () => {
           .order("incident_date", { ascending: false });
 
         if (error) {
-          console.error("Failed to fetch complaints:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Gagal memuat laporan",
+            text:
+              error.message || "Terjadi kesalahan saat mengambil data laporan.",
+            timer: 3000,
+            showConfirmButton: false,
+          });
         } else {
           setReportHistory(data);
         }
       } catch (err) {
-        console.error("Error in fetchUserAndReports:", err);
+        Swal.fire({
+          icon: "error",
+          title: "Terjadi Kesalahan",
+          text: err?.message || "Gagal memuat data pengguna dan laporan.",
+          timer: 3000,
+          showConfirmButton: false,
+        });
       }
     };
 
@@ -79,7 +94,11 @@ const ReportForm = () => {
     e.preventDefault();
 
     if (!user) {
-      Swal.fire("Gagal", "User tidak ditemukan. Silakan login kembali.", "error");
+      Swal.fire(
+        "Gagal",
+        "User tidak ditemukan. Silakan login kembali.",
+        "error"
+      );
       return;
     }
 
@@ -107,16 +126,17 @@ const ReportForm = () => {
         const fileName = `${Date.now()}_${crypto.randomUUID()}.${ext}`;
         const filePath = `${user.id}/${fileName}`;
 
-        const { data: storageData, error: storageError } = await supabase
-          .storage
-          .from("foto-keluhan")
-          .upload(filePath, formData.photo);
+        const { data: storageData, error: storageError } =
+          await supabase.storage
+            .from("foto-keluhan")
+            .upload(filePath, formData.photo);
 
         if (storageError) {
           Swal.fire({
             icon: "error",
             title: "Upload Gagal",
-            text: "Terjadi kesalahan saat mengunggah foto: " + storageError.message,
+            text:
+              "Terjadi kesalahan saat mengunggah foto: " + storageError.message,
           });
           return;
         }
@@ -125,14 +145,13 @@ const ReportForm = () => {
       }
 
       if (isKecamatanValid(formData.location.toLowerCase())) {
-
       } else {
-          Swal.fire({
-            icon: "error",
-            title: "Upload Data Gagal",
-            text: "Terjadi kesalahan saat mengunggah data: kecamatan tidak valid",
-          });
-          return;
+        Swal.fire({
+          icon: "error",
+          title: "Upload Data Gagal",
+          text: "Terjadi kesalahan saat mengunggah data: kecamatan tidak valid",
+        });
+        return;
       }
 
       const { data, error: dbError } = await supabase
@@ -190,7 +209,6 @@ const ReportForm = () => {
       toast.close();
       Swal.fire("Berhasil!", "Keluhan Anda telah dikirim.", "success");
     } catch (err) {
-      console.error(err);
       toast.close();
       Swal.fire("Gagal", err.message || "Terjadi kesalahan.", "error");
     }
@@ -222,8 +240,7 @@ const ReportForm = () => {
       if (deleteError) throw deleteError;
 
       if (photoPath) {
-        const { error: storageError } = await supabase
-          .storage
+        const { error: storageError } = await supabase.storage
           .from("foto-keluhan")
           .remove([photoPath]);
 
@@ -239,7 +256,6 @@ const ReportForm = () => {
         confirmButtonColor: "#52BA5E",
       });
     } catch (err) {
-      console.error("Gagal menghapus keluhan:", err);
       Swal.fire({
         icon: "error",
         title: "Gagal",
@@ -411,7 +427,9 @@ const ReportForm = () => {
                 </div>
                 <button
                   onClick={() =>
-                    handlePageChange(Math.min(currentSectionPage + 1, totalPages))
+                    handlePageChange(
+                      Math.min(currentSectionPage + 1, totalPages)
+                    )
                   }
                   disabled={currentSectionPage === totalPages}
                   className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-200 text-gray-700 rounded-lg disabled:opacity-50 hover:bg-soft-orange/20 cursor-pointer text-sm sm:text-base"

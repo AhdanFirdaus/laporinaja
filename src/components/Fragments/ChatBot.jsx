@@ -1,59 +1,83 @@
 import { useState, useEffect } from "react";
 import { FiMessageSquare, FiX, FiSend } from "react-icons/fi";
+import Swal from "sweetalert2";
 
-// Simple function to parse text for lists and newlines
 const parseMessageText = (text) => {
-  const lines = text.split('\n').map((line, index) => {
-    // Handle unordered lists starting with '- ' or '* '
-    if (line.trim().startsWith('- ') || line.trim().startsWith('* ')) {
+  const lines = text.split("\n").map((line, index) => {
+    if (line.trim().startsWith("- ") || line.trim().startsWith("* ")) {
       return (
         <li key={index} className="ml-4 list-disc">
-          {line.replace(/^[-*]\s/, '')}
+          {line.replace(/^[-*]\s/, "")}
         </li>
       );
     }
-    // Handle numbered lists starting with '1. ', '2. ', etc.
     if (line.trim().match(/^\d+\.\s/)) {
       return (
         <li key={index} className="ml-4 list-decimal">
-          {line.replace(/^\d+\.\s/, '')}
+          {line.replace(/^\d+\.\s/, "")}
         </li>
       );
     }
-    // Handle regular lines
-    return line.trim() ? <p key={index} className="mb-1">{line}</p> : <br key={index} />;
+    return line.trim() ? (
+      <p key={index} className="mb-1">
+        {line}
+      </p>
+    ) : (
+      <br key={index} />
+    );
   });
 
-  // Group list items into <ul> or <ol> based on their type
   const groupedLines = [];
   let currentList = [];
   let listType = null;
 
   lines.forEach((line, index) => {
-    if (line.type === 'li' && line.props.className.includes('list-disc') && listType !== 'ol') {
-      if (listType !== 'ul') {
+    if (
+      line.type === "li" &&
+      line.props.className.includes("list-disc") &&
+      listType !== "ol"
+    ) {
+      if (listType !== "ul") {
         if (currentList.length) {
-          groupedLines.push(<ul key={`ul-${index}`} className="mb-2">{currentList}</ul>);
+          groupedLines.push(
+            <ul key={`ul-${index}`} className="mb-2">
+              {currentList}
+            </ul>
+          );
           currentList = [];
         }
-        listType = 'ul';
+        listType = "ul";
       }
       currentList.push(line);
-    } else if (line.type === 'li' && line.props.className.includes('list-decimal') && listType !== 'ul') {
-      if (listType !== 'ol') {
+    } else if (
+      line.type === "li" &&
+      line.props.className.includes("list-decimal") &&
+      listType !== "ul"
+    ) {
+      if (listType !== "ol") {
         if (currentList.length) {
-          groupedLines.push(<ol key={`ol-${index}`} className="mb-2">{currentList}</ol>);
+          groupedLines.push(
+            <ol key={`ol-${index}`} className="mb-2">
+              {currentList}
+            </ol>
+          );
           currentList = [];
         }
-        listType = 'ol';
+        listType = "ol";
       }
       currentList.push(line);
     } else {
       if (currentList.length) {
         groupedLines.push(
-          listType === 'ul' 
-            ? <ul key={`ul-${index}`} className="mb-2">{currentList}</ul> 
-            : <ol key={`ol-${index}`} className="mb-2">{currentList}</ol>
+          listType === "ul" ? (
+            <ul key={`ul-${index}`} className="mb-2">
+              {currentList}
+            </ul>
+          ) : (
+            <ol key={`ol-${index}`} className="mb-2">
+              {currentList}
+            </ol>
+          )
         );
         currentList = [];
         listType = null;
@@ -62,12 +86,17 @@ const parseMessageText = (text) => {
     }
   });
 
-  // Push any remaining list items
   if (currentList.length) {
     groupedLines.push(
-      listType === 'ul' 
-        ? <ul key="ul-final" className="mb-2">{currentList}</ul> 
-        : <ol key="ol-final" className="mb-2">{currentList}</ol>
+      listType === "ul" ? (
+        <ul key="ul-final" className="mb-2">
+          {currentList}
+        </ul>
+      ) : (
+        <ol key="ol-final" className="mb-2">
+          {currentList}
+        </ol>
+      )
     );
   }
 
@@ -86,10 +115,15 @@ const Chatbot = () => {
     fetch("/webcontext.txt")
       .then((res) => res.text())
       .then((text) => setWebsiteContext(text))
-      .catch((err) => console.error("Failed to load context:", err));
+      .catch(() => {
+        Swal.fire({
+          icon: "error",
+          title: "Gagal memuat konteks",
+          text: "Pastikan file webcontext.txt tersedia.",
+        });
+      });
   }, []);
 
-  // Add welcome message when chat is opened for the first time
   useEffect(() => {
     if (isOpen && !hasWelcomed) {
       setMessages([
@@ -113,7 +147,9 @@ const Chatbot = () => {
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
       if (!apiKey) {
-        throw new Error("API key not found. Ensure VITE_GEMINI_API_KEY is set in .env file.");
+        throw new Error(
+          "API key not found. Ensure VITE_GEMINI_API_KEY is set in .env file."
+        );
       }
 
       const response = await fetch(
@@ -137,7 +173,9 @@ const Chatbot = () => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`API request failed with status ${response.status}: ${errorText}`);
+        throw new Error(
+          `API request failed with status ${response.status}: ${errorText}`
+        );
       }
 
       const data = await response.json();
@@ -149,7 +187,6 @@ const Chatbot = () => {
       const botReply = data.candidates[0].content.parts[0].text;
       setMessages((prev) => [...prev, { sender: "bot", text: botReply }]);
     } catch (error) {
-      console.error("Error calling Gemini API:", error.message);
       setMessages((prev) => [
         ...prev,
         {
@@ -181,7 +218,7 @@ const Chatbot = () => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`bg-soft-orange text-white p-3 sm:p-4 rounded-full shadow-xl hover:bg-soft-orange/90 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-400 cursor-pointer ${
-          isOpen ? 'opacity-0 scale-0' : 'opacity-100 scale-100'
+          isOpen ? "opacity-0 scale-0" : "opacity-100 scale-100"
         } duration-300 ease-in-out`}
         aria-label="Toggle chatbot"
       >
@@ -193,7 +230,9 @@ const Chatbot = () => {
         <div className="bg-white w-[90vw] max-w-[24rem] h-[80vh] max-h-[28rem] sm:w-[24rem] sm:h-[28rem] rounded-xl shadow-2xl flex flex-col mt-3 animate-in fade-in slide-in-from-bottom-10 duration-300">
           {/* Chat Header */}
           <div className="bg-soft-orange text-white p-3 sm:p-4 rounded-t-xl flex justify-between items-center">
-            <span className="font-semibold text-base sm:text-lg">LaporinAja Chatbot</span>
+            <span className="font-semibold text-base sm:text-lg">
+              LaporinAja Chatbot
+            </span>
             <button
               onClick={() => setIsOpen(false)}
               className="hover:bg-orange-700 p-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-orange-300 cursor-pointer"

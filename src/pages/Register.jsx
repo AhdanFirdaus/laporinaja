@@ -5,26 +5,26 @@ import InputUpload from "../components/Elements/InputUpload";
 import AuthLayout from "../components/Layouts/AuthLayout";
 import Tesseract from "tesseract.js";
 import supabase from "../../supabaseClient";
-import { parseKtpText } from '../helper/parseKtpParser';
+import { parseKtpText } from "../helper/parseKtpParser";
 import { isKecamatanValid } from "../helper/isKecamatanValid";
-import Swal from 'sweetalert2';
-import { useNavigate } from "react-router"
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router";
 
 function Register() {
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
-      const checkSession = async () => {
-        const { data: { session } } = await supabase.auth.getSession();
-  
-        if (session) {
-          navigate("/")
-        }
-      };
-      checkSession()
-      
-    }, []);
+    const checkSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (session) {
+        navigate("/");
+      }
+    };
+    checkSession();
+  }, []);
 
   const [formData, setFormData] = useState({
     photo: null,
@@ -76,15 +76,12 @@ function Register() {
     }
 
     try {
-      // Run OCR on the uploaded image
       const { data } = await Tesseract.recognize(file, "eng+ind", {
-        logger: (m) => console.log(m),
+        logger: (m) => {},
       });
 
       const extractedText = data.text;
-      console.log("Extracted Text:", extractedText);
       const parsedData = parseKtpText(extractedText);
-      console.log("Parsed KTP Data:", parsedData);
       const valid = isKecamatanValid(parsedData.kecamatan);
 
       if (!valid) {
@@ -107,13 +104,12 @@ function Register() {
         return;
       }
 
-      // Supabase signup
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: e.target.email.value,
         password: e.target.password.value,
         options: {
-          emailRedirectTo: 'http://localhost:3000/profile'
-        }
+          emailRedirectTo: "http://localhost:3000/profile",
+        },
       });
 
       if (authError) {
@@ -123,24 +119,19 @@ function Register() {
           text: `Registration failed: ${authError.message}`,
           confirmButtonColor: "#d33",
         });
-        console.log(authError);
         return;
       }
 
       if (authData.user) {
-        // Insert user data into the 'user' table
         let formated_tanggal = null;
 
         if (parsedData.tanggalLahir) {
           const [day, month, year] = parsedData.tanggalLahir.split("-");
           formated_tanggal = `${year}-${month}-${day}`;
         }
-        
 
-        
-        const { data, error } = await supabase
-          .from('user')
-          .insert([{
+        const { data, error } = await supabase.from("user").insert([
+          {
             id: authData.user.id,
             email: e.target.email.value,
             username: parsedData.nama,
@@ -151,17 +142,16 @@ function Register() {
             rt: parsedData.rtRw.split("/")[0]?.trim(),
             rw: parsedData.rtRw.split("/")[1]?.trim(),
             kecamatan: parsedData.kecamatan,
-            role: "user"
-          }]);
+            role: "user",
+          },
+        ]);
 
-        // Upload file
-        const fileExt = file.name.split('.').pop();
+        const fileExt = file.name.split(".").pop();
         const fileName = `${authData.user.id}.${fileExt}`;
         const filePath = `${fileName}`;
 
-        const { error: uploadError } = await supabase
-          .storage
-          .from('fotoktp')
+        const { error: uploadError } = await supabase.storage
+          .from("fotoktp")
           .upload(filePath, file);
 
         if (uploadError) {
@@ -173,13 +163,6 @@ function Register() {
           });
           return;
         }
-
-        if (error) {
-          console.error('Failed to save user data: ' + error.message);
-          console.log(error);
-        } else {
-          console.log(data);
-        }
       }
 
       Swal.fire({
@@ -188,9 +171,7 @@ function Register() {
         text: "Form siap dikirim! Silahkan check email untuk verifikasi",
         confirmButtonColor: "#52BA5E",
       });
-
     } catch (error) {
-      console.error("OCR Error:", error);
       Swal.fire({
         icon: "error",
         title: "Gagal",

@@ -1,4 +1,11 @@
-const Select = ({ label, name, value, onChange, options = [], required = false }) => {
+const Select = ({
+  label,
+  name,
+  value,
+  onChange,
+  options = [],
+  required = false,
+}) => {
   return (
     <div className="mb-4">
       <label className="block font-medium mb-1 text-gray-700">{label}</label>
@@ -11,7 +18,9 @@ const Select = ({ label, name, value, onChange, options = [], required = false }
       >
         <option value="">-- Pilih {label} --</option>
         {options.map((opt) => (
-          <option key={opt} value={opt}>{opt}</option>
+          <option key={opt} value={opt}>
+            {opt}
+          </option>
         ))}
       </select>
     </div>

@@ -7,8 +7,8 @@ import Before1 from "./Before1.jpg";
 import After1 from "./After1.jpg";
 import Before2 from "./Before2.jpg";
 import After2 from "./After2.jpeg";
-import Dampak1 from "./Dampak1.png"
-import Dampak2 from "./Dampak2.jpeg"
+import Dampak1 from "./Dampak1.png";
+import Dampak2 from "./Dampak2.jpeg";
 
 export {
   AcceptTask,
@@ -21,5 +21,5 @@ export {
   Before2,
   After2,
   Dampak1,
-  Dampak2
+  Dampak2,
 };

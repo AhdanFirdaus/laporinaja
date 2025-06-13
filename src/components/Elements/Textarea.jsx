@@ -1,4 +1,11 @@
-const Textarea = ({ label, name, value, onChange, required = false, rows = 4 }) => {
+const Textarea = ({
+  label,
+  name,
+  value,
+  onChange,
+  required = false,
+  rows = 4,
+}) => {
   return (
     <div className="mb-4">
       <label className="block font-medium mb-1 text-gray-700">{label}</label>

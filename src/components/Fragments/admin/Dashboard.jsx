@@ -15,7 +15,6 @@ import { FiUsers, FiAlertCircle, FiClock, FiCheckCircle } from "react-icons/fi";
 import { useEffect, useState } from "react";
 import supabase from "../../../../supabaseClient";
 
-// Register Chart.js components, including Filler
 ChartJS.register(
   LineElement,
   PointElement,
@@ -32,29 +31,23 @@ const Dashboard = ({ setView }) => {
   const [totalKeluhan, setTotalKeluhan] = useState(0);
   const [waitingKeluhan, setWaitingKeluhan] = useState(0);
   const [doneKeluhan, setDoneKeluhan] = useState(0);
-  const [visitCounts, setVisitCounts] = useState(Array(12).fill(0)); // initialize 12 month
-
-  
+  const [visitCounts, setVisitCounts] = useState(Array(12).fill(0));
 
   useEffect(() => {
     const fetchStats = async () => {
-      // User count
       const { count: userCountData } = await supabase
         .from("user")
         .select("*", { count: "exact", head: true });
 
-      // Total keluhan
       const { count: totalKeluhanData } = await supabase
         .from("keluhan")
         .select("*", { count: "exact", head: true });
 
-      // Keluhan with status = waiting
       const { count: waitingCount } = await supabase
         .from("keluhan")
         .select("*", { count: "exact", head: true })
         .eq("status", "waiting");
 
-      // Keluhan with status = done
       const { count: doneCount } = await supabase
         .from("keluhan")
         .select("*", { count: "exact", head: true })
@@ -71,18 +64,21 @@ const Dashboard = ({ setView }) => {
 
   useEffect(() => {
     const fetchVisits = async () => {
-      const { data, error } = await supabase
-        .from("visits")
-        .select("month");
+      const { data, error } = await supabase.from("visits").select("month");
 
       if (error) {
-        console.error("Error fetching visit data:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Gagal Memuat Data Kunjungan",
+          text:
+            error?.message ||
+            "Terjadi kesalahan saat mengambil data kunjungan.",
+          timer: 3000,
+          showConfirmButton: false,
+        });
         return;
       }
-      console.log("{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{")
-      console.log(data)
-      // Count visits per month
-      const counts = Array(12).fill(0); // Jan to Dec
+      const counts = Array(12).fill(0);
       data.forEach(({ month }) => {
         const monthIndex = parseInt(month.split("-")[1], 10) - 1;
         if (monthIndex >= 0 && monthIndex < 12) {
@@ -91,8 +87,6 @@ const Dashboard = ({ setView }) => {
       });
 
       setVisitCounts(counts);
-      console.log("++++++++++++++++++++++++++++++++++")
-      console.log(visitCounts)
     };
 
     fetchVisits();
@@ -133,9 +127,21 @@ const Dashboard = ({ setView }) => {
     },
   ];
 
-  // Chart data for Pengunjung (Visitors)
   const chartData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    labels: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
     datasets: [
       {
         label: "Pengunjung",
@@ -173,7 +179,7 @@ const Dashboard = ({ setView }) => {
             <div
               key={index}
               className={`rounded-xl shadow p-4 sm:p-6 ${card.color} text-center flex flex-col justify-between transform hover:scale-105 transition-transform duration-300 cursor-pointer`}
-              onClick={card.onClick} // Card click handler
+              onClick={card.onClick}
             >
               <div className="flex items-center justify-center mb-3 sm:mb-4">
                 {card.icon}
@@ -187,8 +193,8 @@ const Dashboard = ({ setView }) => {
               <Button
                 className="mt-3 sm:mt-4"
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevent card's onClick from firing
-                  card.onClick(); // Trigger the specific card's onClick
+                  e.stopPropagation();
+                  card.onClick();
                 }}
               >
                 {card.button}
@@ -202,7 +208,6 @@ const Dashboard = ({ setView }) => {
           <div className="h-full">
             <Line data={chartData} options={chartOptions} />
           </div>
-          
         </div>
       </main>
     </div>

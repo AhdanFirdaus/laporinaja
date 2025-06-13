@@ -1,6 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { FiPlay, FiPause, FiPlus, FiMinus, FiChevronDown, FiChevronUp } from "react-icons/fi";
+import {
+  FiPlay,
+  FiPause,
+  FiPlus,
+  FiMinus,
+  FiChevronDown,
+  FiChevronUp,
+} from "react-icons/fi";
 import Navbar from "../components/Fragments/Navbar";
 import Button from "../components/Elements/Button";
 import ReactCompareImage from "react-compare-image";
@@ -19,8 +26,8 @@ export default function Home() {
   const [activeIndex, setActiveIndex] = useState(null);
 
   useEffect(() => {
-    fetch('/api/logVisit', {
-      method: 'POST'
+    fetch("/api/logVisit", {
+      method: "POST",
     }).catch(console.error);
   }, []);
 
@@ -113,7 +120,6 @@ export default function Home() {
     },
   ];
 
-
   return (
     <>
       <Navbar />
@@ -127,17 +133,26 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             className="lg:w-1/2 text-center lg:text-left mb-10 lg:mb-0"
           >
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-700 leading-tight mb-4"><span className="text-4xl md:text-5xl font-bold text-gray-900">📢 LaporinAja</span>
+            <h1 className="text-4xl sm:text-5xl font-bold text-gray-700 leading-tight mb-4">
+              <span className="text-4xl md:text-5xl font-bold text-gray-900">
+                📢 LaporinAja
+              </span>
             </h1>
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-700 leading-tight mb-4"><span className="text-4xl md:text-5xl font-bold text-gray-900">Suara Warga, Aksi Nyata! 💪</span>
+            <h1 className="text-4xl sm:text-5xl font-bold text-gray-700 leading-tight mb-4">
+              <span className="text-4xl md:text-5xl font-bold text-gray-900">
+                Suara Warga, Aksi Nyata! 💪
+              </span>
             </h1>
             <p className="text-lg text-gray-600">
               Bersama kita wujudkan fasilitas umum yang layak, aman, dan nyaman.
             </p>
             <p className="text-lg text-gray-600 mb-6">
-              Laporkan kendala di sekitarmu dan jadilah bagian dari perubahan nyata. ✨
+              Laporkan kendala di sekitarmu dan jadilah bagian dari perubahan
+              nyata. ✨
             </p>
-            <Button className="text-lg" to="carapemakaian">Lebih Lanjut</Button>
+            <Button className="text-lg" to="carapemakaian">
+              Lebih Lanjut
+            </Button>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -226,7 +241,10 @@ export default function Home() {
               Tentang LaporinAja
             </h2>
             <p className="text-gray-600 mb-2 sm:mb-4">
-              LaporinAja adalah layanan pengaduan digital yang memudahkan warga Semarang melaporkan kerusakan atau kendala fasilitas umum. Setiap laporan ditindaklanjuti secara aman dan transparan demi lingkungan kota yang lebih tertib dan nyaman.
+              LaporinAja adalah layanan pengaduan digital yang memudahkan warga
+              Semarang melaporkan kerusakan atau kendala fasilitas umum. Setiap
+              laporan ditindaklanjuti secara aman dan transparan demi lingkungan
+              kota yang lebih tertib dan nyaman.
             </p>
             <ul className="list-none text-gray-600 space-y-1 sm:space-y-2">
               <li className="flex items-center">
@@ -268,7 +286,9 @@ export default function Home() {
               Dampak Aplikasi Kami
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              LaporinAja mendorong partisipasi warga, mempercepat penanganan masalah, dan membangun lingkungan kota yang lebih tertib dan nyaman.
+              LaporinAja mendorong partisipasi warga, mempercepat penanganan
+              masalah, dan membangun lingkungan kota yang lebih tertib dan
+              nyaman.
             </p>
           </motion.div>
 
@@ -284,7 +304,9 @@ export default function Home() {
                 Ribuan Warga Terbantu Lewat Aksi Nyata
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Partisipasi aktif warga dalam melaporkan masalah membuat banyak kendala cepat ditangani. Kolaborasi ini terbukti meningkatkan kualitas hidup masyarakat di berbagai kecamatan.
+                Partisipasi aktif warga dalam melaporkan masalah membuat banyak
+                kendala cepat ditangani. Kolaborasi ini terbukti meningkatkan
+                kualitas hidup masyarakat di berbagai kecamatan.
               </p>
             </motion.div>
             <motion.div
@@ -327,7 +349,9 @@ export default function Home() {
                 Kolaborasi Warga dan Pemerintah
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Dengan saling mendukung dan bertindak bersama, kolaborasi antara masyarakat dan pemerintah mampu menghadirkan solusi nyata demi kota yang lebih tertib, bersih, dan nyaman.
+                Dengan saling mendukung dan bertindak bersama, kolaborasi antara
+                masyarakat dan pemerintah mampu menghadirkan solusi nyata demi
+                kota yang lebih tertib, bersih, dan nyaman.
               </p>
             </motion.div>
           </div>
@@ -344,7 +368,8 @@ export default function Home() {
                 Sebelum dan Sesudah
               </h3>
               <p className="text-gray-600 max-w-xl mx-auto">
-                Buktikan sendiri perubahan nyata fasilitas umum yang makin baik berkat laporan dan aksi kita bersama!
+                Buktikan sendiri perubahan nyata fasilitas umum yang makin baik
+                berkat laporan dan aksi kita bersama!
               </p>
             </motion.div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -402,19 +427,20 @@ export default function Home() {
                 <div key={step.number}>
                   <button
                     onClick={() => {
-                      setOpenStep(step.number); // Set active step
+                      setOpenStep(step.number);
                       setExpandedStep(
                         expandedStep === step.number ? null : step.number
-                      ); // Toggle details
+                      );
                     }}
                     className="flex items-center justify-between w-full text-left focus:outline-none cursor-pointer"
                   >
                     <span className="flex items-center">
                       <span
-                        className={`w-8 h-8 flex items-center justify-center rounded-full mr-3 border border-soft-orange ${openStep === step.number
-                          ? "bg-soft-orange text-white"
-                          : "text-soft-orange"
-                          }`}
+                        className={`w-8 h-8 flex items-center justify-center rounded-full mr-3 border border-soft-orange ${
+                          openStep === step.number
+                            ? "bg-soft-orange text-white"
+                            : "text-soft-orange"
+                        }`}
                       >
                         {step.number}
                       </span>
@@ -477,7 +503,8 @@ export default function Home() {
             Tanya Jawab
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Temukan jawaban dari pertanyaan umum seputar penggunaan LaporinAja dan cara berkontribusi untuk lingkungan sekitar.
+            Temukan jawaban dari pertanyaan umum seputar penggunaan LaporinAja
+            dan cara berkontribusi untuk lingkungan sekitar.
           </p>
         </div>
 
@@ -529,7 +556,7 @@ export default function Home() {
       </section>
 
       {/* chatbot */}
-      <Chatbot/>
+      <Chatbot />
 
       {/* footer */}
       <Footer />

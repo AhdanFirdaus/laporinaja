@@ -1,9 +1,6 @@
 import kecamatanList from "../../public/kecamatan.json";
 
 export async function validateLocation(lat, lon) {
-    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-    console.log(lat + lon)
-  // Input validation
   if (!lat || !lon || isNaN(lat) || isNaN(lon)) {
     return {
       valid: false,
@@ -11,16 +8,15 @@ export async function validateLocation(lat, lon) {
     };
   }
 
-  // Validate ranges
   if (lat < -90 || lat > 90 || lon < -180 || lon > 180) {
     return {
       valid: false,
-      reason: "Latitude must be between -90 and 90, and longitude between -180 and 180.",
+      reason:
+        "Latitude must be between -90 and 90, and longitude between -180 and 180.",
     };
   }
 
   const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
-  
 
   try {
     const response = await fetch(url, {
@@ -43,8 +39,12 @@ export async function validateLocation(lat, lon) {
     }
 
     const address = data.address;
-    // Adjust fields based on Indonesia's address hierarchy
-    const kecamatan = address.city_district || address.suburb || address.town || address.village || null;
+    const kecamatan =
+      address.city_district ||
+      address.suburb ||
+      address.town ||
+      address.village ||
+      null;
 
     if (!kecamatan) {
       return {
@@ -53,7 +53,6 @@ export async function validateLocation(lat, lon) {
       };
     }
 
-    // Normalize case for comparison
     const isValid = kecamatanList.some(
       (item) => item.toLowerCase() === kecamatan.toLowerCase()
     );
@@ -62,7 +61,9 @@ export async function validateLocation(lat, lon) {
       valid: isValid,
       kecamatan,
       fullAddress: data.display_name || "Unknown address",
-      reason: isValid ? "Valid location" : `Kecamatan "${kecamatan}" not allowed`,
+      reason: isValid
+        ? "Valid location"
+        : `Kecamatan "${kecamatan}" not allowed`,
     };
   } catch (error) {
     return {
