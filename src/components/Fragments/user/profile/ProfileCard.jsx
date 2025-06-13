@@ -4,7 +4,36 @@ import Modal from "../../../Elements/Modal";
 import Input from "../../../Elements/Input";
 import supabase from "../../../../../supabaseClient";
 import { useNavigate } from "react-router";
-import Swal from "sweetalert2";
+import { showConfirmation, showSuccess, showError } from "../../../Elements/Alert";
+
+const Select = ({
+  label,
+  name,
+  value,
+  onChange,
+  options = [],
+  required = false,
+}) => {
+  return (
+    <div className="mb-4">
+      <label className="block font-medium mb-1 text-gray-700">{label}</label>
+      <select
+        name={name}
+        value={value}
+        onChange={onChange}
+        className="w-full border focus:border-soft-orange px-3 py-2 rounded-lg focus:outline-none focus:ring focus:ring-[var(--color-soft-orange)]"
+        required={required}
+      >
+        <option value="">-- Pilih {label} --</option>
+        {options.map((opt) => (
+          <option key={opt} value={opt}>
+            {opt}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+};
 
 const ProfileCard = ({ user, refreshUser }) => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -18,7 +47,8 @@ const ProfileCard = ({ user, refreshUser }) => {
     birthDate: user.birthDate,
     gender: user.gender,
     address: {
-      rtRw: user.address.rtRw,
+      rt: user.address.rtRw?.split("/")[0]?.trim()?.replace("RT", "").trim() || "",
+      rw: user.address.rtRw?.split("/")[1]?.trim()?.replace("RW", "").trim() || "",
       kelurahan: user.address.kelurahan,
       kecamatan: user.address.kecamatan,
     },
@@ -34,13 +64,31 @@ const ProfileCard = ({ user, refreshUser }) => {
     const { name, value } = e.target;
     if (name.includes("address.")) {
       const addressField = name.split(".")[1];
-      setFormData({
-        ...formData,
-        address: {
-          ...formData.address,
-          [addressField]: value,
-        },
-      });
+      if (addressField === "rt" || addressField === "rw") {
+        // Restrict RT and RW to numbers only
+        if (value === "" || /^\d*$/.test(value)) {
+          setFormData({
+            ...formData,
+            address: {
+              ...formData.address,
+              [addressField]: value,
+            },
+          });
+        }
+      } else {
+        setFormData({
+          ...formData,
+          address: {
+            ...formData.address,
+            [addressField]: value,
+          },
+        });
+      }
+    } else if (name === "nik") {
+      // Restrict NIK to numbers only
+      if (/^\d*$/.test(value)) {
+        setFormData({ ...formData, [name]: value });
+      }
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -59,16 +107,25 @@ const ProfileCard = ({ user, refreshUser }) => {
       nik,
       birthDate,
       gender,
-      address: { rtRw, kelurahan, kecamatan },
+      address: { rt, rw, kelurahan, kecamatan },
     } = formData;
+
+    // Validate RT and RW
+    if ((rt || rw) && (!/^\d+$/.test(rt) || !/^\d+$/.test(rw))) {
+      showError({
+        title: "Gagal",
+        text: "RT dan RW harus berupa angka.",
+        confirmButtonColor: "#d33",
+      });
+      return;
+    }
 
     try {
       const {
         data: { user: currentUser },
       } = await supabase.auth.getUser();
       if (!currentUser) {
-        Swal.fire({
-          icon: "error",
+        showError({
           title: "Gagal",
           text: "User tidak login.",
           confirmButtonColor: "#d33",
@@ -84,16 +141,15 @@ const ProfileCard = ({ user, refreshUser }) => {
           nik,
           tanggal_lahir: birthDate,
           gender,
-          rt: rtRw?.split("/")[0]?.trim()?.replace("RT", "").trim(),
-          rw: rtRw?.split("/")[1]?.trim()?.replace("RW", "").trim(),
+          rt: rt || null,
+          rw: rw || null,
           kelurahan,
           kecamatan,
         })
         .eq("id", currentUser.id);
 
       if (error) {
-        Swal.fire({
-          icon: "error",
+        showError({
           title: "Gagal",
           text: `Gagal memperbarui profil: ${error.message}`,
           confirmButtonColor: "#d33",
@@ -103,8 +159,7 @@ const ProfileCard = ({ user, refreshUser }) => {
 
       await refreshUser();
 
-      Swal.fire({
-        icon: "success",
+      showSuccess({
         title: "Berhasil!",
         text: "Profil berhasil diperbarui!",
         confirmButtonColor: "#52BA5E",
@@ -112,8 +167,7 @@ const ProfileCard = ({ user, refreshUser }) => {
       setIsEditModalOpen(false);
       navigate("/profile");
     } catch (err) {
-      Swal.fire({
-        icon: "error",
+      showError({
         title: "Gagal",
         text: `Terjadi kesalahan tak terduga: ${err.message}`,
         confirmButtonColor: "#d33",
@@ -126,8 +180,7 @@ const ProfileCard = ({ user, refreshUser }) => {
     const { currentPassword, newPassword, confirmPassword } = passwordData;
 
     if (newPassword !== confirmPassword) {
-      Swal.fire({
-        icon: "error",
+      showError({
         title: "Gagal",
         text: "Password baru dan konfirmasi tidak cocok.",
         confirmButtonColor: "#d33",
@@ -140,8 +193,7 @@ const ProfileCard = ({ user, refreshUser }) => {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) {
-        Swal.fire({
-          icon: "error",
+        showError({
           title: "Gagal",
           text: "Tidak ada pengguna yang sedang login.",
           confirmButtonColor: "#d33",
@@ -155,8 +207,7 @@ const ProfileCard = ({ user, refreshUser }) => {
       });
 
       if (signInError) {
-        Swal.fire({
-          icon: "error",
+        showError({
           title: "Gagal",
           text: "Password saat ini salah.",
           confirmButtonColor: "#d33",
@@ -169,8 +220,7 @@ const ProfileCard = ({ user, refreshUser }) => {
       });
 
       if (updateError) {
-        Swal.fire({
-          icon: "error",
+        showError({
           title: "Gagal",
           text: `Gagal mengubah password: ${updateError.message}`,
           confirmButtonColor: "#d33",
@@ -178,8 +228,7 @@ const ProfileCard = ({ user, refreshUser }) => {
         return;
       }
 
-      Swal.fire({
-        icon: "success",
+      showSuccess({
         title: "Berhasil!",
         text: "Password berhasil diubah.",
         confirmButtonColor: "#52BA5E",
@@ -191,14 +240,15 @@ const ProfileCard = ({ user, refreshUser }) => {
         confirmPassword: "",
       });
     } catch (err) {
-      Swal.fire({
-        icon: "error",
+      showError({
         title: "Gagal",
         text: `Terjadi kesalahan tak terduga: ${err.message}`,
         confirmButtonColor: "#d33",
       });
     }
   };
+
+  const genderOptions = ["Laki-Laki", "Perempuan"];
 
   return (
     <div className="flex flex-col gap-6 md:gap-8 p-6 md:p-8 bg-white rounded-lg shadow-md">
@@ -252,7 +302,7 @@ const ProfileCard = ({ user, refreshUser }) => {
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
         title="Edit Profile"
-        className="w-full max-w-4xl mx-4 sm:mx-6 md:8"
+        className="w-full max-w-4xl mx-4 sm:mx-6 md:mx-8"
         footer={
           <div className="flex justify-end gap-2">
             <Button onClick={() => setIsEditModalOpen(false)} color="red">
@@ -282,8 +332,14 @@ const ProfileCard = ({ user, refreshUser }) => {
             <Input
               label="NIK"
               name="nik"
+              type="number"
               value={formData.nik}
               onChange={handleInputChange}
+              onKeyPress={(e) => {
+                if (!/[0-9]/.test(e.key)) {
+                  e.preventDefault();
+                }
+              }}
               required
             />
             <Input
@@ -294,18 +350,43 @@ const ProfileCard = ({ user, refreshUser }) => {
               onChange={handleInputChange}
               required
             />
-            <Input
+            <Select
               label="Jenis Kelamin"
               name="gender"
               value={formData.gender}
               onChange={handleInputChange}
+              options={genderOptions}
+              required
             />
-            <Input
-              label="RT/RW"
-              name="address.rtRw"
-              value={formData.address.rtRw}
-              onChange={handleInputChange}
-            />
+            <div className="flex items-center gap-2">
+              <Input
+                label="RT"
+                name="address.rt"
+                type="number"
+                value={formData.address.rt}
+                onChange={handleInputChange}
+                onKeyPress={(e) => {
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
+                className="w-1/2"
+              />
+              <span className="text-gray-700 text-lg">/</span>
+              <Input
+                label="RW"
+                name="address.rw"
+                type="number"
+                value={formData.address.rw}
+                onChange={handleInputChange}
+                onKeyPress={(e) => {
+                  if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
+                className="w-1/2"
+              />
+            </div>
             <Input
               label="Kelurahan"
               name="address.kelurahan"
