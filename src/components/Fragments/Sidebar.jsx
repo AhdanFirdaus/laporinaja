@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FiX, FiLogOut, FiMenu, FiHome } from "react-icons/fi";
+import { useNavigate } from "react-router";
 import Button from "../Elements/Button";
 
 const Sidebar = ({
@@ -9,9 +10,9 @@ const Sidebar = ({
   title = "Sidebar",
   showLogout = false,
   onLogout = () => {},
-  onHome = () => {},
 }) => {
   const [isOpen, setIsOpen] = useState(() => window.innerWidth >= 768);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleResize = () => {
@@ -23,6 +24,11 @@ const Sidebar = ({
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
+  };
+
+  const handleHomeClick = () => {
+    navigate("/");
+    if (window.innerWidth < 768) setIsOpen(false);
   };
 
   return (
@@ -48,6 +54,19 @@ const Sidebar = ({
         </div>
 
         <nav className="space-y-4">
+          <div
+            onClick={handleHomeClick}
+            className={`flex items-center gap-3 px-3 py-3 rounded-lg cursor-pointer transition-all
+              text-gray-700 hover:bg-soft-orange hover:text-white
+              ${isOpen ? "justify-start" : "justify-center"} md:justify-start`}
+          >
+            <div className="text-xl">
+              <FiHome />
+            </div>
+            <span className={`${isOpen ? "block" : "hidden"} md:block`}>
+              Beranda
+            </span>
+          </div>
           {menuItems.map((item) => (
             <div
               key={item.key}

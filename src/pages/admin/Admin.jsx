@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../../components/Fragments/Sidebar";
-import { FiAlertCircle, FiHome, FiUsers } from "react-icons/fi";
+import { FiAlertCircle, FiGrid, FiUsers } from "react-icons/fi";
 import Dashboard from "../../components/Fragments/admin/Dashboard";
 import Complaints from "../../components/Fragments/admin/Complaints";
 import Users from "../../components/Fragments/admin/Users";
@@ -8,7 +8,7 @@ import { useNavigate } from "react-router";
 import supabase from "../../../supabaseClient";
 
 const menuItems = [
-  { key: "dashboard", icon: <FiHome />, label: "Dashboard" },
+  { key: "dashboard", icon: <FiGrid />, label: "Dashboard" },
   { key: "complaints", icon: <FiAlertCircle />, label: "Keluhan" },
   { key: "users", icon: <FiUsers />, label: "Pengguna" },
 ];
