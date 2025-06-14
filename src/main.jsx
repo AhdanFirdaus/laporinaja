@@ -8,6 +8,10 @@ import ProfilePage from './pages/ProfilePage';
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Admin from "./pages/admin/Admin"
+import "leaflet-defaulticon-compatibility";
+import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
+import "leaflet/dist/leaflet.css";
+
 
 const router = createBrowserRouter([
   {
