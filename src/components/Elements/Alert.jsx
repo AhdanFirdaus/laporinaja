@@ -46,3 +46,13 @@ export const showError = ({
     confirmButtonColor,
   });
 };
+
+export const showSend = () => {
+  return Swal.fire({
+    icon: "info",
+    title: "Mengirim Keluhan",
+    text: "...",
+    timer: 3000,
+    showConfirmButton: false,
+  });
+};

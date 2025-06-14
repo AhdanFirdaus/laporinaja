@@ -6,7 +6,7 @@ import Select from "../../../Elements/Select";
 import InputUpload from "../../../Elements/InputUpload";
 import CardComplaint from "../../../Fragments/CardComplaint";
 import DetailComplaintModal from "../../../Fragments/DetailComplaintModal";
-import { showConfirmation, showSuccess, showError } from "../../../Elements/Alert";
+import { showConfirmation, showSuccess, showError, showSend } from "../../../Elements/Alert";
 import supabase from "../../../../../supabaseClient";
 import checkImageSize from "../../../../helper/checkImageSize";
 import { isKecamatanValid } from "../../../../helper/isKecamatanValid";
@@ -97,15 +97,7 @@ const ReportForm = () => {
       return;
     }
 
-    const toast = showConfirmation({
-      title: "Mengirim keluhan…",
-      text: "",
-      showCancelButton: false,
-      confirmButtonText: "",
-      cancelButtonText: "",
-      confirmButtonColor: "#52BA5E",
-      icon: "info",
-    });
+    const toast = showSend()
 
     try {
       let photoPath = null;
