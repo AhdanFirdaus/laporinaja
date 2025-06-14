@@ -112,7 +112,7 @@ const Dashboard = ({ setView }) => {
     {
       title: "Keluhan Menunggu",
       value: waitingKeluhan,
-      button: "Keluhan Waiting",
+      button: "Keluhan Menunggu",
       color: "bg-orange-100",
       icon: <FiClock className="text-3xl text-orange-600" />,
       onClick: () => setView("complaints"),
@@ -120,7 +120,7 @@ const Dashboard = ({ setView }) => {
     {
       title: "Keluhan Selesai",
       value: doneKeluhan,
-      button: "Keluhan Done",
+      button: "Keluhan Selesai",
       color: "bg-green-100",
       icon: <FiCheckCircle className="text-3xl text-green-600" />,
       onClick: () => setView("complaints"),
