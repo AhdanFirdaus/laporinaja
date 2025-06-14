@@ -12,7 +12,7 @@ import Navbar from "../components/Fragments/Navbar";
 import Button from "../components/Elements/Button";
 import ReactCompareImage from "react-compare-image";
 import * as Imgs from "../assets/images/Images";
-import Contoh from "../assets/videos/contoh.mp4";
+import DemoPemakaian from "../assets/videos/Demo-Pemakaian.mp4";
 import Footer from "../components/Fragments/Footer";
 import Chatbot from "../components/Fragments/ChatBot";
 
@@ -502,7 +502,7 @@ export default function Home() {
           >
             <video
               ref={videoRef}
-              src={Contoh}
+              src={DemoPemakaian}
               className="rounded-lg shadow-lg w-full h-auto object-cover"
               onClick={togglePlay}
             >
