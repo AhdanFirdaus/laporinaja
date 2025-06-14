@@ -7,7 +7,7 @@ import Tesseract from "tesseract.js";
 import supabase from "../../supabaseClient";
 import { parseKtpText } from "../helper/parseKtpParser";
 import { isKecamatanValid } from "../helper/isKecamatanValid";
-import { showSuccess, showError, showConfirmation } from "../components/Elements/Alert";
+import { showSuccess, showError, showConfirmation, showSend } from "../components/Elements/Alert";
 import { useNavigate } from "react-router";
 import checkImageSize from "../helper/checkImageSize";
 
@@ -74,15 +74,7 @@ function Register() {
     }
 
     setIsLoading(true);
-    const toast = showConfirmation({
-      title: "Memproses KTP…",
-      text: "",
-      showCancelButton: false,
-      confirmButtonText: "",
-      cancelButtonText: "",
-      confirmButtonColor: "#52BA5E",
-      icon: "info",
-    });
+    const toast = showSend()
 
     try {
       const { data } = await Tesseract.recognize(file, "eng+ind", {
