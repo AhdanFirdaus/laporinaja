@@ -316,10 +316,10 @@ const ReportForm = () => {
 
   const categoryOptions = [
     "Jalan dan Trotoar",
-    "Peneranthus Jalan Umum",
+    "Penerangan Jalan",
     "Saluran Air",
     "Sampah",
-    "Keamanan dan Ketertiban",
+    "Sungai",
     "Lainnya",
   ];
 
