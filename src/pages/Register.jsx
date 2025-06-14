@@ -9,6 +9,7 @@ import { parseKtpText } from "../helper/parseKtpParser";
 import { isKecamatanValid } from "../helper/isKecamatanValid";
 import { showSuccess, showError, showConfirmation } from "../components/Elements/Alert";
 import { useNavigate } from "react-router";
+import checkImageSize from "../helper/checkImageSize";
 
 function Register() {
   const navigate = useNavigate();
@@ -30,8 +31,6 @@ function Register() {
     photo: null,
   });
   const [isLoading, setIsLoading] = useState(false);
-
-  const MAX_SIZE_MB = 3;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.files[0] });
@@ -55,10 +54,11 @@ function Register() {
       return;
     }
 
-    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+    const sizeCheck = checkImageSize(file);
+    if (!sizeCheck.valid) {
       showError({
         title: "Gagal",
-        text: "Ukuran gambar melebihi 3MB!",
+        text: sizeCheck.message,
         confirmButtonColor: "#d33",
       });
       return;
