@@ -7,7 +7,7 @@ import Tesseract from "tesseract.js";
 import supabase from "../../supabaseClient";
 import { parseKtpText } from "../helper/parseKtpParser";
 import { isKecamatanValid } from "../helper/isKecamatanValid";
-import Swal from "sweetalert2";
+import { showSuccess, showError, showConfirmation } from "../components/Elements/Alert";
 import { useNavigate } from "react-router";
 
 function Register() {
@@ -24,13 +24,14 @@ function Register() {
       }
     };
     checkSession();
-  }, []);
+  }, [navigate]);
 
   const [formData, setFormData] = useState({
     photo: null,
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const MAX_SIZE_MB = 1;
+  const MAX_SIZE_MB = 3;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.files[0] });
@@ -46,8 +47,7 @@ function Register() {
     const file = formData.photo;
 
     if (!file) {
-      Swal.fire({
-        icon: "error",
+      showError({
         title: "Gagal",
         text: "Mohon upload foto KTP terlebih dahulu.",
         confirmButtonColor: "#d33",
@@ -56,24 +56,33 @@ function Register() {
     }
 
     if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-      Swal.fire({
-        icon: "error",
+      showError({
         title: "Gagal",
-        text: "Ukuran gambar melebihi 1MB!",
+        text: "Ukuran gambar melebihi 3MB!",
         confirmButtonColor: "#d33",
       });
       return;
     }
 
     if (e.target.password.value.length < 6) {
-      Swal.fire({
-        icon: "error",
+      showError({
         title: "Gagal",
         text: "Password harus lebih dari 6 karakter!",
         confirmButtonColor: "#d33",
       });
       return;
     }
+
+    setIsLoading(true);
+    const toast = showConfirmation({
+      title: "Memproses KTP…",
+      text: "",
+      showCancelButton: false,
+      confirmButtonText: "",
+      cancelButtonText: "",
+      confirmButtonColor: "#52BA5E",
+      icon: "info",
+    });
 
     try {
       const { data } = await Tesseract.recognize(file, "eng+ind", {
@@ -85,8 +94,7 @@ function Register() {
       const valid = isKecamatanValid(parsedData.kecamatan);
 
       if (!valid) {
-        Swal.fire({
-          icon: "error",
+        showError({
           title: "Gagal",
           text: "Kecamatan tidak valid!",
           confirmButtonColor: "#d33",
@@ -95,8 +103,7 @@ function Register() {
       }
 
       if (!extractedText.includes("NIK")) {
-        Swal.fire({
-          icon: "error",
+        showError({
           title: "Gagal",
           text: "Gagal mengenali KTP. Pastikan foto jelas dan sesuai.",
           confirmButtonColor: "#d33",
@@ -115,8 +122,7 @@ function Register() {
       });
 
       if (authError) {
-        Swal.fire({
-          icon: "error",
+        showError({
           title: "Gagal",
           text: `Registration failed: ${authError.message}`,
           confirmButtonColor: "#d33",
@@ -132,7 +138,7 @@ function Register() {
           formated_tanggal = `${year}-${month}-${day}`;
         }
 
-        const { data, error } = await supabase.from("user").insert([
+        const { error } = await supabase.from("user").insert([
           {
             id: authData.user.id,
             email: e.target.email.value,
@@ -148,6 +154,15 @@ function Register() {
           },
         ]);
 
+        if (error) {
+          showError({
+            title: "Gagal",
+            text: `Gagal menyimpan data pengguna: ${error.message}`,
+            confirmButtonColor: "#d33",
+          });
+          return;
+        }
+
         const fileExt = file.name.split(".").pop();
         const fileName = `${authData.user.id}.${fileExt}`;
         const filePath = `${fileName}`;
@@ -157,29 +172,30 @@ function Register() {
           .upload(filePath, file);
 
         if (uploadError) {
-          Swal.fire({
-            icon: "error",
+          showError({
             title: "Gagal",
             text: `Upload gagal: ${uploadError.message}`,
             confirmButtonColor: "#d33",
           });
           return;
         }
-      }
 
-      Swal.fire({
-        icon: "success",
-        title: "Berhasil!",
-        text: "Form siap dikirim! Silahkan check email untuk verifikasi",
-        confirmButtonColor: "#52BA5E",
-      });
+        showSuccess({
+          title: "Berhasil!",
+          text: "Form siap dikirim! Silahkan check email untuk verifikasi",
+          confirmButtonColor: "#52BA5E",
+        });
+        navigate("/login");
+      }
     } catch (error) {
-      Swal.fire({
-        icon: "error",
+      showError({
         title: "Gagal",
         text: "Terjadi kesalahan saat membaca gambar.",
         confirmButtonColor: "#d33",
       });
+    } finally {
+      setIsLoading(false);
+      toast.close();
     }
   };
 
@@ -221,10 +237,11 @@ function Register() {
           value={formData.photo}
           onChange={handleChange}
           onClear={handleClearFile}
+          disabled={isLoading}
         />
 
-        <Button type="submit" className="w-full">
-          Daftar
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? "Memproses..." : "Daftar"}
         </Button>
       </form>
     </AuthLayout>
