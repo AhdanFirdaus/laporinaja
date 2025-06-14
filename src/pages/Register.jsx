@@ -74,7 +74,7 @@ function Register() {
     }
 
     setIsLoading(true);
-    const toast = showSend()
+    const toast = showSend({ title: "Memverifikasi KTP" });
 
     try {
       const { data } = await Tesseract.recognize(file, "eng+ind", {

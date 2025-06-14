@@ -47,12 +47,17 @@ export const showError = ({
   });
 };
 
-export const showSend = () => {
+export const showSend = ({
+  title = "",
+  text = "...",
+  timer = 3000,
+  showConfirmButton = false,
+}) => {
   return Swal.fire({
     icon: "info",
-    title: "Mengirim Keluhan",
-    text: "...",
-    timer: 3000,
-    showConfirmButton: false,
+    title,
+    text,
+    timer,
+    showConfirmButton,
   });
 };

@@ -97,7 +97,7 @@ const ReportForm = () => {
       return;
     }
 
-    const toast = showSend()
+    const toast = showSend({title: "Mengirim Keluhan"})
 
     try {
       let photoPath = null;
