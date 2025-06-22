@@ -82,17 +82,17 @@ const Users = ({ setView, handleEachModal }) => {
     setSelectedUser(null);
   };
 
-  const handleDelete = async (username) => {
+  const handleDelete = async (id) => {
     showConfirmation({
       title: "Konfirmasi Hapus Pengguna",
-      text: `Apakah Anda yakin ingin menghapus pengguna "${username}"?`,
+      text: `Apakah Anda yakin ingin menghapus pengguna "${id}"?`,
       confirmButtonText: "Hapus",
     }).then(async (result) => {
       if (result.isConfirmed) {
         const { error } = await supabase
           .from("user")
           .delete()
-          .eq("username", username);
+          .eq("id", id);
 
         if (error) {
           Swal.fire({
@@ -110,15 +110,15 @@ const Users = ({ setView, handleEachModal }) => {
         }
 
         setUserData((prev) =>
-          prev.filter((user) => user.username !== username)
+          prev.filter((user) => user.id !== id)
         );
-        if (selectedUser?.username === username) {
+        if (selectedUser?.id === id) {
           closeModal();
         }
 
         showSuccess({
           title: "Berhasil!",
-          text: `Pengguna "${username}" telah dihapus.`,
+          text: `Pengguna "${id}" telah dihapus.`,
         });
       }
     });
@@ -226,7 +226,7 @@ const Users = ({ setView, handleEachModal }) => {
             <Button onClick={closeModal} color="red">
               Batal
             </Button>
-            <Button onClick={() => handleDelete(selectedUser?.username)}>
+            <Button onClick={() => handleDelete(selectedUser?.id)}>
               Hapus Pengguna
             </Button>
           </div>
