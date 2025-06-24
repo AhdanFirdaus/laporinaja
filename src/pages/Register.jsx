@@ -3,7 +3,6 @@ import Input from "../components/Elements/Input";
 import Button from "../components/Elements/Button";
 import InputUpload from "../components/Elements/InputUpload";
 import AuthLayout from "../components/Layouts/AuthLayout";
-import Tesseract from "tesseract.js";
 import supabase from "../../supabaseClient";
 import { parseKtpText } from "../helper/parseKtpParser";
 import { isKecamatanValid } from "../helper/isKecamatanValid";
@@ -213,7 +212,7 @@ function Register() {
 
         showSuccess({
           title: "Berhasil!",
-          text: "Form siap dikirim! Silahkan check email untuk verifikasi",
+          text: "Data telah dikirim! Silahkan check email untuk verifikasi",
           confirmButtonColor: "#52BA5E",
         });
 
