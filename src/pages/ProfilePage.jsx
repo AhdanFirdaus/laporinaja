@@ -4,6 +4,7 @@ import Sidebar from "../components/Fragments/Sidebar";
 import Terms from "../components/Fragments/user/profile/Terms";
 import ComplaintsList from "../components/Fragments/user/profile/ComplaintsList";
 import ReportForm from "../components/Fragments/user/profile/ReportForm";
+import { showSuccess } from "../components/Elements/Alert";
 import {
   FiUser,
   FiShield,
@@ -13,7 +14,7 @@ import {
 } from "react-icons/fi";
 import { useState, useEffect } from "react";
 import supabase from "../../supabaseClient";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import Swal from "sweetalert2";
 
 const menuItems = [
@@ -107,6 +108,18 @@ const ProfilePage = () => {
 
       if (session.user.id === "0340bc90-20c4-40c4-828c-6b89b8924d8d") {
         navigate("/admin");
+      }
+
+      const params = new URLSearchParams(location.search);
+      if (params.get("verified") === "yes") {
+        console.log("success")
+        showSuccess({
+                  title: "Berhasil!",
+                  text: "Email telah terverifikasi!",
+                  confirmButtonColor: "#52BA5E",
+                });
+
+        window.history.replaceState({}, document.title, window.location.pathname);
       }
     };
     checkSession();

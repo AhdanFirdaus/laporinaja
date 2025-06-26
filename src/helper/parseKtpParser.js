@@ -36,10 +36,12 @@ export function parseKtpText(text) {
           result.nama = cleanString(value);
           break;
         case "tempat/tgl lahir":
-          const parts = value.split(" ");
-          const date = parts.pop();
-          result.tanggalLahir = cleanString(date);
-          result.tempatLahir = cleanString(parts.join(" "));
+          const birthMatch = value.match(/([0-9]{2}-[0-9]{2}-[0-9]{4})/);
+          if (birthMatch) {
+            result.tanggalLahir = birthMatch[1];
+          }
+          const tempat = value.replace(/[^a-zA-Z\s]/g, "").replace(/\bGol\b.*$/, "").trim();
+          result.tempatLahir = cleanString(tempat);
           break;
         case "jenis kelamin":
           result.jenisKelamin = cleanString(value.split(" ")[0]);

@@ -3,7 +3,6 @@ import Input from "../components/Elements/Input";
 import Button from "../components/Elements/Button";
 import InputUpload from "../components/Elements/InputUpload";
 import AuthLayout from "../components/Layouts/AuthLayout";
-import Tesseract from "tesseract.js";
 import supabase from "../../supabaseClient";
 import { parseKtpText } from "../helper/parseKtpParser";
 import { isKecamatanValid } from "../helper/isKecamatanValid";
@@ -39,6 +38,15 @@ function Register() {
   const handleClearFile = () => {
     setFormData({ ...formData, photo: null });
   };
+
+  const toBase64 = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (err) => reject(err);
+    reader.readAsDataURL(file);
+  });
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -77,11 +85,42 @@ function Register() {
     const toast = showSend({ title: "Memverifikasi KTP" });
 
     try {
-      const { data } = await Tesseract.recognize(file, "eng+ind", {
-        logger: (m) => {},
-      });
+      const toast = showSend({ title: "Memverifikasi KTP" });
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      if (!apiKey) {
+        throw new Error("VITE_GEMINI_API_KEY is missing in .env");
+      }
 
-      const extractedText = data.text;
+      const base64Image = await toBase64(file); // base64 converter helper (shown below)
+
+      const geminiRes = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    inlineData: {
+                      mimeType: file.type,
+                      data: base64Image.replace(/^data:image\/\w+;base64,/, ""),
+                    },
+                  },
+                  {
+                    text: "Extract the full raw text content from this Indonesian KTP image. Do not explain. Just return all text.",
+                  },
+                ],
+              },
+            ],
+          }),
+        }
+      );
+
+      const geminiJson = await geminiRes.json();
+      const extractedText = geminiJson?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
       const parsedData = parseKtpText(extractedText);
       const valid = isKecamatanValid(parsedData.kecamatan);
 
@@ -124,7 +163,6 @@ function Register() {
 
       if (authData.user) {
         let formated_tanggal = null;
-
         if (parsedData.tanggalLahir) {
           const [day, month, year] = parsedData.tanggalLahir.split("-");
           formated_tanggal = `${year}-${month}-${day}`;
@@ -174,21 +212,23 @@ function Register() {
 
         showSuccess({
           title: "Berhasil!",
-          text: "Form siap dikirim! Silahkan check email untuk verifikasi",
+          text: "Data telah dikirim! Silahkan check email untuk verifikasi",
           confirmButtonColor: "#52BA5E",
         });
+
         navigate("/login");
       }
     } catch (error) {
       showError({
         title: "Gagal",
-        text: "Terjadi kesalahan saat membaca gambar.",
+        text: error.message || "Terjadi kesalahan saat membaca gambar.",
         confirmButtonColor: "#d33",
       });
     } finally {
       setIsLoading(false);
       toast.close();
     }
+
   };
 
   return (

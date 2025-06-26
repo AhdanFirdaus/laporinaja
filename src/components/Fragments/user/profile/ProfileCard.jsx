@@ -65,7 +65,6 @@ const ProfileCard = ({ user, refreshUser }) => {
     if (name.includes("address.")) {
       const addressField = name.split(".")[1];
       if (addressField === "rt" || addressField === "rw") {
-        // Restrict RT and RW to numbers only
         if (value === "" || /^\d*$/.test(value)) {
           setFormData({
             ...formData,
@@ -85,7 +84,6 @@ const ProfileCard = ({ user, refreshUser }) => {
         });
       }
     } else if (name === "nik") {
-      // Restrict NIK to numbers only
       if (/^\d*$/.test(value)) {
         setFormData({ ...formData, [name]: value });
       }
@@ -110,7 +108,6 @@ const ProfileCard = ({ user, refreshUser }) => {
       address: { rt, rw, kelurahan, kecamatan },
     } = formData;
 
-    // Validate RT and RW
     if ((rt || rw) && (!/^\d+$/.test(rt) || !/^\d+$/.test(rw))) {
       showError({
         title: "Gagal",
@@ -253,14 +250,14 @@ const ProfileCard = ({ user, refreshUser }) => {
   return (
     <div className="flex flex-col gap-6 md:gap-8 p-6 md:p-8 bg-white rounded-lg shadow-md">
       <div className="flex flex-col lg:flex-row justify-between items-start md:items-center gap-4 md:gap-6">
-        <div className="flex items-center gap-4 md:gap-6 flex-col md:flex-row mx-auto md:mx-0">
+        <div className="flex items-center gap-4 md:gap-6 flex-col md:flex-row mx-auto md:mx-0 w-full md:w-auto">
           <img
             src={user.avatar}
             alt="Profile"
             className="w-16 h-16 md:w-24 md:h-24 rounded-full md:rounded-md"
           />
-          <div>
-            <p className="text-lg md:text-xl text-center md:text-start font-bold">
+          <div className="flex flex-col items-center md:items-start">
+            <p className="text-lg text-center md:text-xl font-bold">
               {user.fullName}
             </p>
             <p className="text-xs md:text-sm text-gray-500 mt-0.5 md:mt-1">
