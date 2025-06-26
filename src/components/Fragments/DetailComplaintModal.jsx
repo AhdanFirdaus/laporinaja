@@ -1,9 +1,10 @@
 import Modal from "../Elements/Modal";
 import Button from "../Elements/Button";
+import LabelStatus from "../Elements/LabelStatus";
 
 const statusLabels = {
   waiting: "Menunggu",
-  processing: "Diproses",
+  processing: "Proses",
   done: "Selesai",
   reject: "Ditolak",
 };
@@ -44,7 +45,7 @@ const DetailComplaintModal = ({ isOpen, onClose, complaint }) => {
         </p>
         <p className="text-md text-gray-600">
           <span className="font-medium">Status:</span>{" "}
-          <span>{label}</span>
+          <LabelStatus label={label} />
         </p>
         <p className="text-md text-gray-600">
           <span className="font-medium">Tanggal:</span>{" "}
