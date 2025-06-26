@@ -37,7 +37,8 @@ const Dashboard = ({ setView }) => {
     const fetchStats = async () => {
       const { count: userCountData } = await supabase
         .from("user")
-        .select("*", { count: "exact", head: true });
+        .select("*", { count: "exact", head: true })
+        .neq("id", "0340bc90-20c4-40c4-828c-6b89b8924d8d");
 
       const { count: totalKeluhanData } = await supabase
         .from("keluhan")

@@ -17,7 +17,8 @@ const Users = ({ setView, handleEachModal }) => {
       try {
         const { data: users, error: userError } = await supabase
           .from("user")
-          .select("id, username, kecamatan");
+          .select("id, username, kecamatan")
+          .neq("id", "0340bc90-20c4-40c4-828c-6b89b8924d8d");
 
         if (userError) {
           Swal.fire({
