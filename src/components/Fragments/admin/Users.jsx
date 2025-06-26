@@ -24,7 +24,7 @@ const Users = ({ setView, handleEachModal }) => {
             icon: "error",
             title: "Gagal Memuat User",
             text:
-              error?.message || "Terjadi kesalahan saat mengambil data user.",
+              userError?.message || "Terjadi kesalahan saat mengambil data user.",
             timer: 3000,
             showConfirmButton: false,
           });
@@ -40,7 +40,7 @@ const Users = ({ setView, handleEachModal }) => {
             icon: "error",
             title: "Gagal Memuat Laporan",
             text:
-              error?.message ||
+              complaintError?.message ||
               "Terjadi kesalahan saat mengambil data laporan.",
             timer: 3000,
             showConfirmButton: false,
@@ -245,24 +245,28 @@ const Users = ({ setView, handleEachModal }) => {
             <div>
               <p className="font-semibold mb-1">Keluhan:</p>
               <div className="space-y-2">
-                {selectedUser.complaints.map(([id, title]) => (
-                  <div
-                    key={id}
-                    className="flex items-center gap-2 group text-gray-700"
-                  >
-                    <span className="text-base leading-none">•</span>
-                    <span
-                      className="truncate hover:underline cursor-pointer text-sm sm:text-base"
-                      onClick={() => handleEachModal(id)}
+                {selectedUser.complaints.length > 0 ? (
+                  selectedUser.complaints.map(([id, title]) => (
+                    <div
+                      key={id}
+                      className="flex items-center gap-2 group text-gray-700"
                     >
-                      {title}
-                    </span>
-                    <FiArrowRight
-                      size={12}
-                      className="transform transition-transform duration-200 group-hover:-rotate-45"
-                    />
-                  </div>
-                ))}
+                      <span className="text-base leading-none">•</span>
+                      <span
+                        className="truncate hover:underline cursor-pointer text-sm sm:text-base"
+                        onClick={() => handleEachModal(id)}
+                      >
+                        {title}
+                      </span>
+                      <FiArrowRight
+                        size={12}
+                        className="transform transition-transform duration-200 group-hover:-rotate-45"
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <p className="italic text-gray-500">Keluhan Masih Kosong.</p>
+                )}
               </div>
             </div>
           </div>
