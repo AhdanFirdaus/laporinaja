@@ -12,6 +12,7 @@ import checkImageSize from "../helper/checkImageSize";
 
 function Register() {
   const navigate = useNavigate();
+  const [emails, setEmails] = useState([]);
 
   useEffect(() => {
     const checkSession = async () => {
@@ -21,6 +22,17 @@ function Register() {
 
       if (session) {
         navigate("/");
+      }
+
+      const { data, error } = await supabase
+        .from("user")
+        .select("email");
+
+      if (error) {
+        console.error("Error fetching emails:", error.message);
+      } else {
+        const emailList = data.map((user) => user.email);
+        setEmails(emailList);
       }
     };
     checkSession();
@@ -72,6 +84,15 @@ function Register() {
       return;
     }
 
+    if (emails.includes(e.target.email.value)) {
+      showError({
+        title: "Gagal",
+        text: "Akun sudah ada!",
+        confirmButtonColor: "#d33",
+      });
+      return;
+    }
+    
     if (e.target.password.value.length < 6) {
       showError({
         title: "Gagal",
@@ -91,7 +112,7 @@ function Register() {
         throw new Error("VITE_GEMINI_API_KEY is missing in .env");
       }
 
-      const base64Image = await toBase64(file); // base64 converter helper (shown below)
+      const base64Image = await toBase64(file);
 
       const geminiRes = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
