@@ -119,7 +119,6 @@ const ProfilePage = () => {
                   confirmButtonColor: "#52BA5E",
                 });
 
-        // ✅ Remove query from URL after showing toast
         window.history.replaceState({}, document.title, window.location.pathname);
       }
     };
