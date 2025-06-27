@@ -50,7 +50,7 @@ const CardComplaint = ({ complaint, actions = [], className = "" }) => {
                     {action.label}
                   </button>
                   {isDropdownOpen && action.selectOptions && (
-                    <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-md z-50">
+                    <div className="absolute top-full -right-20 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-md z-50">
                       {action.selectOptions.map((option) => (
                         <button
                           key={option.value}
