@@ -7,8 +7,8 @@ import DetailComplaintModal from "../../DetailComplaintModal";
 import supabase from "../../../../../supabaseClient";
 
 const getColor = (keluhan) => {
-  if (keluhan > 15) return "red";
-  if (keluhan > 5) return "orange";
+  if (keluhan >= 5) return "red";
+  if (keluhan >= 2 && keluhan < 5) return "orange";
   return "green";
 };
 
@@ -18,8 +18,9 @@ const ComplaintsList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentSectionPage, setCurrentSectionPage] = useState(1);
   const complaintsPerPage = 6;
-  const [keluhanData, setKeluhanData] = useState({});
+  const [keluhanData, setKeluhanData] = useState([]);
   const [geoData, setGeoData] = useState(null);
+  const [keluhanDataParsed, setKeluhanDataParsed] = useState({});
 
   useEffect(() => {
     const fetchComplaints = async () => {
@@ -58,46 +59,85 @@ const ComplaintsList = () => {
   }, []);
 
   useEffect(() => {
-    fetch("/export.geojson")
-      .then((res) => res.json())
-      .then((data) => setGeoData(data))
-      .catch((err) => {});
-  }, []);
+  // Load GeoJSON once
+  fetch("/export.geojson")
+    .then((res) => res.json())
+    .then((data) => setGeoData(data))
+    .catch((err) => {
+      console.error("Failed to load GeoJSON:", err);
+    });
+}, []);
 
-  useEffect(() => {
-    const fetchKeluhanCountByLocation = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("keluhan")
-          .select("location");
+useEffect(() => {
+  const fetchKeluhanCountByKecamatan = async () => {
+    try {
+      // 1. Fetch data from Supabase
+      const { data, error } = await supabase
+        .from("keluhan")
+        .select("location");
 
-        if (error) {
-          return false;
-        }
-
-        const counts = data.reduce((acc, curr) => {
-          const loc = curr.location;
-          acc[loc] = (acc[loc] || 0) + 1;
-          return acc;
-        }, {});
-
-        setKeluhanData(counts);
-      } catch (err) {
-        Swal.fire({
-          icon: "error",
-          title: "Kesalahan Tak Terduga",
-          text: err?.message || "Terjadi kesalahan yang tidak diketahui.",
-          timer: 3000,
-          showConfirmButton: false,
-        });
+      if (error || !data) {
+        console.error("Error fetching keluhan:", error);
+        return;
       }
-    };
 
-    fetchKeluhanCountByLocation();
-  }, []);
+      // 2. First, extract matchedKecamatan for each item, and count
+      const matchedData = data.map((item) => {
+        const loc = item.location.toLowerCase();
+
+        // Try to extract the kecamatan name from the location
+        const match = loc.match(/semarang\s\w+|pedurungan|mijen|candisari/);
+        const matchedKecamatan = match ? match[0] : "lainnya";
+
+        return {
+          ...item,
+          matchedKecamatan,
+        };
+      });
+
+      // 3. Count by matched kecamatan
+      const countsByKecamatan = matchedData.reduce((acc, curr) => {
+        acc[curr.matchedKecamatan] = (acc[curr.matchedKecamatan] || 0) + 1;
+        return acc;
+      }, {});
+      setKeluhanDataParsed(countsByKecamatan);
+
+      // 4. Map full locations → use kecamatan's count
+      const uniqueLocations = Array.from(new Set(matchedData.map((d) => d.location)));
+
+      const detailedKeluhan = uniqueLocations.map((loc) => {
+        const found = matchedData.find((d) => d.location === loc);
+        const kecamatan = found?.matchedKecamatan || "lainnya";
+        const count = countsByKecamatan[kecamatan] || 0;
+
+        return {
+          location: loc,
+          count,
+        };
+      });
+
+      setKeluhanData(detailedKeluhan);
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Kesalahan Tak Terduga",
+        text: err?.message || "Terjadi kesalahan yang tidak diketahui.",
+        timer: 3000,
+        showConfirmButton: false,
+      });
+    }
+  };
+
+  fetchKeluhanCountByKecamatan();
+}, []);
+
+
+
+
 
   const style = (feature) => ({
-    fillColor: getColor(keluhanData[feature.properties.name]),
+    fillColor: getColor(keluhanDataParsed[feature.properties.name]),
     weight: 1,
     color: "white",
     fillOpacity: 0.8,
@@ -131,13 +171,19 @@ const ComplaintsList = () => {
     setIsModalOpen(false);
   };
 
-  const kecamatanList = Object.entries(keluhanData).map(
-    ([kecamatan, keluhan]) => ({
-      name: kecamatan,
-      keluhan,
-      color: getColor(keluhan),
-    })
-  );
+  const kecamatanList = keluhanData.map((entry) => {
+  const loc = entry.location.toLowerCase();
+
+  // Try matching from known list
+  
+
+  return {
+    name: loc,
+    keluhan: entry.count,
+    color: getColor(entry.count),
+  };
+});
+
 
   const minimKeluhan = kecamatanList.filter((item) => item.color === "green");
   const banyakKeluhan = kecamatanList.filter((item) => item.color !== "green");
