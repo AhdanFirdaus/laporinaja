@@ -59,7 +59,6 @@ const ComplaintsList = () => {
   }, []);
 
   useEffect(() => {
-  // Load GeoJSON once
   fetch("/export.geojson")
     .then((res) => res.json())
     .then((data) => setGeoData(data))
@@ -71,7 +70,7 @@ const ComplaintsList = () => {
 useEffect(() => {
   const fetchKeluhanCountByKecamatan = async () => {
     try {
-      // 1. Fetch data from Supabase
+      
       const { data, error } = await supabase
         .from("keluhan")
         .select("location");
@@ -81,11 +80,11 @@ useEffect(() => {
         return;
       }
 
-      // 2. First, extract matchedKecamatan for each item, and count
+      
       const matchedData = data.map((item) => {
         const loc = item.location.toLowerCase();
 
-        // Try to extract the kecamatan name from the location
+        
         const match = loc.match(/semarang\s\w+|pedurungan|mijen|candisari/);
         const matchedKecamatan = match ? match[0] : "lainnya";
 
@@ -102,7 +101,7 @@ useEffect(() => {
       }, {});
       setKeluhanDataParsed(countsByKecamatan);
 
-      // 4. Map full locations → use kecamatan's count
+      
       const uniqueLocations = Array.from(new Set(matchedData.map((d) => d.location)));
 
       const detailedKeluhan = uniqueLocations.map((loc) => {
@@ -174,7 +173,7 @@ useEffect(() => {
   const kecamatanList = keluhanData.map((entry) => {
   const loc = entry.location.toLowerCase();
 
-  // Try matching from known list
+  
   
 
   return {
