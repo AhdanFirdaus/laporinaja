@@ -100,6 +100,7 @@ useEffect(() => {
         return acc;
       }, {});
       setKeluhanDataParsed(countsByKecamatan);
+      console.log(countsByKecamatan)
 
       
       const uniqueLocations = Array.from(new Set(matchedData.map((d) => d.location)));
@@ -184,8 +185,8 @@ useEffect(() => {
 });
 
 
-  const minimKeluhan = kecamatanList.filter((item) => item.color === "green");
-  const banyakKeluhan = kecamatanList.filter((item) => item.color !== "green");
+  const minimKeluhan = kecamatanList.filter((item) => item.color === "orange");
+  const banyakKeluhan = kecamatanList.filter((item) => item.color === "red");
 
   const totalPages = Math.ceil(complaintHistory.length / complaintsPerPage);
   const indexOfLastComplaint = currentSectionPage * complaintsPerPage;
